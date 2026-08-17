@@ -311,6 +311,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const allCards = document.querySelectorAll('.equipment-card');
 
+    let debounceTimer;
+    function filterEquipmentDebounced() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(filterEquipment, 150);
+    }
+
     function filterEquipment() {
         const searchTerm = searchInput.value.toLowerCase();
         const activeType = typeFilter.value;
@@ -341,17 +347,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
+            // ล้างบิลด์อนิเมชั่นดีเลย์ของบราวเซอร์เพื่อความเร็วสูงสุดขณะพิมพ์
+            if (card._fadeTimeout) {
+                clearTimeout(card._fadeTimeout);
+            }
+
             if (matchesSearch && matchesType && matchesCat && matchesLocation && matchesBorrowable) {
                 card.style.display = 'flex';
-                setTimeout(() => card.style.opacity = '1', 10);
+                card._fadeTimeout = setTimeout(() => {
+                    card.style.opacity = '1';
+                }, 10);
             } else {
                 card.style.opacity = '0';
-                setTimeout(() => card.style.display = 'none', 300);
+                card._fadeTimeout = setTimeout(() => {
+                    card.style.display = 'none';
+                }, 300);
             }
         });
     }
 
-    searchInput.addEventListener('input', filterEquipment);
+    // ดีเลย์การค้นหาชั่วคราวเพื่อรอให้ผู้ใช้พิมพ์เสร็จก่อนค่อยกรอง (Debounce) ป้องกันเว็บหน่วง
+    searchInput.addEventListener('input', filterEquipmentDebounced);
     typeFilter.addEventListener('change', filterEquipment);
     categoryFilter.addEventListener('change', filterEquipment);
     floorRoomFilter.addEventListener('change', filterEquipment);
