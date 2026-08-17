@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}ข้อมูลส่วนตัว — ระบบยืม-คืนครุภัณฑ์{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; margin: 2rem auto; padding: 0 1rem;">
+
+    <!-- Header -->
+    <div style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <h1 style="font-size: 1.8rem; font-weight: 700; background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.25rem;">
+                <i class="fas fa-id-card-clip" style="color: var(--purple-light); margin-right: 8px;"></i> ข้อมูลส่วนตัวของผู้ใช้งาน
+            </h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">จัดการข้อมูลบัญชีผู้ใช้และรูปภาพโปรไฟล์ของคุณ</p>
+        </div>
+        <a href="{{ url_for('user.dashboard') }}" class="btn btn-sm" style="background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-secondary);">
+            <i class="fas fa-arrow-left"></i> กลับไปหน้าแดชบอร์ด
+        </a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 300px 1fr; gap: 1.5rem;">
+
+        <!-- คอลัมน์ซ้าย: รูปโปรไฟล์ + สถิติ -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- การ์ดโปรไฟล์ -->
+            <div style="background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 2rem 1.5rem; text-align: center; box-shadow: var(--shadow);">
+                <form id="profileImgForm" method="POST" action="{{ url_for('user.profile') }}" enctype="multipart/form-data">
+                    <div style="position: relative; width: 130px; height: 130px; margin: 0 auto 1.25rem;">
+                        {% if current_user.profile_image %}
+                        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_image) }}" alt="Avatar" style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 3px solid var(--purple-light); box-shadow: var(--glow-purple);">
+                        {% else %}
+                        <div style="width: 130px; height: 130px; border-radius: 50%; background: var(--gradient-main); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; color: white; border: 3px solid var(--glass-border); box-shadow: var(--shadow);">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        {% endif %}
+
+                        <!-- ปุ่มกล้องสำหรับเปลี่ยนรูป -->
+                        <label for="profile_image" style="position: absolute; bottom: 5px; right: 5px; background: var(--gradient-btn); color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); border: 2px solid var(--bg-card-solid); transition: var(--transition);" title="เปลี่ยนรูปโปรไฟล์">
+                            <i class="fas fa-camera"></i>
+                        </label>
+                        <input type="file" id="profile_image" name="profile_image" accept="image/*" style="display: none;" onchange="document.getElementById('profileImgForm').submit();">
+                    </div>
+                </form>
+
+                <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.25rem;">{{ current_user.full_name }}</h2>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">{{ current_user.email }}</p>
+
+                <span class="badge badge-{{ 'admin' if current_user.is_admin() else 'user' }}" style="font-size: 0.8rem; padding: 4px 14px;">
+                    <i class="fas {{ 'fa-shield-halved' if current_user.is_admin() else 'fa-user-graduate' }}" style="margin-right: 4px;"></i>
+                    {{ 'ผู้ดูแลระบบ (Admin)' if current_user.is_admin() else 'ผู้ใช้งานทั่วไป (User)' }}
+                </span>
+            </div>
+
+            <!-- การ์ดสรุปสถิติ -->
+            <div style="background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow);">
+                <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-chart-pie" style="color: var(--pink);"></i> สถิติการใช้งาน
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 0.875rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--bg-surface); border-radius: var(--radius-sm); border: 1px solid var(--glass-border);">
+                        <span style="color: var(--text-muted); font-size: 0.875rem;">รายการยืมทั้งหมด</span>
+                        <span style="font-weight: 700; color: var(--purple-light); font-size: 1.1rem;">{{ total_borrowed }} ครั้ง</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: var(--bg-surface); border-radius: var(--radius-sm); border: 1px solid var(--glass-border);">
+                        <span style="color: var(--text-muted); font-size: 0.875rem;">กำลังถือครองอยู่</span>
+                        <span style="font-weight: 700; color: var(--pink); font-size: 1.1rem;">{{ active_borrows }} รายการ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- คอลัมน์ขวา: ฟอร์มแก้ไขข้อมูล -->
+        <div style="background: var(--bg-card); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow);">
+            <form method="POST" action="{{ url_for('user.profile') }}" enctype="multipart/form-data">
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.25rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-user-pen" style="color: var(--purple-light);"></i> แก้ไขข้อมูลส่วนตัว
+                </h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+                    <div class="form-group">
+                        <label for="full_name"><i class="fas fa-id-card"></i> ชื่อ-นามสกุล (ภาษาไทย)</label>
+                        <input type="text" id="full_name" name="full_name" value="{{ current_user.full_name }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> อีเมล (.ac.th)</label>
+                        <input type="email" id="email" name="email" value="{{ current_user.email }}" required>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); margin-top: 2rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.75rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-key" style="color: var(--pink);"></i> เปลี่ยนรหัสผ่าน (หากไม่ต้องการเปลี่ยนให้เว้นว่างไว้)
+                </h3>
+
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                    <label for="old_password"><i class="fas fa-lock"></i> รหัสผ่านปัจจุบัน</label>
+                    <input type="password" id="old_password" name="old_password" placeholder="กรอกรหัสผ่านปัจจุบัน">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 2rem;">
+                    <div class="form-group">
+                        <label for="new_password"><i class="fas fa-lock"></i> รหัสผ่านใหม่</label>
+                        <input type="password" id="new_password" name="new_password" placeholder="อย่างน้อย 8 ตัวอักษร">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password"><i class="fas fa-lock"></i> ยืนยันรหัสผ่านใหม่</label>
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="กรอกรหัสผ่านใหม่อีกครั้ง">
+                    </div>
+                </div>
+
+                <div style="text-align: right;">
+                    <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">
+                        <i class="fas fa-save"></i> บันทึกการเปลี่ยนแปลง
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

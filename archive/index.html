@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATCC - Equipment System</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar container">
+        <div class="nav-brand">
+            <i class="fa-solid fa-rocket brand-icon"></i>
+            <span>ATCC</span>
+        </div>
+        <div class="nav-links">
+            <a href="#" class="active">หน้าแรก</a>
+            <a href="#equipment-grid">คลังอุปกรณ์</a>
+            <a href="#borrow-section">ยืม-คืน</a>
+        </div>
+        <div class="nav-action">
+            <a href="#borrow-section" class="btn btn-nav">เริ่มต้นใช้งาน</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero container">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="text-pink">ค้นหา.</span> 
+                <span class="text-orange">ยืม.</span> 
+                <span class="text-blue">ใช้งาน.</span>
+            </h1>
+            <p class="hero-subtitle">ยกระดับการทำงานและการเรียนรู้ของคุณ ด้วยระบบยืม-คืนอุปกรณ์ที่ทันสมัยและรวดเร็วที่สุด</p>
+            <div class="hero-buttons">
+                <a href="#borrow-section" class="btn btn-gradient">ยืมอุปกรณ์เลย</a>
+                <a href="#equipment-grid" class="btn btn-outline">ดูอุปกรณ์ทั้งหมด</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container grid-layout" id="borrow-section">
+        <!-- Equipment List Section -->
+        <section class="card equipment-section">
+            <div class="section-header">
+                <h2>คลังอุปกรณ์ของเรา</h2>
+                <p>อุปกรณ์ที่พร้อมให้บริการ</p>
+            </div>
+            <div class="equipment-grid" id="equipment-grid">
+                <!-- Equipment items will be loaded here via JS -->
+            </div>
+        </section>
+
+        <!-- Borrow Form Section -->
+        <section class="card borrow-section">
+            <div class="section-header">
+                <h2>ทำรายการยืม</h2>
+                <p>กรอกข้อมูลเพื่อเบิกอุปกรณ์</p>
+            </div>
+            <form id="borrow-form">
+                <div class="form-group">
+                    <label for="borrower-name">ชื่อผู้ยืม / รหัสนักศึกษา</label>
+                    <input type="text" id="borrower-name" required placeholder="เช่น นายสมชาย ใจดี">
+                </div>
+                <div class="form-group">
+                    <label for="equipment-select">เลือกอุปกรณ์ที่ต้องการ</label>
+                    <select id="equipment-select" required>
+                        <option value="">-- กรุณาเลือกอุปกรณ์ --</option>
+                        <!-- Options loaded via JS -->
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-gradient w-100"><i class="fa-solid fa-paper-plane"></i> ยืนยันการยืม</button>
+            </form>
+            <div id="borrow-message" class="message"></div>
+        </section>
+
+        <!-- Transactions Section -->
+        <section class="card transactions-section">
+            <div class="section-header">
+                <h2>ประวัติการทำรายการ</h2>
+                <p>สถานะการยืม-คืนล่าสุด</p>
+            </div>
+            <div class="table-responsive">
+                <table id="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>รหัส</th>
+                            <th>อุปกรณ์</th>
+                            <th>ผู้ยืม</th>
+                            <th>วันที่ยืม</th>
+                            <th>สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactions-body">
+                        <!-- Transactions loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Popup for Equipment Details -->
+    <div id="equipment-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div class="modal-body">
+                <img id="modal-image" src="" alt="Equipment Image" class="modal-img">
+                <div class="modal-info">
+                    <h2 id="modal-title" class="gradient-text"></h2>
+                    <p id="modal-desc" class="modal-desc-text"></p>
+                    <div class="modal-status">
+                        <span id="modal-badge" class="badge"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

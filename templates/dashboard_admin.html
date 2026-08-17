@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+{% block title %}แดชบอร์ดผู้ดูแลระบบ — ระบบยืม-คืนครุภัณฑ์{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <!-- หัวข้อหน้า -->
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
+        <div>
+            <h1 class="text-gradient" style="margin-bottom: 0.5rem;"><i class="fas fa-tachometer-alt"></i> แดชบอร์ดผู้ดูแลระบบ</h1>
+            <p style="color: var(--text-muted);">ภาพรวมครุภัณฑ์ อนุมัติคำขอ และจัดการสถานะการซ่อมบำรุง</p>
+        </div>
+        <div>
+            <a href="{{ url_for('admin.manage_locations') }}" class="btn btn-info btn-sm" style="margin-right: 10px;">
+                <i class="fas fa-map-marker-alt"></i> จัดการอาคาร/ห้อง
+            </a>
+            <a href="{{ url_for('admin.add_equipment') }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> เพิ่มอุปกรณ์ใหม่
+            </a>
+        </div>
+    </div>
+
+    <!-- การ์ดสถิติ -->
+    <div class="stats-grid">
+        <div class="stat-card stat-total">
+            <div class="stat-icon"><i class="fas fa-boxes"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ stats.total_equipment }}</span>
+                <span class="stat-label">อุปกรณ์ทั้งหมด</span>
+            </div>
+        </div>
+        <div class="stat-card stat-available">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ stats.available }}</span>
+                <span class="stat-label">ว่างพร้อมยืม</span>
+            </div>
+        </div>
+        <div class="stat-card stat-borrowed">
+            <div class="stat-icon"><i class="fas fa-hand-holding"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ stats.borrowed }}</span>
+                <span class="stat-label">ถูกยืมไปแล้ว</span>
+            </div>
+        </div>
+        <div class="stat-card stat-pending">
+            <div class="stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ stats.pending_requests }}</span>
+                <span class="stat-label">รออนุมัติ</span>
+            </div>
+        </div>
+        {% if stats.overdue_count > 0 %}
+        <div class="stat-card" style="background: linear-gradient(135deg, rgba(239,68,68,0.3), rgba(239,68,68,0.1)); border: 1px solid rgba(239,68,68,0.5);">
+            <div class="stat-icon" style="color: #ef4444;"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="stat-info">
+                <span class="stat-number" style="color: #ef4444;">{{ stats.overdue_count }}</span>
+                <span class="stat-label" style="color: #fca5a5;">เกินกำหนดคืน</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ตารางคำขอยืม-คืน -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fas fa-clipboard-list"></i> คำขอยืม-คืนล่าสุด</h2>
+        </div>
+        <div class="card-body">
+            {% if requests %}
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ผู้ยื่นคำขอ</th>
+                            <th>อุปกรณ์</th>
+                            <th>ประเภท</th>
+                            <th>วันที่ยืม</th>
+                            <th>กำหนดคืน</th>
+                            <th>สถานะ</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in requests %}
+                        <tr class="fade-in">
+                            <td>{{ req.id }}</td>
+                            <td>
+                                <div class="user-cell">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>{{ req.requester.full_name }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    {% if req.equipment.image_filename %}
+                                    <img src="{{ url_for('static', filename='uploads/' + req.equipment.image_filename) }}" class="eq-table-img">
+                                    {% else %}
+                                    <div class="eq-table-img" style="background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;"><i class="fas fa-image" style="color: var(--text-muted);"></i></div>
+                                    {% endif %}
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--text-primary);">{{ req.equipment.name }}</div>
+                                        <div class="code-badge" style="display: inline-block; margin-top: 4px;">{{ req.equipment.equipment_code }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if req.equipment.item_type == 'consumable' %}
+                                <span style="background: #f59e0b; color: #000; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">วัสดุ x{{ req.quantity }}</span>
+                                {% else %}
+                                <span style="background: #10b981; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">ครุภัณฑ์ ({{ req.borrow_days or 3 }} วัน)</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ req.borrow_datetime.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                {% if req.return_due_datetime %}
+                                    {% if req.is_overdue() and req.status not in ['returned', 'rejected'] %}
+                                    <span style="color: #ff4d4d; font-weight: bold;">⏰ {{ req.return_due_datetime.strftime('%d/%m/%Y') }}</span>
+                                    {% else %}
+                                    {{ req.return_due_datetime.strftime('%d/%m/%Y') }}
+                                    {% endif %}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="status-badge status-{{ req.status }}">
+                                    {% if req.status == 'pending' %}⏳ รออนุมัติ
+                                    {% elif req.status == 'approved' %}
+                                        {% if req.is_overdue() %}🔴 เกินกำหนด!
+                                        {% else %}✅ กำลังยืม{% endif %}
+                                    {% elif req.status == 'return_pending' %}
+                                        ⚠️ รอรับคืน
+                                        {% if req.damage_status == 'damaged' %}
+                                        <div style="font-size: 0.7rem; color: #ff6b6b; margin-top: 3px;">🔧 ชำรุด: {{ req.damage_note }}</div>
+                                        {% endif %}
+                                        {% if req.return_image_filename %}
+                                        <div style="margin-top: 5px;">
+                                            <a href="{{ url_for('static', filename='uploads/' + req.return_image_filename) }}" target="_blank" style="color: #60a5fa; font-size: 0.75rem; text-decoration: underline;">
+                                                <i class="fas fa-image"></i> ดูรูปสภาพส่งคืน
+                                            </a>
+                                        </div>
+                                        {% endif %}
+                                    {% elif req.status == 'returned' %}
+                                        📦 คืนแล้ว
+                                        {% if req.damage_status == 'damaged' %}
+                                        <div style="font-size: 0.7rem; color: #ff6b6b; margin-top: 3px;">🔧 ชำรุด: {{ req.damage_note }}</div>
+                                        {% endif %}
+                                        {% if req.return_image_filename %}
+                                        <div style="margin-top: 5px;">
+                                            <a href="{{ url_for('static', filename='uploads/' + req.return_image_filename) }}" target="_blank" style="color: #60a5fa; font-size: 0.75rem; text-decoration: underline;">
+                                                <i class="fas fa-image"></i> ดูรูปสภาพส่งคืน
+                                            </a>
+                                        </div>
+                                        {% endif %}
+                                    {% elif req.status == 'rejected' %}❌ ปฏิเสธ
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% if req.status == 'pending' %}
+                                <div class="action-btns">
+                                    <form method="POST" action="{{ url_for('admin.approve_borrow', req_id=req.id) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-success" title="อนุมัติ">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('admin.reject_borrow', req_id=req.id) }}" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="ปฏิเสธ">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                {% elif req.status == 'approved' %}
+                                <form method="POST" action="{{ url_for('admin.send_warning', req_id=req.id) }}" style="display:flex; gap: 5px; margin-top: 5px; flex-direction: column;">
+                                    <input type="text" name="warning_message" placeholder="พิมพ์ข้อความเตือน..." class="purpose-input" style="padding: 5px; font-size: 0.8rem;" required>
+                                    <button type="submit" class="btn btn-sm btn-warning" title="ส่งแจ้งเตือน">
+                                        <i class="fas fa-bell"></i> ส่งแจ้งเตือน
+                                    </button>
+                                </form>
+                                {% elif req.status == 'return_pending' %}
+                                <form method="POST" action="{{ url_for('admin.approve_return', req_id=req.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-success" title="ยืนยันรับคืนเข้าคลัง" style="margin-top: 5px;">
+                                        <i class="fas fa-box-open"></i> รับของคืน
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="text-muted">—</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>ยังไม่มีคำขอยืม-คืนในระบบ</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ตารางแจ้งซ่อม -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fas fa-tools"></i> รายการแจ้งซ่อมอุปกรณ์</h2>
+        </div>
+        <div class="card-body">
+            {% if repair_requests %}
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>ผู้แจ้งซ่อม</th>
+                            <th>อุปกรณ์</th>
+                            <th>รายละเอียดปัญหา</th>
+                            <th>วันที่แจ้งซ่อม</th>
+                            <th>สถานะ</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in repair_requests %}
+                        <tr class="fade-in">
+                            <td>{{ req.id }}</td>
+                            <td>
+                                <div class="user-cell">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>{{ req.reporter.full_name }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    {% if req.equipment.image_filename %}
+                                    <img src="{{ url_for('static', filename='uploads/' + req.equipment.image_filename) }}" class="eq-table-img">
+                                    {% else %}
+                                    <div class="eq-table-img" style="background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;"><i class="fas fa-image" style="color: var(--text-muted);"></i></div>
+                                    {% endif %}
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--text-primary);">{{ req.equipment.name }}</div>
+                                        <div class="code-badge" style="display: inline-block; margin-top: 4px;">{{ req.equipment.equipment_code }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ req.issue_description }}</td>
+                            <td>{{ req.reported_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                <span class="status-badge status-{{ req.status }}">
+                                    {% if req.status == 'pending' %}⏳ รอดำเนินการ
+                                    {% elif req.status == 'in_progress' %}🔧 กำลังดำเนินการซ่อม
+                                    {% elif req.status == 'completed' %}✅ ซ่อมเสร็จสิ้น
+                                    {% else %}{{ req.status }}{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% if req.status != 'completed' %}
+                                <form method="POST" action="{{ url_for('admin.update_repair', repair_id=req.id) }}" style="display:flex; gap: 5px; flex-direction: column;">
+                                    <select name="status" class="purpose-input" style="padding: 5px; font-size: 0.85rem; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;">
+                                        <option value="in_progress" {% if req.status == 'in_progress' %}selected{% endif %} style="color: black;">🔧 กำลังซ่อม</option>
+                                        <option value="completed" style="color: black;">✅ ซ่อมเสร็จสิ้น</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-primary">อัปเดต</button>
+                                </form>
+                                {% else %}
+                                <span class="text-muted"><i class="fas fa-check"></i> ซ่อมแล้ว</span>
+                                <div style="font-size: 0.75rem; color: #a78bfa;">{{ req.resolved_at.strftime('%d/%m/%Y %H:%M') if req.resolved_at else '' }}</div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-check-circle"></i>
+                <p>ไม่มีรายการแจ้งซ่อมในระบบ</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ตารางครุภัณฑ์ทั้งหมด -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fas fa-microscope"></i> รายการอุปกรณ์ทั้งหมด</h2>
+            <a href="{{ url_for('admin.add_equipment') }}" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> เพิ่มอุปกรณ์ใหม่
+            </a>
+        </div>
+        <div class="card-body">
+            {% if equipment %}
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>รูปภาพ</th>
+                            <th>รหัส</th>
+                            <th>ชื่ออุปกรณ์</th>
+                            <th>จำนวนว่าง/ทั้งหมด</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for eq in equipment %}
+                        <tr class="fade-in">
+                            <td>
+                                {% if eq.image_filename %}
+                                <img src="{{ url_for('static', filename='uploads/' + eq.image_filename) }}" class="eq-table-img">
+                                {% else %}
+                                <div class="eq-table-img" style="background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;"><i class="fas fa-image" style="color: var(--text-muted);"></i></div>
+                                {% endif %}
+                            </td>
+                            <td><span class="code-badge">{{ eq.equipment_code }}</span></td>
+                            <td><strong>{{ eq.name }}</strong></td>
+                            <td>
+                                <span class="status-badge status-{{ 'available' if eq.available_quantity > 0 else 'borrowed' }}">
+                                    {{ eq.available_quantity }} / {{ eq.total_quantity }}
+                                </span>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 8px;">
+                                    <a href="{{ url_for('admin.edit_equipment', eq_id=eq.id) }}" class="btn btn-sm btn-info" style="border-radius: 8px;">
+                                        <i class="fas fa-edit"></i> แก้ไข
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <p>ยังไม่มีอุปกรณ์ในระบบ</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

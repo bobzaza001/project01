@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}เกิดข้อผิดพลาดของระบบ (500) — ระบบยืม-คืนครุภัณฑ์{% endblock %}
+{% block content %}
+<div class="auth-wrapper" style="min-height: 70vh; display: flex; align-items: center; justify-content: center;">
+    <div class="auth-card" style="text-align: center; max-width: 500px; padding: 3rem 2rem;">
+        <div style="font-size: 5rem; color: #ef4444; margin-bottom: 1.5rem; text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);">
+            <i class="fas fa-exclamation-triangle"></i> 500
+        </div>
+        <h1 style="font-size: 1.8rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">เกิดข้อผิดพลาดภายในระบบ</h1>
+        <p style="color: var(--text-muted); margin-bottom: 2rem; line-height: 1.6;">
+            ขออภัยในความไม่สะดวก เกิดข้อผิดพลาดของเซิร์ฟเวอร์ในการประมวลผลคำขอของคุณ ทีมงานผู้พัฒนาได้รับการแจ้งเตือนแล้ว
+        </p>
+        <a href="/" class="btn btn-primary btn-full" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fas fa-home"></i> กลับสู่หน้าหลัก
+        </a>
+    </div>
+</div>
+{% endblock %}

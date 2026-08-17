@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'แก้ไขห้อง' if room else 'เพิ่มห้องใหม่' }} — ระบบยืม-คืนครุภัณฑ์{% endblock %}
+
+{% block content %}
+<div class="admin-form-wrapper fade-in" style="max-width: 600px; margin: 2rem auto;">
+    <div class="admin-form-card" style="padding: 2rem; border-radius: 20px; background: rgba(30, 27, 75, 0.6); border: 1px solid rgba(255,255,255,0.1);">
+        
+        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+            <a href="{{ url_for('admin.manage_building_detail', b_id=floor.building_id) }}" class="btn btn-secondary btn-sm" style="margin-right: 15px;">
+                <i class="fas fa-arrow-left"></i> กลับ
+            </a>
+            <h1 style="margin: 0; font-size: 1.5rem;"><i class="fas {{ 'fa-edit' if room else 'fa-door-open' }}"></i> {{ 'แก้ไขชื่อห้อง' if room else 'เพิ่มห้องใหม่' }}</h1>
+        </div>
+        <p style="color: #a78bfa; margin-bottom: 2rem; margin-left: 55px;"><i class="fas fa-map-marker-alt"></i> อาคาร: {{ floor.building.name }} > ชั้น: {{ floor.name }}</p>
+        
+        <form method="POST" action="{{ url_for('admin.edit_room', r_id=room.id) if room else url_for('admin.add_room', f_id=floor.id) }}" class="auth-form">
+            <div class="form-group">
+                <label>ชื่อห้อง หรือหมายเลขห้อง</label>
+                <input type="text" name="name" required class="purpose-input" placeholder="เช่น 231, ห้องประชุม A" value="{{ room.name if room else '' }}">
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <button type="submit" class="btn btn-{{ 'warning' if room else 'primary' }} btn-full">
+                    <i class="fas fa-save"></i> บันทึกข้อมูล
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

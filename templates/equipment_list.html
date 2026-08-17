@@ -1,0 +1,396 @@
+{% extends 'base.html' %}
+{% block title %}คลังอุปกรณ์ของเรา — ระบบยืม-คืนครุภัณฑ์{% endblock %}
+{% block content %}
+<!-- Add Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+
+<!-- หน้าคลังอุปกรณ์ (Equipment Gallery) -->
+<div class="equipment-page">
+    <!-- Back Button -->
+    <div style="margin-bottom: 1.25rem; display: flex; justify-content: flex-start;" class="fade-in">
+        <a href="{{ url_for('admin.dashboard') if current_user.is_admin() else url_for('user.dashboard') }}" class="btn btn-secondary btn-sm" style="border-radius: 50px; padding: 0.5rem 1.25rem; font-weight: 600;">
+            <i class="fas fa-arrow-left"></i> กลับสู่หน้าหลัก
+        </a>
+    </div>
+
+    <div class="equipment-page-header fade-in">
+        <h1 style="font-size: 2.5rem; color: var(--text-primary);">คลังอุปกรณ์ของเรา</h1>
+        <p style="color: #a78bfa; font-size: 1.1rem; margin-top: 0.5rem;">อุปกรณ์ที่พร้อมให้บริการสำหรับการยืม-คืน</p>
+    </div>
+
+    <!-- แถบค้นหาและตัวกรอง -->
+    <div class="filter-container fade-in" style="margin-bottom: 2rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+        
+        <!-- แถบค้นหา -->
+        <div style="width: 100%; max-width: 800px;">
+            <input type="text" id="searchInput" placeholder="🔍 ค้นหาชื่ออุปกรณ์ หรือ เลขห้อง..." style="width: 100%; padding: 1rem 1.5rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.1); color: white; outline: none; font-size: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;">
+        </div>
+
+        <!-- แถบตัวกรอง (Dropdowns) -->
+        <div style="display: flex; gap: 10px; width: 100%; max-width: 800px; flex-wrap: wrap;">
+            
+            <!-- ประเภท -->
+            <select id="typeFilter" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(30, 27, 75, 0.8); color: white; outline: none; cursor: pointer; font-size: 0.95rem;">
+                <option value="all">📦 ทุกประเภท</option>
+                <option value="durable">🔄 ครุภัณฑ์ (ยืม-คืน)</option>
+                <option value="consumable">📝 วัสดุสิ้นเปลือง</option>
+            </select>
+
+            <!-- ชั้น/ห้อง -->
+            <select id="floorRoomFilter" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(30, 27, 75, 0.8); color: white; outline: none; cursor: pointer; font-size: 0.95rem;">
+                <option value="all">🏢 ทุกชั้น / ทุกห้อง</option>
+                {% for b in buildings %}
+                    <optgroup label="อาคาร: {{ b.name }}" style="color: black;">
+                    {% for f in b.floors %}
+                        <option value="floor-{{ f.id }}">🏢 เลือกทั้งชั้น: {{ f.name }}</option>
+                        {% for r in f.rooms %}
+                            <option value="room-{{ r.id }}">-- ห้อง {{ r.name }}</option>
+                        {% endfor %}
+                    {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+
+            <!-- หมวดหมู่ -->
+            <select id="categoryFilter" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(30, 27, 75, 0.8); color: white; outline: none; cursor: pointer; font-size: 0.95rem;">
+                <option value="all">🏷️ ทุกหมวดหมู่</option>
+                <option value="ไอทีและคอมพิวเตอร์">🖥️ ไอทีและคอมพิวเตอร์</option>
+                <option value="เฟอร์นิเจอร์">🪑 เฟอร์นิเจอร์</option>
+                <option value="เครื่องใช้ไฟฟ้า">⚡ เครื่องใช้ไฟฟ้า</option>
+                <option value="โสตทัศนูปกรณ์">🎥 โสตทัศนูปกรณ์</option>
+                <option value="ทั่วไป">📦 ทั่วไป</option>
+            </select>
+            
+            <select id="borrowableFilter" class="filter-dropdown" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(30, 27, 75, 0.8); color: white; outline: none; cursor: pointer; font-size: 0.95rem;">
+                <option value="all">🔄 ประเภทการใช้งาน (ทั้งหมด)</option>
+                <option value="true">🎒 พกพา/ยืมกลับได้</option>
+                <option value="false">🏢 ประจำห้อง/ยืมไม่ได้</option>
+            </select>
+
+        </div>
+    </div>
+
+    <!-- Grid -->
+    <div class="equipment-grid" id="equipmentGrid">
+        {% for eq in equipment %}
+        <div class="equipment-card reveal-card" data-category="{{ eq.category }}" data-item-type="{{ eq.item_type }}" data-floor-id="{{ eq.room.floor_id if eq.room else '' }}" data-room-id="{{ eq.room_id or '' }}" data-borrowable="{{ 'true' if eq.is_borrowable else 'false' }}">
+            
+            <!-- รูปภาพ -->
+            <div class="eq-image-wrapper">
+                {% if eq.image_filename %}
+                <img src="{{ url_for('static', filename='uploads/' + eq.image_filename) }}" alt="{{ eq.name }}" class="eq-img">
+                {% else %}
+                <div class="eq-image-placeholder">
+                    <div class="placeholder-icon-circle">
+                        <i class="fas fa-box-open"></i>
+                    </div>
+                    <span>ไม่มีรูปภาพ</span>
+                </div>
+                {% endif %}
+                
+                <!-- Badge ประเภทการใช้งาน -->
+                <div class="eq-type-badge {{ 'type-consumable' if eq.item_type == 'consumable' else 'type-durable' }}">
+                    {% if eq.item_type == 'consumable' %}
+                    <i class="fas fa-tags"></i> วัสดุสิ้นเปลือง
+                    {% else %}
+                    <i class="fas fa-microchip"></i> ครุภัณฑ์ (ยืม-คืน)
+                    {% endif %}
+                </div>
+
+                <!-- Badge ยืมพกพา / ประจำห้อง -->
+                {% if eq.item_type == 'durable' %}
+                <div class="eq-location-badge {{ 'borrowable' if eq.is_borrowable else 'room-only' }}">
+                    {% if eq.is_borrowable %}
+                    <i class="fas fa-walking"></i> พกพาได้
+                    {% else %}
+                    <i class="fas fa-door-closed"></i> ประจำห้อง
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="eq-card-body">
+                <!-- หมวดหมู่ & สถานที่ -->
+                <div class="eq-meta-row">
+                    <span class="eq-category-tag"><i class="fas fa-tag"></i> {{ eq.category }}</span>
+                    {% if eq.room %}
+                    <span class="eq-room-tag" title="{{ eq.room.floor.building.name }} > ชั้น {{ eq.room.floor.name }} > ห้อง {{ eq.room.name }}">
+                        <i class="fas fa-location-dot"></i> ห้อง {{ eq.room.name }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <h3 class="eq-name" title="{{ eq.name }}">{{ eq.name }}</h3>
+                <p class="eq-code"><i class="fas fa-barcode"></i> {{ eq.equipment_code }}</p>
+                <p class="eq-desc">{{ eq.description or 'ไม่มีรายละเอียดเพิ่มเติม' }}</p>
+                
+                <div class="eq-card-footer">
+                    <!-- Badge จำนวนคงเหลือ -->
+                    {% set badge_class = 'available' if eq.available_quantity > 0 else 'unavailable' %}
+                    <div class="eq-availability {{ badge_class }}">
+                        <i class="fas {{ 'fa-check-circle' if eq.available_quantity > 0 else 'fa-times-circle' }}"></i>
+                        <span>คงเหลือ <strong>{{ eq.available_quantity }}</strong> / {{ eq.total_quantity }}</span>
+                    </div>
+                    
+                    <!-- ปุ่มการทำงาน -->
+                    <div class="eq-actions-group">
+                        {% if current_user.role == 'user' %}
+                            {% if current_user.is_student() %}
+                                {# === นักเรียน: ทำได้แค่แจ้งซ่อมครุภัณฑ์ === #}
+                                {% if eq.item_type == 'durable' %}
+                                    {% if eq.status == 'maintenance' %}
+                                        <button class="btn-eq btn-disabled" disabled style="width: 100%;"><i class="fas fa-wrench"></i> กำลังซ่อมบำรุง</button>
+                                    {% else %}
+                                        <button type="button" class="btn-eq btn-repair-action" onclick="openRepairModal({{ eq.id }}, '{{ eq.name }}')" style="width: 100%;">
+                                            <i class="fas fa-triangle-exclamation"></i> แจ้งซ่อมอุปกรณ์ชำรุด
+                                        </button>
+                                    {% endif %}
+                                {% else %}
+                                    <span style="color: var(--text-muted); font-size: 0.85rem; padding: 0.5rem;"><i class="fas fa-info-circle"></i> เฉพาะอาจารย์ที่เบิกได้</span>
+                                {% endif %}
+                            {% else %}
+                                {# === อาจารย์/ผู้ใช้ทั่วไป: ยืม คืน ส่งซ่อม และแจ้งข้อมูลต่างๆ ได้ === #}
+                                {% if eq.status == 'maintenance' %}
+                                    <button class="btn-eq btn-disabled" disabled><i class="fas fa-wrench"></i> กำลังซ่อมบำรุง</button>
+                                {% elif eq.available_quantity > 0 %}
+                                    {% if eq.item_type == 'durable' %}
+                                        <div class="btn-dual-group">
+                                            {% if eq.is_borrowable %}
+                                            <button type="button" class="btn-eq btn-borrow-action" onclick="openBorrowModal({{ eq.id }}, '{{ eq.name }}')">
+                                                <i class="fas fa-hand-holding-hand"></i> ยืมอุปกรณ์
+                                            </button>
+                                            {% endif %}
+                                            <button type="button" class="btn-eq btn-repair-action" onclick="openRepairModal({{ eq.id }}, '{{ eq.name }}')">
+                                                <i class="fas fa-triangle-exclamation"></i> แจ้งซ่อม
+                                            </button>
+                                        </div>
+                                    {% else %}
+                                    <button type="button" class="btn-eq btn-consumable-action" onclick="openConsumableModal({{ eq.id }}, '{{ eq.name }}', {{ eq.available_quantity }})">
+                                        <i class="fas fa-box-tissue"></i> เบิกวัสดุ
+                                    </button>
+                                    {% endif %}
+                                {% else %}
+                                    <button class="btn-eq btn-disabled" disabled><i class="fas fa-ban"></i> ไม่พร้อมให้บริการ</button>
+                                    {% if eq.item_type == 'durable' %}
+                                    <button type="button" class="btn-eq btn-repair-action" onclick="openRepairModal({{ eq.id }}, '{{ eq.name }}')">
+                                        <i class="fas fa-triangle-exclamation"></i> แจ้งซ่อม
+                                    </button>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+
+                        {% if current_user.is_admin() %}
+                        <a href="{{ url_for('admin.edit_equipment', eq_id=eq.id) }}" class="btn-eq btn-admin-edit">
+                            <i class="fas fa-pen-to-square"></i> แก้ไขข้อมูล
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Borrow Modal -->
+<div id="borrowModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6);">
+    <div class="modal-content fade-in" style="background: linear-gradient(145deg, #1e1b4b, #312e81); margin: 10% auto; padding: 2rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 400px; color: white; position: relative;">
+        <span class="close-modal" onclick="closeBorrowModal()" style="color: #aaa; position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        <h2 style="margin-bottom: 1rem;"><i class="fas fa-hand-holding" style="color: #8b5cf6;"></i> ยืมอุปกรณ์</h2>
+        <p id="borrowItemName" style="color: #a78bfa; margin-bottom: 1.5rem;"></p>
+        <form id="borrowForm" method="POST">
+            <div style="margin-bottom: 1.25rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">วันที่และเวลาที่ยืม:</label>
+                <input type="text" name="borrow_datetime" required class="purpose-input thai-datepicker" placeholder="📅 เลือกวัน/เวลา">
+            </div>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">จำนวนวันที่ต้องการยืม (วัน):</label>
+                <input type="number" name="borrow_days" value="3" min="1" max="30" class="purpose-input">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">ยืนยันการยืม</button>
+        </form>
+    </div>
+</div>
+
+<!-- Consumable Modal -->
+<div id="consumableModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6);">
+    <div class="modal-content fade-in" style="background: linear-gradient(145deg, #1e1b4b, #312e81); margin: 10% auto; padding: 2rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 400px; color: white; position: relative;">
+        <span class="close-modal" onclick="closeConsumableModal()" style="color: #aaa; position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        <h2 style="margin-bottom: 1rem;"><i class="fas fa-box-open" style="color: #f59e0b;"></i> เบิกวัสดุสิ้นเปลือง</h2>
+        <p id="consumableItemName" style="color: #a78bfa; margin-bottom: 1.5rem;"></p>
+        <form id="consumableForm" method="POST">
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary);">ระบุจำนวนที่ต้องการเบิก:</label>
+                <input type="number" name="quantity" id="consumableQuantity" value="1" min="1" class="purpose-input">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" style="background: linear-gradient(135deg, #f59e0b, #d97706);">ยืนยันการเบิก</button>
+        </form>
+    </div>
+</div>
+
+<!-- Repair Modal -->
+<div id="repairModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6);">
+    <div class="modal-content fade-in" style="background: linear-gradient(145deg, #1e1b4b, #312e81); margin: 10% auto; padding: 2rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 500px; color: white; position: relative;">
+        <span class="close-modal" onclick="closeRepairModal()" style="color: #aaa; position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        <h2 style="margin-bottom: 1rem;"><i class="fas fa-wrench" style="color: #ef4444;"></i> แจ้งซ่อมอุปกรณ์</h2>
+        <p id="repairItemName" style="color: #a78bfa; margin-bottom: 1.5rem;"></p>
+        <form id="repairForm" method="POST">
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem;">รายละเอียดปัญหา / อาการชำรุด:</label>
+                <textarea name="issue_description" required rows="4" style="width: 100%; padding: 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: white; resize: vertical;"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">ส่งเรื่องแจ้งซ่อม</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/th.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Scroll Reveal Animation
+    const cards = document.querySelectorAll('.reveal-card');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
+    cards.forEach(card => observer.observe(card));
+
+    // 2. Flatpickr (พ.ศ.)
+    flatpickr(".thai-datepicker", {
+        enableTime: true,
+        time_24hr: true,
+        altInput: true,
+        altFormat: "d/m/Y H:i",
+        dateFormat: "Y-m-dTH:i",
+        locale: "th",
+        defaultDate: new Date(),
+        onReady: function(selectedDates, dateStr, instance) {
+            const yearInput = instance.currentYearElement;
+            if (yearInput) yearInput.value = parseInt(yearInput.value) + 543;
+        },
+        onYearChange: function(selectedDates, dateStr, instance) {
+            const yearInput = instance.currentYearElement;
+            if (yearInput) yearInput.value = parseInt(yearInput.value) + 543;
+        },
+        formatDate: (date, format, locale) => {
+            if (format === "d/m/Y H:i") {
+                const year = date.getFullYear() + 543;
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const mins = String(date.getMinutes()).padStart(2, '0');
+                return `${day}/${month}/${year} เวลา ${hours}:${mins} น.`;
+            }
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            const h = String(date.getHours()).padStart(2, '0');
+            const mn = String(date.getMinutes()).padStart(2, '0');
+            return `${y}-${m}-${d}T${h}:${mn}`;
+        }
+    });
+
+    // 3. ระบบค้นหาและกรอง
+    const searchInput = document.getElementById('searchInput');
+    const typeFilter = document.getElementById('typeFilter');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const floorRoomFilter = document.getElementById('floorRoomFilter');
+    const borrowableFilter = document.getElementById('borrowableFilter');
+    
+    const allCards = document.querySelectorAll('.equipment-card');
+
+    function filterEquipment() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const activeType = typeFilter.value;
+        const activeCat = categoryFilter.value;
+        const activeLocation = floorRoomFilter.value; // "all", "floor-X", "room-Y"
+        const activeBorrowable = borrowableFilter.value;
+
+        allCards.forEach(card => {
+            const eqName = card.querySelector('.eq-name').innerText.toLowerCase();
+            const eqDesc = card.querySelector('.eq-desc').innerText.toLowerCase();
+            const eqCat = card.getAttribute('data-category');
+            const eqType = card.getAttribute('data-item-type');
+            const eqFloorId = card.getAttribute('data-floor-id');
+            const eqRoomId = card.getAttribute('data-room-id');
+            const eqBorrowable = card.getAttribute('data-borrowable');
+            
+            const matchesSearch = eqName.includes(searchTerm) || eqDesc.includes(searchTerm);
+            const matchesType = (activeType === 'all' || eqType === activeType);
+            const matchesCat = (activeCat === 'all' || eqCat === activeCat);
+            const matchesBorrowable = (activeBorrowable === 'all' || eqBorrowable === activeBorrowable);
+            
+            let matchesLocation = true;
+            if (activeLocation !== 'all') {
+                if (activeLocation.startsWith('floor-')) {
+                    matchesLocation = (eqFloorId === activeLocation.split('-')[1]);
+                } else if (activeLocation.startsWith('room-')) {
+                    matchesLocation = (eqRoomId === activeLocation.split('-')[1]);
+                }
+            }
+
+            if (matchesSearch && matchesType && matchesCat && matchesLocation && matchesBorrowable) {
+                card.style.display = 'flex';
+                setTimeout(() => card.style.opacity = '1', 10);
+            } else {
+                card.style.opacity = '0';
+                setTimeout(() => card.style.display = 'none', 300);
+            }
+        });
+    }
+
+    searchInput.addEventListener('input', filterEquipment);
+    typeFilter.addEventListener('change', filterEquipment);
+    categoryFilter.addEventListener('change', filterEquipment);
+    floorRoomFilter.addEventListener('change', filterEquipment);
+    borrowableFilter.addEventListener('change', filterEquipment);
+
+    // 4. Modal Functions
+    window.openBorrowModal = function(id, name) {
+        document.getElementById('borrowItemName').innerText = 'อุปกรณ์: ' + name;
+        document.getElementById('borrowForm').action = '/user/request_borrow/' + id;
+        document.getElementById('borrowModal').style.display = 'block';
+    }
+    window.closeBorrowModal = function() {
+        document.getElementById('borrowModal').style.display = 'none';
+    }
+
+    window.openConsumableModal = function(id, name, maxQuantity) {
+        document.getElementById('consumableItemName').innerText = 'วัสดุ: ' + name;
+        document.getElementById('consumableQuantity').max = maxQuantity;
+        document.getElementById('consumableForm').action = '/user/request_consumable/' + id;
+        document.getElementById('consumableModal').style.display = 'block';
+    }
+    window.closeConsumableModal = function() {
+        document.getElementById('consumableModal').style.display = 'none';
+    }
+
+    window.openRepairModal = function(id, name) {
+        document.getElementById('repairItemName').innerText = 'อุปกรณ์: ' + name;
+        document.getElementById('repairForm').action = '/user/report_repair/' + id;
+        document.getElementById('repairModal').style.display = 'block';
+    }
+    window.closeRepairModal = function() {
+        document.getElementById('repairModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('repairModal')) closeRepairModal();
+        if (event.target == document.getElementById('borrowModal')) closeBorrowModal();
+        if (event.target == document.getElementById('consumableModal')) closeConsumableModal();
+    }
+});
+</script>
+{% endblock %}

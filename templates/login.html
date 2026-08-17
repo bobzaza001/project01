@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}เข้าสู่ระบบ — ระบบยืม-คืนครุภัณฑ์{% endblock %}
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <!-- ส่วนหัวของการ์ด -->
+        <div class="auth-header">
+            <div class="auth-logo-wrapper">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ATCC Logo" class="auth-logo-img">
+            </div>
+            <h1>ระบบยืม-คืนครุภัณฑ์</h1>
+            <p>ห้องปฏิบัติการ</p>
+        </div>
+
+        <!-- ฟอร์มเข้าสู่ระบบ -->
+        <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm" class="auth-form">
+            <div class="form-group">
+                <label for="username">
+                    <i class="fas fa-user"></i> ชื่อ-นามสกุล / ชื่อผู้ใช้
+                </label>
+                <input type="text" id="username" name="username" placeholder="กรอกชื่อ-นามสกุล หรือชื่อผู้ใช้" required autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">
+                    <i class="fas fa-lock"></i> รหัสผ่าน
+                </label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" placeholder="กรอกรหัสผ่าน" required autocomplete="current-password">
+                    <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                        <i class="fas fa-eye" id="password-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="remember" value="1">
+                    <span>จดจำฉัน</span>
+                </label>
+                <a href="{{ url_for('auth.forgot_password') }}" class="forgot-link">ลืมรหัสผ่าน?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full" id="loginBtn">
+                <span class="btn-text">เข้าสู่ระบบ</span>
+                <span class="btn-loader" style="display:none;"><i class="fas fa-spinner fa-spin"></i></span>
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>ยังไม่มีบัญชี? <a href="{{ url_for('auth.register') }}">สมัครสมาชิก</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

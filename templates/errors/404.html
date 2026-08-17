@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}ไม่พบหน้านี้ (404) — ระบบยืม-คืนครุภัณฑ์{% endblock %}
+{% block content %}
+<div class="auth-wrapper" style="min-height: 70vh; display: flex; align-items: center; justify-content: center;">
+    <div class="auth-card" style="text-align: center; max-width: 500px; padding: 3rem 2rem;">
+        <div style="font-size: 5rem; color: var(--purple-light); margin-bottom: 1.5rem; text-shadow: 0 0 20px rgba(167, 139, 250, 0.4);">
+            <i class="fas fa-compass-drafting fa-spin-slow"></i> 404
+        </div>
+        <h1 style="font-size: 1.8rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;">ไม่พบหน้าที่คุณต้องการ</h1>
+        <p style="color: var(--text-muted); margin-bottom: 2rem; line-height: 1.6;">
+            ลิงก์อาจจะเสีย หรือหน้านี้ถูกย้ายไปที่อื่นแล้ว กรุณาตรวจสอบความถูกต้องของ URL หรือกลับไปที่หน้าหลัก
+        </p>
+        <a href="/" class="btn btn-primary btn-full" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fas fa-home"></i> กลับสู่หน้าหลัก
+        </a>
+        <div style="margin-top: 2rem; padding: 1rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; text-align: left; font-size: 0.8rem; font-family: monospace; color: var(--text-muted);">
+            <div style="color: #ff6b6b; font-weight: bold; margin-bottom: 0.5rem;">[Debug Routing Info]</div>
+            <div>URL: {{ request.url }}</div>
+            <div>Path: {{ request.path }}</div>
+            <div>PATH_INFO: {{ request.environ.get('PATH_INFO') }}</div>
+            <div>SCRIPT_NAME: {{ request.environ.get('SCRIPT_NAME') }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ระบบยืม-คืนครุภัณฑ์ห้องปฏิบัติการ">
+    <title>{% block title %}ระบบยืม-คืนครุภัณฑ์{% endblock %}</title>
+    <!-- Google Fonts: Inter + Noto Sans Thai -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Kanit:wght@300;400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome สำหรับไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        // โหลดค่า theme ก่อน render เพื่อไม่ให้เกิด flash
+        (function() {
+            var saved = localStorage.getItem('theme');
+            if (saved) document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
+<body>
+    <!-- Initial Page Intro Transition / Curtain Reveal — แสดงเฉพาะหน้า Login / Logout / และตอนเข้าสู่ระบบใหม่ -->
+    {% if not current_user.is_authenticated or session.pop('show_login_intro', False) %}
+    <div id="pagePreloader" class="page-preloader">
+        <div class="preloader-content">
+            <div class="preloader-logo-box">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ATCC Logo" class="preloader-logo">
+                <div class="preloader-glow"></div>
+            </div>
+            <div class="preloader-title">LAB EQUIPMENT SYSTEM</div>
+            <div class="preloader-sub">วิทยาลัยเทคโนโลยีพณิชยการอยุธยา (ATCC)</div>
+            <div class="preloader-bar-container">
+                <div class="preloader-bar"></div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- แถบนำทาง (Navbar) — แสดงเฉพาะเมื่อ login แล้ว -->
+    {% if current_user.is_authenticated %}
+    <nav class="navbar">
+        <div class="nav-brand">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ATCC Logo" style="height: 34px; background: white; padding: 3px 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+            <span>LAB Equipment</span>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('user.dashboard') }}" class="nav-link {% if request.endpoint == 'user.dashboard' or request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i> แดชบอร์ด
+            </a>
+            <a href="{{ url_for('user.equipment_list') }}" class="nav-link {% if request.endpoint == 'user.equipment_list' %}active{% endif %}">
+                <i class="fas fa-boxes"></i> คลังอุปกรณ์
+            </a>
+            {% if current_user.is_admin() %}
+            <a href="{{ url_for('admin.manage_locations') }}" class="nav-link {% if request.endpoint == 'admin.manage_locations' %}active{% endif %}">
+                <i class="fas fa-map-marker-alt"></i> สถานที่
+            </a>
+            <a href="{{ url_for('admin.notification_settings') }}" class="nav-link {% if request.endpoint == 'admin.notification_settings' %}active{% endif %}">
+                <i class="fas fa-bell"></i> แจ้งเตือน
+            </a>
+            {% endif %}
+            <a href="{{ url_for('user.contact') }}" class="nav-link {% if request.endpoint == 'user.contact' %}active{% endif %}">
+                <i class="fas fa-headset"></i> ติดต่อด่วน
+            </a>
+            <a href="{{ url_for('user.profile') }}" class="nav-user" style="text-decoration: none; cursor: pointer; transition: var(--transition);" title="ดู/แก้ไข ข้อมูลส่วนตัว">
+                {% if current_user.profile_image %}
+                <img src="{{ url_for('static', filename='uploads/' + current_user.profile_image) }}" alt="Avatar" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid var(--purple-light);">
+                {% else %}
+                <i class="fas fa-user-circle"></i>
+                {% endif %}
+                <span>{{ current_user.full_name }}</span>
+                <span class="badge badge-{{ 'admin' if current_user.is_admin() else 'user' }}">
+                    {{ 'ผู้ดูแลระบบ' if current_user.is_admin() else 'ผู้ใช้งาน' }}
+                </span>
+            </a>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="สลับธีม Light/Dark" aria-label="Toggle theme">
+                <i class="theme-icon fas fa-moon" id="themeIcon"></i>
+            </button>
+            <a href="{{ url_for('auth.logout') }}" class="nav-link logout-btn">
+                <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+            </a>
+        </div>
+        <!-- ปุ่ม Hamburger สำหรับมือถือ -->
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+    {% endif %}
+
+    <!-- พื้นที่แสดงข้อความแจ้งเตือน (Flash Messages) -->
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}" onclick="this.style.display='none'">
+                    <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'danger' %}fa-exclamation-circle{% elif category == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
+                    {{ message }}
+                    <span class="flash-close">&times;</span>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- ปุ่มสลับธีมสำหรับหน้าที่ไม่มี Navbar (Login/Register) -->
+    {% if not current_user.is_authenticated %}
+    <button class="theme-toggle theme-toggle-fixed" id="themeToggleFixed" onclick="toggleTheme()" title="สลับธีม Light/Dark" aria-label="Toggle theme">
+        <i class="theme-icon fas fa-moon" id="themeIconFixed"></i>
+    </button>
+    {% endif %}
+
+    <!-- เนื้อหาหลัก -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

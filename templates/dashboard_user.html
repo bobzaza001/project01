@@ -1,0 +1,402 @@
+{% extends 'base.html' %}
+{% block title %}แดชบอร์ดผู้ใช้งาน — ระบบยืม-คืนครุภัณฑ์{% endblock %}
+{% block content %}
+<div class="dashboard">
+    <!-- หัวข้อหน้า -->
+    <div class="page-header reveal-section" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
+        <div>
+            <h1 class="text-gradient" style="margin-bottom: 0.5rem;"><i class="fas fa-tachometer-alt"></i> แดชบอร์ดของฉัน</h1>
+            <p style="color: var(--text-muted);">ยินดีต้อนรับคุณ <strong>{{ current_user.full_name }}</strong>, จัดการการยืมและแจ้งซ่อมของคุณได้ที่นี่</p>
+        </div>
+    </div>
+
+    <!-- แจ้งเตือนเกินกำหนด -->
+    {% set overdue_items = [] %}
+    {% for req in my_requests %}
+        {% if req.is_overdue() %}
+            {% if overdue_items.append(req) %}{% endif %}
+        {% endif %}
+    {% endfor %}
+    {% if overdue_items %}
+    <div class="reveal-section" style="background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.1)); border: 1px solid rgba(239,68,68,0.4); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="color: #ff6b6b; margin-bottom: 0.5rem;"><i class="fas fa-exclamation-triangle"></i> ⏰ คุณมี {{ overdue_items|length }} รายการที่เกินกำหนดคืน!</h3>
+        <p style="color: #fca5a5; font-size: 0.9rem;">กรุณาติดต่อคืนอุปกรณ์โดยเร็วที่สุด เพื่อไม่ให้ส่งผลกระทบต่อสิทธิ์การยืมในอนาคต</p>
+        {% for req in overdue_items %}
+        <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 0.5rem 1rem; margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+            <span>🔴 <strong>{{ req.equipment.name }}</strong> — กำหนดคืน {{ req.return_due_datetime.strftime('%d/%m/%Y') }}</span>
+            <button onclick="openReturnModal({{ req.id }}, '{{ req.equipment.name }}')" class="btn btn-sm btn-danger" style="border-radius: 50px;">แจ้งคืนด่วน!</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- ลิงก์ไปคลังอุปกรณ์ -->
+    <div class="card reveal-section cta-equipment-card" style="margin-bottom: 2rem;">
+        <div class="card-body" style="text-align: center; padding: 3rem 1.5rem;">
+            <div class="floating-icon-wrapper">
+                <div class="floating-icon-glow"></div>
+                <i class="fas fa-boxes floating-icon"></i>
+            </div>
+            {% if current_user.is_student() %}
+            <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">อุปกรณ์ในห้องปฏิบัติการชำรุดเสียหาย?</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">คุณสามารถไปที่คลังอุปกรณ์ ค้นหาอุปกรณ์ในห้อง และยื่นเรื่องแจ้งซ่อมแซมได้ทันที</p>
+            <a href="{{ url_for('user.equipment_list') }}" class="btn btn-primary btn-shimmer" style="font-size: 1.1rem; padding: 0.75rem 2rem; background: linear-gradient(135deg, #ef4444, #b91c1c);">
+                แจ้งซ่อมอุปกรณ์ชำรุด <i class="fas fa-arrow-right btn-arrow"></i>
+            </a>
+            {% else %}
+            <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">ต้องการเบิกใช้อุปกรณ์ใหม่?</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">ไปที่คลังอุปกรณ์เพื่อดูรายการอุปกรณ์ทั้งหมดที่พร้อมให้บริการ และยื่นคำขอยืมได้ทันที</p>
+            <a href="{{ url_for('user.equipment_list') }}" class="btn btn-primary btn-shimmer" style="font-size: 1.1rem; padding: 0.75rem 2rem;">
+                ไปที่คลังอุปกรณ์ <i class="fas fa-arrow-right btn-arrow"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- สถิติสรุป -->
+    <div class="reveal-section" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div class="card stat-card" style="padding: 1.25rem 1.5rem; text-align: center;">
+            <i class="fas fa-clipboard-list" style="font-size: 1.5rem; color: var(--purple-light); margin-bottom: 0.5rem;"></i>
+            <div class="count-up" data-target="{{ my_requests|length }}" style="font-size: 2rem; font-weight: 800; background: var(--gradient-main); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">0</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">คำขอทั้งหมด</div>
+        </div>
+        <div class="card stat-card" style="padding: 1.25rem 1.5rem; text-align: center;">
+            {% set approved_count = my_requests|selectattr('status', 'equalto', 'approved')|list|length %}
+            <i class="fas fa-hand-holding-medical" style="font-size: 1.5rem; color: var(--success); margin-bottom: 0.5rem;"></i>
+            <div class="count-up" data-target="{{ approved_count }}" style="font-size: 2rem; font-weight: 800; color: var(--success);">0</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">กำลังยืมอยู่</div>
+        </div>
+        <div class="card stat-card" style="padding: 1.25rem 1.5rem; text-align: center;">
+            {% set returned_count = my_requests|selectattr('status', 'equalto', 'returned')|list|length %}
+            <i class="fas fa-check-double" style="font-size: 1.5rem; color: var(--cyan); margin-bottom: 0.5rem;"></i>
+            <div class="count-up" data-target="{{ returned_count }}" style="font-size: 2rem; font-weight: 800; color: var(--cyan);">0</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">คืนแล้ว</div>
+        </div>
+        <div class="card stat-card" style="padding: 1.25rem 1.5rem; text-align: center;">
+            <i class="fas fa-tools" style="font-size: 1.5rem; color: var(--pink); margin-bottom: 0.5rem;"></i>
+            <div class="count-up" data-target="{{ my_repair_requests|length }}" style="font-size: 2rem; font-weight: 800; color: var(--pink);">0</div>
+            <div style="color: var(--text-muted); font-size: 0.85rem;">แจ้งซ่อม</div>
+        </div>
+    </div>
+
+    <!-- ประวัติการยืม -->
+    <div class="card reveal-section" style="margin-bottom: 2rem;">
+        <div class="card-header accordion-toggle" id="borrowHistoryToggle" style="cursor: pointer; user-select: none;">
+            <h2><i class="fas fa-history"></i> ประวัติการยืมของฉัน</h2>
+            <i class="fas fa-chevron-down accordion-chevron"></i>
+        </div>
+        <div class="accordion-body" id="borrowHistoryBody">
+            {% if my_requests %}
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>รูปภาพ</th>
+                                <th>อุปกรณ์</th>
+                                <th>ประเภท</th>
+                                <th>วันที่ยืม</th>
+                                <th>กำหนดคืน</th>
+                                <th>สถานะ</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in my_requests %}
+                            <tr class="stagger-row">
+                                <td>{{ req.id }}</td>
+                                <td>
+                                    {% if req.equipment.image_filename %}
+                                    <img src="{{ url_for('static', filename='uploads/' + req.equipment.image_filename) }}" class="eq-table-img">
+                                    {% else %}
+                                    <div class="eq-table-img" style="background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;"><i class="fas fa-image" style="color: var(--text-muted);"></i></div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong>{{ req.equipment.name }}</strong>
+                                    <div style="font-size: 0.75rem; color: var(--purple-light);">{{ req.equipment.equipment_code }}</div>
+                                </td>
+                                <td>
+                                    {% if req.equipment.item_type == 'consumable' %}
+                                    <span style="background: #f59e0b; color: #000; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">วัสดุ x{{ req.quantity }}</span>
+                                    {% else %}
+                                    <span style="background: #10b981; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">ครุภัณฑ์ ({{ req.borrow_days }} วัน)</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ req.borrow_datetime.strftime('%d/%m/%Y %H:%M') }}</td>
+                                <td>
+                                    {% if req.return_due_datetime %}
+                                        {% if req.is_overdue() and req.status not in ['returned', 'rejected'] %}
+                                        <span style="color: #ff4d4d; font-weight: bold;">⏰ {{ req.return_due_datetime.strftime('%d/%m/%Y') }}</span>
+                                        {% else %}
+                                        {{ req.return_due_datetime.strftime('%d/%m/%Y') }}
+                                        {% endif %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="status-badge status-{{ req.status }}">
+                                        {% if req.status == 'pending' %}⏳ รออนุมัติ
+                                        {% elif req.status == 'approved' %}
+                                            {% if req.is_overdue() %}🔴 เกินกำหนด!
+                                            {% else %}✅ กำลังยืม{% endif %}
+                                        {% elif req.status == 'return_pending' %}
+                                            ⚠️ รอตรวจสอบ
+                                            {% if req.damage_status == 'damaged' %}
+                                            <div style="font-size: 0.75rem; color: #ff6b6b;">🔧 ชำรุด</div>
+                                            {% endif %}
+                                            {% if req.return_image_filename %}
+                                            <div style="font-size: 0.7rem; margin-top: 3px;">
+                                                <a href="{{ url_for('static', filename='uploads/' + req.return_image_filename) }}" target="_blank" style="color: var(--purple-light); text-decoration: underline;"><i class="fas fa-image"></i> รูปแนบแล้ว</a>
+                                            </div>
+                                            {% endif %}
+                                        {% elif req.status == 'returned' %}
+                                            📦 คืนแล้ว
+                                            {% if req.damage_status == 'damaged' %}
+                                            <div style="font-size: 0.75rem; color: #ff6b6b;">🔧 ชำรุด</div>
+                                            {% endif %}
+                                            {% if req.return_image_filename %}
+                                            <div style="font-size: 0.7rem; margin-top: 3px;">
+                                                <a href="{{ url_for('static', filename='uploads/' + req.return_image_filename) }}" target="_blank" style="color: var(--purple-light); text-decoration: underline;"><i class="fas fa-image"></i> รูปส่งคืน</a>
+                                            </div>
+                                            {% endif %}
+                                        {% elif req.status == 'rejected' %}❌ ปฏิเสธ
+                                        {% endif %}
+                                    </span>
+                                    {% if req.warning_message %}
+                                    <div style="margin-top: 8px; color: #ff6b6b; font-size: 0.85rem; padding: 4px; border: 1px solid rgba(255,107,107,0.3); border-radius: 4px; background: rgba(255,107,107,0.1);">
+                                        <i class="fas fa-exclamation-circle"></i> <strong>Admin:</strong> {{ req.warning_message }}
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if not current_user.is_student() %}
+                                        {% if req.status == 'approved' and req.equipment.item_type == 'durable' %}
+                                        <button onclick="openReturnModal({{ req.id }}, '{{ req.equipment.name }}')" class="btn btn-sm btn-info" style="border-radius: 50px;">
+                                            <i class="fas fa-undo"></i> แจ้งส่งคืน
+                                        </button>
+                                        {% elif req.status == 'return_pending' %}
+                                        <span class="text-muted" style="font-size: 0.85rem;"><i class="fas fa-clock"></i> รอแอดมินรับของ</span>
+                                        {% else %}
+                                        <span class="text-muted">—</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div class="card-body">
+                <div class="empty-state">
+                    <i class="fas fa-clipboard"></i>
+                    <p>คุณยังไม่มีประวัติการยืม</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ประวัติการแจ้งซ่อม -->
+    <div class="card reveal-section">
+        <div class="card-header accordion-toggle" id="repairHistoryToggle" style="cursor: pointer; user-select: none;">
+            <h2><i class="fas fa-tools"></i> ประวัติการแจ้งซ่อมของฉัน</h2>
+            <i class="fas fa-chevron-down accordion-chevron"></i>
+        </div>
+        <div class="accordion-body" id="repairHistoryBody">
+            {% if my_repair_requests %}
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>อุปกรณ์</th>
+                                <th>รายละเอียดปัญหา</th>
+                                <th>วันที่แจ้งซ่อม</th>
+                                <th>สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in my_repair_requests %}
+                            <tr class="stagger-row">
+                                <td>{{ req.id }}</td>
+                                <td>
+                                    <strong>{{ req.equipment.name }}</strong>
+                                    <div style="font-size: 0.75rem; color: var(--purple-light);">{{ req.equipment.equipment_code }}</div>
+                                </td>
+                                <td>{{ req.issue_description }}</td>
+                                <td>{{ req.reported_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ req.status }}">
+                                        {% if req.status == 'pending' %}⏳ รอดำเนินการ
+                                        {% elif req.status == 'in_progress' %}🔧 กำลังดำเนินการซ่อม
+                                        {% elif req.status == 'completed' %}✅ ซ่อมเสร็จสิ้น
+                                        {% else %}{{ req.status }}{% endif %}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div class="card-body">
+                <div class="empty-state">
+                    <i class="fas fa-wrench"></i>
+                    <p>คุณยังไม่มีประวัติการแจ้งซ่อม</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal แจ้งส่งคืน + ระบุสภาพ -->
+<div id="returnModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: var(--bg-card-solid); border: 1px solid var(--glass-border); border-radius: 20px; padding: 2rem; max-width: 450px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+        <h3 style="color: white; margin-bottom: 1rem; text-align: center;"><i class="fas fa-undo"></i> แจ้งส่งคืนอุปกรณ์</h3>
+        <p style="color: var(--text-secondary); text-align: center; margin-bottom: 1.5rem;" id="returnModalName"></p>
+        
+        <form id="returnForm" method="POST" action="" enctype="multipart/form-data">
+            <div style="margin-bottom: 1.25rem;">
+                <label style="color: white; font-weight: bold; display: block; margin-bottom: 0.5rem;">สภาพอุปกรณ์:</label>
+                
+                <label style="display: flex; align-items: center; gap: 8px; padding: 10px 15px; border: 2px solid rgba(16,185,129,0.5); border-radius: 12px; margin-bottom: 8px; cursor: pointer; color: #10b981; transition: all 0.3s;">
+                    <input type="radio" name="damage_status" value="normal" checked style="accent-color: #10b981;"> 
+                    ✅ <strong>สภาพปกติ</strong> — ของยังสมบูรณ์
+                </label>
+                
+                <label style="display: flex; align-items: center; gap: 8px; padding: 10px 15px; border: 2px solid rgba(239,68,68,0.5); border-radius: 12px; cursor: pointer; color: #ef4444; transition: all 0.3s;">
+                    <input type="radio" name="damage_status" value="damaged" style="accent-color: #ef4444;">
+                    ⚠️ <strong>ชำรุด/เสียหาย</strong>
+                </label>
+            </div>
+            
+            <div id="damageNoteBox" style="display: none; margin-bottom: 1.25rem;">
+                <label style="color: #ff6b6b; font-weight: bold; display: block; margin-bottom: 0.5rem;">รายละเอียดความเสียหาย:</label>
+                <textarea name="damage_note" rows="3" placeholder="เช่น จอแตกมุมซ้ายล่าง, ปุ่มหลุด ฯลฯ" style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--bg-input); color: white; outline: none; resize: none;"></textarea>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="color: white; font-weight: bold; display: block; margin-bottom: 0.5rem;"><i class="fas fa-image"></i> แนบรูปสภาพอุปกรณ์ (ถ้ามี):</label>
+                <input type="file" name="return_image" accept="image/*" style="width: 100%; padding: 8px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--bg-input); color: white; outline: none; font-size: 0.9rem;">
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button type="button" onclick="closeReturnModal()" style="flex: 1; padding: 10px; border-radius: 12px; border: 1px solid var(--glass-border); background: transparent; color: white; cursor: pointer;">ยกเลิก</button>
+                <button type="submit" class="btn btn-primary" style="flex: 1; padding: 10px; border-radius: 12px; font-weight: bold;">ยืนยันส่งคืน</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// === Return Modal ===
+function openReturnModal(reqId, eqName) {
+    document.getElementById('returnModal').style.display = 'flex';
+    document.getElementById('returnModalName').innerText = '📦 ' + eqName;
+    document.getElementById('returnForm').action = '/user/return_equipment/' + reqId;
+}
+function closeReturnModal() {
+    document.getElementById('returnModal').style.display = 'none';
+}
+document.querySelectorAll('input[name="damage_status"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        document.getElementById('damageNoteBox').style.display = 
+            this.value === 'damaged' ? 'block' : 'none';
+    });
+});
+document.getElementById('returnModal').addEventListener('click', function(e) {
+    if (e.target === this) closeReturnModal();
+});
+
+// === Count-Up Animation ===
+function animateCountUp(el) {
+    const target = parseInt(el.dataset.target, 10);
+    if (isNaN(target)) return;
+    const duration = 1200;
+    const start = performance.now();
+    
+    function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        // easeOutExpo
+        const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        el.textContent = Math.round(eased * target);
+        if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+}
+
+// === Intersection Observer for reveal & count-up ===
+document.addEventListener('DOMContentLoaded', function() {
+    // Stagger reveal sections
+    const sections = document.querySelectorAll('.reveal-section');
+    let sectionDelay = 0;
+    const revealObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                sectionDelay += 120;
+                const d = sectionDelay;
+                setTimeout(function() {
+                    entry.target.classList.add('revealed');
+                }, d);
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.05 });
+    
+    sections.forEach(function(s) { revealObserver.observe(s); });
+
+    // Count-up observer
+    const countEls = document.querySelectorAll('.count-up');
+    const countObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                animateCountUp(entry.target);
+                countObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.3 });
+    countEls.forEach(function(el) { countObserver.observe(el); });
+
+    // Stagger table rows when their parent card is revealed
+    const rowObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                const rows = entry.target.querySelectorAll('.stagger-row');
+                rows.forEach(function(row, i) {
+                    setTimeout(function() {
+                        row.classList.add('row-visible');
+                    }, i * 60);
+                });
+                rowObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.05 });
+    document.querySelectorAll('.accordion-body').forEach(function(body) {
+        rowObserver.observe(body);
+    });
+
+    // Accordion toggle
+    document.querySelectorAll('.accordion-toggle').forEach(function(toggle) {
+        toggle.addEventListener('click', function() {
+            const body = this.nextElementSibling;
+            const chevron = this.querySelector('.accordion-chevron');
+            body.classList.toggle('collapsed');
+            chevron.classList.toggle('rotated');
+        });
+    });
+});
+</script>
+{% endblock %}

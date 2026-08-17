@@ -1,0 +1,35 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Sensitive Local Configurations
+.env
+
+# Local Databases
+*.db
+*.sqlite3
+
+# IDE files
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# User uploads (Exclude everything in uploads directory)
+static/uploads/*
+
+# But KEEP default placeholder assets
+!static/uploads/cat_*.jpg
+!static/uploads/camera_canon_eos.jpg
+!static/uploads/ipad_pro.jpg
+!static/uploads/laptop_dell_xps13.jpg
+!static/uploads/projector_epson.jpg
