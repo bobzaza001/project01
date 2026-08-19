@@ -59,6 +59,58 @@
         {% endif %}
     </div>
 
+    <!-- นับหมวดหมู่อุปกรณ์จริงจากฐานข้อมูลเพื่อวาดกราฟ -->
+    {% set cat_counts = {'ไอที': 0, 'ไฟฟ้า': 0, 'ทั่วไป': 0, 'โสตฯ': 0} %}
+    {% for eq in equipment %}
+        {% if 'ไอที' in eq.category or 'คอม' in eq.category or 'IT' in eq.category.upper() %}
+            {% set _ = cat_counts.update({'ไอที': cat_counts['ไอที'] + 1}) %}
+        {% elif 'ไฟฟ้า' in eq.category %}
+            {% set _ = cat_counts.update({'ไฟฟ้า': cat_counts['ไฟฟ้า'] + 1}) %}
+        {% elif 'โสต' in eq.category or 'สื่อ' in eq.category %}
+            {% set _ = cat_counts.update({'โสตฯ': cat_counts['โสตฯ'] + 1}) %}
+        {% else %}
+            {% set _ = cat_counts.update({'ทั่วไป': cat_counts['ทั่วไป'] + 1}) %}
+        {% endif %}
+    {% endfor %}
+
+    <!-- แผงแสดงกราฟสถิตินีออนเรืองแสง -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 2.5rem;" class="fade-in">
+        <!-- กราฟที่ 1: สัดส่วนสถานะการใช้งาน -->
+        <div class="card" style="margin-bottom: 0;">
+            <div class="card-header">
+                <h2><i class="fas fa-chart-pie"></i> สัดส่วนความพร้อมใช้งาน</h2>
+            </div>
+            <div class="card-body" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; gap: 1.5rem;">
+                <div style="width: 160px; height: 160px; position: relative;">
+                    <canvas id="equipmentStatusChart"></canvas>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; width: 100%;">
+                    <span style="font-size: 0.8rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #10b981; padding: 3px 8px; border-radius: 20px;">
+                        🟢 ว่าง: {{ stats.available }}
+                    </span>
+                    <span style="font-size: 0.8rem; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); color: #3b82f6; padding: 3px 8px; border-radius: 20px;">
+                        🔵 ถูกยืม: {{ stats.borrowed }}
+                    </span>
+                    <span style="font-size: 0.8rem; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 3px 8px; border-radius: 20px;">
+                        🟡 รออนุมัติ: {{ stats.pending_requests }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- กราฟที่ 2: สถิติจำแนกประเภทครุภัณฑ์ -->
+        <div class="card" style="margin-bottom: 0;">
+            <div class="card-header">
+                <h2><i class="fas fa-chart-bar"></i> ประเภทครุภัณฑ์ยอดนิยมในคลัง</h2>
+            </div>
+            <div class="card-body" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; height: 100%;">
+                <div style="width: 100%; height: 160px;">
+                    <canvas id="equipmentCategoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ตารางคำขอยืม-คืน -->
     <div class="card">
         <div class="card-header">
@@ -341,4 +393,90 @@
         </div>
     </div>
 </div>
+
+<!-- Load Chart.js and render beautiful dark neon charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // --- 1. Equipment Status Chart (Doughnut) ---
+        const ctxStatus = document.getElementById('equipmentStatusChart').getContext('2d');
+        const available = {{ stats.available }};
+        const borrowed = {{ stats.borrowed }};
+        const pending = {{ stats.pending_requests }};
+        
+        new Chart(ctxStatus, {
+            type: 'doughnut',
+            data: {
+                labels: ['ว่างพร้อมยืม', 'ถูกยืมใช้งาน', 'รออนุมัติ'],
+                datasets: [{
+                    data: [available, borrowed, pending],
+                    backgroundColor: ['#10b981', '#3b82f6', '#f59e0b'],
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                cutout: '75%'
+            }
+        });
+
+        // --- 2. Equipment Category Chart (Bar Chart) ---
+        const ctxCategory = document.getElementById('equipmentCategoryChart').getContext('2d');
+        new Chart(ctxCategory, {
+            type: 'bar',
+            data: {
+                labels: ['ไอที', 'ไฟฟ้า', 'ทั่วไป', 'โสตฯ'],
+                datasets: [{
+                    label: 'จำนวนชิ้น',
+                    data: [
+                        {{ cat_counts['ไอที'] }},
+                        {{ cat_counts['ไฟฟ้า'] }},
+                        {{ cat_counts['ทั่วไป'] }},
+                        {{ cat_counts['โสตฯ'] }}
+                    ],
+                    backgroundColor: ['#a78bfa', '#f43f5e', '#10b981', '#3b82f6'],
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#94a3b8'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#94a3b8',
+                            stepSize: 5
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}
