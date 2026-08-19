@@ -112,11 +112,17 @@ HTML_CONTENT = """<!DOCTYPE html>
     <img src="https://project01-psi-plum.vercel.app/static/img/diagrams/er_diagram.png" alt="ER Diagram">
     <p class="caption">รูปที่ 3.1: แผนภาพแสดงความสัมพันธ์ของฐานข้อมูล (ER Diagram)</p>
 
+    <h2>4. สถาปัตยกรรมระบบ (System Architecture - 3-Tier)</h2>
+    <p>แผนภาพแสดงสถาปัตยกรรมโครงสร้างการพัฒนาระบบยืม-คืนครุภัณฑ์ โดยแบ่งเป็น 3 ชั้น (3-Tier Architecture) ได้แก่ Presentation Layer (ส่วนติดต่อผู้ใช้), Application Layer (เซิร์ฟเวอร์ประมวลผล Python/Flask โฮสต์บน Vercel), และ Data Layer (ส่วนจัดเก็บข้อมูลระบบ Supabase PostgreSQL)</p>
+    
+    <img src="https://project01-psi-plum.vercel.app/static/img/diagrams/system_architecture.png" alt="System Architecture">
+    <p class="caption">รูปที่ 4.1: แผนภาพแสดงสถาปัตยกรรมการพัฒนาระบบแบบ 3-Tier (System Architecture)</p>
+
     <hr>
 
-    <h2>4. พจนานุกรมข้อมูล (Data Dictionary) พร้อมตัวอย่างข้อมูล</h2>
+    <h2>5. พจนานุกรมข้อมูล (Data Dictionary) พร้อมตัวอย่างข้อมูล</h2>
 
-    <h3>ตาราง 4.1: โครงสร้างตาราง User (ข้อมูลสมาชิก)</h3>
+    <h3>ตาราง 5.1: โครงสร้างตาราง User (ข้อมูลสมาชิก)</h3>
     <table>
         <thead>
             <tr>
@@ -237,7 +243,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         </tbody>
     </table>
 
-    <h3>ตาราง 4.2: โครงสร้างตาราง Equipment (ข้อมูลครุภัณฑ์/วัสดุ)</h3>
+    <h3>ตาราง 5.2: โครงสร้างตาราง Equipment (ข้อมูลครุภัณฑ์/วัสดุ)</h3>
     <table>
         <thead>
             <tr>
@@ -370,7 +376,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         </tbody>
     </table>
 
-    <h3>ตาราง 4.3: โครงสร้างตาราง BorrowRequest (ประวัติการยืม-คืน)</h3>
+    <h3>ตาราง 5.3: โครงสร้างตาราง BorrowRequest (ประวัติการยืม-คืน)</h3>
     <table>
         <thead>
             <tr>
