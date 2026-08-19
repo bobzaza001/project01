@@ -1,0 +1,513 @@
+import os
+
+HTML_CONTENT = """<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>เอกสารระบบ LAB Equipment System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, CordiaUPC, AngsanaUPC, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #1e3a8a;
+            border-bottom: 2px solid #0ea5e9;
+            padding-bottom: 10px;
+            font-size: 24pt;
+        }
+        h2 {
+            color: #0f172a;
+            margin-top: 30px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 5px;
+            font-size: 18pt;
+        }
+        h3 {
+            color: #0369a1;
+            font-size: 14pt;
+        }
+        p {
+            font-size: 12pt;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            font-size: 11pt;
+        }
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f1f5f9;
+            color: #1e3a8a;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .caption {
+            text-align: center;
+            font-style: italic;
+            color: #64748b;
+            font-size: 10pt;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+        .notice {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 11pt;
+            color: #78350f;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📊 เอกสารแผนภาพและข้อมูลระบบ (LAB Equipment System)</h1>
+    <div class="notice">
+        <strong>💡 คำแนะนำสำหรับการนำเข้า Google Docs:</strong><br>
+        1. เปิดไฟล์นี้ในเว็บเบราว์เซอร์ของคุณ (เช่น Google Chrome)<br>
+        2. กดปุ่มคีย์ลัด <strong>Ctrl + A</strong> (เลือกทั้งหมด) จากนั้นกด <strong>Ctrl + C</strong> (คัดลอก)<br>
+        3. เปิดหน้าเอกสารว่างใน <strong>Google Docs</strong> แล้วกด <strong>Ctrl + V</strong> (วาง)<br>
+        * แผนภาพทั้งหมดจะถูกโหลดเข้า Google Docs โดยอัตโนมัติจากที่อยู่เว็บจริง และตารางจะถูกแปลงเป็นรูปแบบตารางของ Google Docs อย่างสวยงามทันที!
+    </div>
+
+    <hr>
+
+    <h2>1. แผนภาพบริบท (Context Diagram)</h2>
+    <p>แผนภาพระดับบนสุด (DFD Level 0) แสดงขอบเขตการทำงานของระบบและการแลกเปลี่ยนกระแสข้อมูลระหว่างระบบจัดการครุภัณฑ์ห้องปฏิบัติการคอมพิวเตอร์กับหน่วยงานภายนอก (Entities) ได้แก่ ผู้ใช้ทั่วไป, ผู้ดูแลระบบ (Admin) และระบบส่งเมลเซิร์ฟเวอร์ (SMTP Server)</p>
+    
+    <img src="https://project01-psi-plum.vercel.app/static/img/diagrams/context_diagram.png" alt="Context Diagram">
+    <p class="caption">รูปที่ 1.1: แผนภาพบริบทของระบบ (Context Diagram)</p>
+
+    <h2>2. แผนภาพขั้นตอนการทำงานของระบบ (System Flowchart)</h2>
+    <p>แผนภาพแสดงขั้นตอนการทำงาน ลำดับความคิด และทิศทางข้อมูลของระบบทั้งหมด ตั้งแต่การตรวจสอบสิทธิ์การเข้าใช้งาน การกดยื่นคำขอของนักศึกษา/อาจารย์ และขั้นตอนการพิจารณาตรวจสอบการยืม-คืนของแอดมิน</p>
+    
+    <img src="https://project01-psi-plum.vercel.app/static/img/diagrams/system_flowchart.png" alt="System Flowchart">
+    <p class="caption">รูปที่ 2.1: แผนภาพขั้นตอนการทำงานของระบบ (System Flowchart)</p>
+
+    <h2>3. แผนภาพความสัมพันธ์ของข้อมูล (ER Diagram)</h2>
+    <p>แผนภาพแสดงสถาปัตยกรรมความสัมพันธ์ของฐานข้อมูลเชิงสัมพันธ์แบบ One-to-Many (1:N) ระหว่างข้อมูลผู้ใช้ ข้อมูลครุภัณฑ์และวัสดุ ข้อมูลใบคำร้องยืมคืน ข้อมูลประวัติการซ่อมแซม และข้อมูลแผนผังห้องปฏิบัติการ</p>
+    
+    <img src="https://project01-psi-plum.vercel.app/static/img/diagrams/er_diagram.png" alt="ER Diagram">
+    <p class="caption">รูปที่ 3.1: แผนภาพแสดงความสัมพันธ์ของฐานข้อมูล (ER Diagram)</p>
+
+    <hr>
+
+    <h2>4. พจนานุกรมข้อมูล (Data Dictionary) พร้อมตัวอย่างข้อมูล</h2>
+
+    <h3>ตาราง 4.1: โครงสร้างตาราง User (ข้อมูลสมาชิก)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ลำดับ</th>
+                <th>ชื่อคอลัมน์ (Field)</th>
+                <th>ประเภทข้อมูล (Type)</th>
+                <th>คีย์ (Key)</th>
+                <th>คำอธิบาย (Description)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>id</td>
+                <td>INT</td>
+                <td>PK</td>
+                <td>รหัสรันอัตโนมัติประจำตัวผู้ใช้งาน</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>username</td>
+                <td>VARCHAR(150)</td>
+                <td>Unique</td>
+                <td>ชื่อผู้ใช้งานสำหรับเข้าระบบ</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>full_name</td>
+                <td>VARCHAR(200)</td>
+                <td>-</td>
+                <td>ชื่อ-นามสกุลจริงของผู้ใช้งาน</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>email</td>
+                <td>VARCHAR(150)</td>
+                <td>Unique</td>
+                <td>อีเมลแอดเดรสสำหรับการส่งแจ้งเตือน</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>password_hash</td>
+                <td>VARCHAR(256)</td>
+                <td>-</td>
+                <td>รหัสผ่านที่ผ่านการแฮชความปลอดภัย</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>role</td>
+                <td>VARCHAR(20)</td>
+                <td>-</td>
+                <td>สิทธิ์การใช้งาน (admin หรือ user)</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>profile_image</td>
+                <td>VARCHAR(200)</td>
+                <td>-</td>
+                <td>ชื่อไฟล์รูปโปรไฟล์</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>created_at</td>
+                <td>DATETIME</td>
+                <td>-</td>
+                <td>วันและเวลาที่สร้างบัญชี</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><strong>ตัวอย่างข้อมูลตาราง User:</strong></p>
+    <table>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>username</th>
+                <th>full_name</th>
+                <th>email</th>
+                <th>role</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>admin1</td>
+                <td>สมชาย ผู้ดูแลระบบ</td>
+                <td>admin1@lab.ac.th</td>
+                <td>admin</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>user1</td>
+                <td>สมหญิง นักศึกษา</td>
+                <td>user1@student.ac.th</td>
+                <td>user</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>user2</td>
+                <td>สมศักดิ์ บุคลากร</td>
+                <td>user2@student.ac.th</td>
+                <td>user</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>เอกวุฒิ</td>
+                <td>เอกวุฒิ วงศ์มี</td>
+                <td>68302040047@atcc.ac.th</td>
+                <td>user</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>ธีรวัฒน์ ชินรัมย์</td>
+                <td>ธีรวัฒน์ ชินรัมย์</td>
+                <td>68302040056@atcc.ac.th</td>
+                <td>user</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>ตาราง 4.2: โครงสร้างตาราง Equipment (ข้อมูลครุภัณฑ์/วัสดุ)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ลำดับ</th>
+                <th>ชื่อคอลัมน์ (Field)</th>
+                <th>ประเภทข้อมูล (Type)</th>
+                <th>คีย์ (Key)</th>
+                <th>คำอธิบาย (Description)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>id</td>
+                <td>INT</td>
+                <td>PK</td>
+                <td>รหัสรันอัตโนมัติประจำตัวอุปกรณ์</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>equipment_code</td>
+                <td>VARCHAR(100)</td>
+                <td>Unique</td>
+                <td>รหัสสติ๊กเกอร์รหัสครุภัณฑ์เพื่อการตรวจสอบ</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>name</td>
+                <td>VARCHAR(200)</td>
+                <td>-</td>
+                <td>ชื่อของอุปกรณ์ / ครุภัณฑ์</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>category</td>
+                <td>VARCHAR(100)</td>
+                <td>-</td>
+                <td>หมวดหมู่ เช่น ไอที, เครื่องใช้ไฟฟ้า, ทั่วไป</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>status</td>
+                <td>VARCHAR(50)</td>
+                <td>-</td>
+                <td>สถานะอุปกรณ์ (available, borrowed, maintenance)</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>total_quantity</td>
+                <td>INT</td>
+                <td>-</td>
+                <td>จำนวนรวมทั้งหมดที่มีในระบบคลัง</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>available_quantity</td>
+                <td>INT</td>
+                <td>-</td>
+                <td>จำนวนครุภัณฑ์ที่พร้อมให้กดยืมได้จริง</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>item_type</td>
+                <td>VARCHAR(50)</td>
+                <td>-</td>
+                <td>ประเภทอุปกรณ์ (durable หรือ consumable)</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>is_borrowable</td>
+                <td>BOOLEAN</td>
+                <td>-</td>
+                <td>สิทธิ์ในการกดยืมกลับบ้านได้ (True/False)</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>room_id</td>
+                <td>INT</td>
+                <td>FK</td>
+                <td>รหัสเชื่อมโยงห้องเก็บครุภัณฑ์</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><strong>ตัวอย่างข้อมูลตาราง Equipment:</strong></p>
+    <table>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>equipment_code</th>
+                <th>name</th>
+                <th>status</th>
+                <th>total_quantity</th>
+                <th>available_quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>2000</td>
+                <td>EQ-248-011</td>
+                <td>ชุดเครื่องคอมพิวเตอร์ ยี่ห้อ AR THUR CPU I5 4440 RAM 4 HD 500 GB</td>
+                <td>available</td>
+                <td>44</td>
+                <td>44</td>
+            </tr>
+            <tr>
+                <td>2001</td>
+                <td>EQ-248-012</td>
+                <td>ชุดเครื่องคอมพิวเตอร์ ยี่ห้อ HP รุ่น Compaq 8200 CPU I5 2500 RAM 4 HD 500 GB</td>
+                <td>available</td>
+                <td>1</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>2002</td>
+                <td>EQ-248-013</td>
+                <td>ชุดเครื่องคอมพิวเตอร์ ยี่ห้อ HP รุ่น Prodesk 400 g3 mt CPU I5-6500 RAM 12 HD 233 GB</td>
+                <td>available</td>
+                <td>1</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>2004</td>
+                <td>EQ-248-015</td>
+                <td>Monitor ยี่ห้อ HP ขนาด 20 นิ้ว สี ดำ</td>
+                <td>available</td>
+                <td>23</td>
+                <td>23</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>ตาราง 4.3: โครงสร้างตาราง BorrowRequest (ประวัติการยืม-คืน)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ลำดับ</th>
+                <th>ชื่อคอลัมน์ (Field)</th>
+                <th>ประเภทข้อมูล (Type)</th>
+                <th>คีย์ (Key)</th>
+                <th>คำอธิบาย (Description)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>id</td>
+                <td>INT</td>
+                <td>PK</td>
+                <td>รหัสใบทำรายการคำร้อง</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>user_id</td>
+                <td>INT</td>
+                <td>FK</td>
+                <td>รหัสผู้ทำรายการยืม</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>equipment_id</td>
+                <td>INT</td>
+                <td>FK</td>
+                <td>รหัสครุภัณฑ์ที่ยืม</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>status</td>
+                <td>VARCHAR(50)</td>
+                <td>-</td>
+                <td>สถานะการทำงาน (pending, approved, returned, etc.)</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>requested_at</td>
+                <td>DATETIME</td>
+                <td>-</td>
+                <td>วันเวลาที่ส่งคำร้องเข้ามา</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>borrow_datetime</td>
+                <td>DATETIME</td>
+                <td>-</td>
+                <td>วันเวลาที่แอดมินส่งมอบอุปกรณ์</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>return_due_datetime</td>
+                <td>DATETIME</td>
+                <td>-</td>
+                <td>กำหนดส่งคืนอุปกรณ์</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>returned_at</td>
+                <td>DATETIME</td>
+                <td>-</td>
+                <td>วันเวลาที่ส่งคืนจริงในคลัง</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>quantity</td>
+                <td>INT</td>
+                <td>-</td>
+                <td>จำนวนที่ขอรับ</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>return_image_filename</td>
+                <td>VARCHAR(200)</td>
+                <td>-</td>
+                <td>ชื่อรูปถ่ายหลักฐานยืนยันตอนส่งคืน</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p><strong>ตัวอย่างข้อมูลตาราง BorrowRequest:</strong></p>
+    <table>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>user_id</th>
+                <th>equipment_id</th>
+                <th>quantity</th>
+                <th>status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>7</td>
+                <td>2 (สมหญิง)</td>
+                <td>1526</td>
+                <td>1</td>
+                <td>returned</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>2 (สมหญิง)</td>
+                <td>1526</td>
+                <td>1</td>
+                <td>returned</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>2 (สมหญิง)</td>
+                <td>1539</td>
+                <td>1</td>
+                <td>rejected</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>2 (สมหญิง)</td>
+                <td>1530</td>
+                <td>1</td>
+                <td>returned</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
+"""
+
+def generate_html_document():
+    os.makedirs("scratch", exist_ok=True)
+    file_path = "scratch/system_documentation.html"
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.write(HTML_CONTENT)
+    print(f"Generated HTML Document at: {file_path}")
+
+if __name__ == "__main__":
+    generate_html_document()
