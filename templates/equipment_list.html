@@ -409,8 +409,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 3D Hover Tilt Effect for Equipment Cards
-    const cards = document.querySelectorAll('.equipment-card');
-    cards.forEach(card => {
+    const tiltCards = document.querySelectorAll('.equipment-card');
+    tiltCards.forEach(card => {
         card.style.transition = 'transform 0.15s ease, box-shadow 0.3s ease';
         
         card.addEventListener('mousemove', (e) => {
