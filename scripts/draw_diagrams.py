@@ -165,25 +165,25 @@ def draw_er_diagram():
             ax.text((x1+x2)/2, (y1+y2)/2, text, fontsize=8, color='#64748b', ha='center', va='center', backgroundcolor='white')
 
     # User (1) -- (N) BorrowRequest
-    draw_line(2.8, 7.8, 4.7, 7.8, "1", "N", "ยื่นคำขอ")
+    draw_line(2.7, 7.35, 4.8, 7.35, "1", "N", "ยื่นคำขอ")
     
     # Equipment (1) -- (N) BorrowRequest
-    draw_line(9.2, 7.8, 7.1, 7.8, "1", "N", "ถูกยืม")
+    draw_line(9.3, 7.0, 7.0, 7.0, "1", "N", "ถูกยืม")
 
     # User (1) -- (N) RepairRequest
-    draw_line(2.8, 6.8, 4.7, 4.0, "1", "N", "แจ้งปัญหา", style='--')
+    draw_line(2.7, 6.5, 4.8, 3.5, "1", "N", "แจ้งปัญหา", style='--')
 
     # Equipment (1) -- (N) RepairRequest
-    draw_line(10.4, 5.7, 7.1, 4.0, "1", "N", "ชำรุด", style='--')
+    draw_line(9.3, 5.8, 7.0, 3.5, "1", "N", "ชำรุด", style='--')
 
     # Room (1) -- (N) Equipment
-    draw_line(10.4, 4.6, 10.4, 5.8, "1", "N", "เก็บอยู่ที่")
+    draw_line(10.4, 4.5, 10.4, 5.5, "1", "N", "เก็บอยู่ที่")
 
     # Floor (1) -- (N) Room
-    draw_line(10.4, 2.3, 10.4, 3.5, "1", "N", "สังกัด")
+    draw_line(10.4, 2.2, 10.4, 3.25, "1", "N", "สังกัด")
 
     # Building (1) -- (N) Floor
-    draw_line(7.8, 1.8, 9.2, 1.8, "1", "N", "ตั้งอยู่ใน")
+    draw_line(7.7, 1.7, 9.3, 1.575, "1", "N", "ตั้งอยู่ใน")
 
     save_fig(fig, "er_diagram.png")
     plt.close(fig)
