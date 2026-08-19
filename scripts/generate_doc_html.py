@@ -175,11 +175,18 @@ HTML_CONTENT = """<!DOCTYPE html>
     <img src="https://project01-psi-plum.vercel.app/static/img/diagrams/system_architecture.png" alt="System Architecture">
     <p class="caption">รูปที่ 5.1: แผนภาพแสดงสถาปัตยกรรมการพัฒนาระบบแบบ 3-Tier (System Architecture)</p>
 
+    <h2>6. การออกแบบต้นแบบหน้าจอหลัก (User Dashboard UI Prototype)</h2>
+    <p>การออกแบบส่วนติดต่อผู้ใช้งานหลัก (User Interface) สำหรับหน้าแสดงรายการครุภัณฑ์และการจัดการสิทธิ์การขอยืม-คืนของผู้ใช้</p>
+    
+    <img src="https://project01-psi-plum.vercel.app/static/img/diagrams/user_dashboard_prototype.jpg" alt="User Dashboard UI Prototype" onerror="this.src='https://project01-psi-plum.vercel.app/static/img/logo.png'; this.style.maxWidth='120px';">
+    <p class="caption">รูปที่ 3-4: แผนภาพแสดงการออกแบบต้นแบบหน้าจอหลัก (User Dashboard / Equipment List)</p>
+    <p><strong>คำอธิบายรายละเอียดจากรูปที่ 3-4:</strong> การออกแบบต้นแบบหน้าจอหลัก (User Dashboard) ประกอบด้วย 3 ส่วนหลัก ได้แก่ (1) แถบนำทางด้านข้างและด้านบน (Sidebar & Navbar) สำหรับเปลี่ยนสิทธิ์ สลับการทำรายการ และปุ่มเปลี่ยนโหมดกลางวัน/กลางคืน (2) ส่วนแถบค้นหาอัจฉริยะและตัวกรองอุปกรณ์ (Search & Filter Area) สำหรับพิมพ์ค้นหาชื่อรหัสอุปกรณ์ที่มีการหน่วงระบบ Debounce และปุ่มตัวกรองตามหมวดหมู่ ตึก ชั้น หรือห้องปฏิบัติการ และ (3) รายการแสดงการ์ดรายละเอียดครุภัณฑ์และวัสดุทั้งหมด (Equipment Grid Catalog) พร้อมแสดงรูปภาพ รหัสครุภัณฑ์ สถานะสต็อกคงเหลือ และปุ่มสีน้ำเงินสำหรับส่งคำขอยืมครุภัณฑ์หรือปุ่มขอเบิกวัสดุสิ้นเปลือง</p>
+
     <hr>
 
-    <h2>6. พจนานุกรมข้อมูล (Data Dictionary) พร้อมตัวอย่างข้อมูล</h2>
+    <h2>7. พจนานุกรมข้อมูล (Data Dictionary) พร้อมตัวอย่างข้อมูล</h2>
 
-    <h3>ตาราง 6.1: โครงสร้างตาราง User (ข้อมูลสมาชิก)</h3>
+    <h3>ตาราง 7.1: โครงสร้างตาราง User (ข้อมูลสมาชิก)</h3>
     <table>
         <thead>
             <tr>
@@ -300,7 +307,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         </tbody>
     </table>
 
-    <h3>ตาราง 6.2: โครงสร้างตาราง Equipment (ข้อมูลครุภัณฑ์/วัสดุ)</h3>
+    <h3>ตาราง 7.2: โครงสร้างตาราง Equipment (ข้อมูลครุภัณฑ์/วัสดุ)</h3>
     <table>
         <thead>
             <tr>
@@ -433,7 +440,7 @@ HTML_CONTENT = """<!DOCTYPE html>
         </tbody>
     </table>
 
-    <h3>ตาราง 6.3: โครงสร้างตาราง BorrowRequest (ประวัติการยืม-คืน)</h3>
+    <h3>ตาราง 7.3: โครงสร้างตาราง BorrowRequest (ประวัติการยืม-คืน)</h3>
     <table>
         <thead>
             <tr>
@@ -563,10 +570,10 @@ HTML_CONTENT = """<!DOCTYPE html>
 
     <hr>
 
-    <h2>7. การทดสอบระบบ (System Testing - Black-box Testing)</h2>
+    <h2>8. การทดสอบระบบ (System Testing - Black-box Testing)</h2>
     <p>ตารางทดสอบฟังก์ชันงานหลักของระบบด้วยวิธีการทดสอบแบบกล่องดำ (Black-box Testing) โดยครอบคลุมทั้งกรณีทดสอบปกติ (Positive Cases) และกรณีที่กรอกข้อมูลผิดพลาด/เกิดเงื่อนไขขัดแย้ง (Negative Cases)</p>
 
-    <h3>ตาราง 7.1: กรณีทดสอบระบบ (Test Cases Table)</h3>
+    <h3>ตาราง 8.1: กรณีทดสอบระบบ (Test Cases Table)</h3>
     <table>
         <thead>
             <tr>
