@@ -10,7 +10,7 @@ HTML_CONTENT = """<!DOCTYPE html>
             font-family: 'Segoe UI', Tahoma, CordiaUPC, AngsanaUPC, sans-serif;
             line-height: 1.6;
             color: #333333;
-            max-width: 800px;
+            max-width: 850px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -45,6 +45,7 @@ HTML_CONTENT = """<!DOCTYPE html>
             border: 1px solid #cbd5e1;
             padding: 10px;
             text-align: left;
+            vertical-align: top;
         }
         th {
             background-color: #f1f5f9;
@@ -79,17 +80,26 @@ HTML_CONTENT = """<!DOCTYPE html>
             color: #78350f;
             border-radius: 4px;
         }
+        .badge-pass {
+            background-color: #d1fae5;
+            color: #065f46;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 9pt;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
 
-    <h1>📊 เอกสารแผนภาพและข้อมูลระบบ (LAB Equipment System)</h1>
+    <h1>📊 เอกสารแผนภาพ ข้อมูล และการทดสอบระบบ (LAB Equipment System)</h1>
     <div class="notice">
         <strong>💡 คำแนะนำสำหรับการนำเข้า Google Docs:</strong><br>
         1. เปิดไฟล์นี้ในเว็บเบราว์เซอร์ของคุณ (เช่น Google Chrome)<br>
         2. กดปุ่มคีย์ลัด <strong>Ctrl + A</strong> (เลือกทั้งหมด) จากนั้นกด <strong>Ctrl + C</strong> (คัดลอก)<br>
         3. เปิดหน้าเอกสารว่างใน <strong>Google Docs</strong> แล้วกด <strong>Ctrl + V</strong> (วาง)<br>
-        * แผนภาพทั้งหมดจะถูกโหลดเข้า Google Docs โดยอัตโนมัติจากที่อยู่เว็บจริง และตารางจะถูกแปลงเป็นรูปแบบตารางของ Google Docs อย่างสวยงามทันที!
+        * ระบบจะดึงแผนภาพ ตารางพจนานุกรมข้อมูล และตารางกรณีทดสอบระบบทั้งหมดเข้าไปอยู่ใน Google Docs ของคุณพร้อมจัดหน้าอัตโนมัติทันทีครับ!
     </div>
 
     <hr>
@@ -500,6 +510,147 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>1530</td>
                 <td>1</td>
                 <td>returned</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>6. การทดสอบระบบ (System Testing - Black-box Testing)</h2>
+    <p>ตารางทดสอบฟังก์ชันงานหลักของระบบด้วยวิธีการทดสอบแบบกล่องดำ (Black-box Testing) โดยครอบคลุมทั้งกรณีทดสอบปกติ (Positive Cases) และกรณีที่กรอกข้อมูลผิดพลาด/เกิดเงื่อนไขขัดแย้ง (Negative Cases)</p>
+
+    <h3>ตาราง 6.1: กรณีทดสอบระบบ (Test Cases Table)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 8%;">ID</th>
+                <th style="width: 15%;">ฟังก์ชันงาน (Feature)</th>
+                <th style="width: 20%;">วัตถุประสงค์การทดสอบ</th>
+                <th style="width: 17%;">ข้อมูลนำเข้า (Inputs)</th>
+                <th style="width: 22%;">ผลลัพธ์ที่คาดหวัง (Expected)</th>
+                <th style="width: 10%;">ผลการทดสอบจริง</th>
+                <th style="width: 8%;">สถานะ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Login -->
+            <tr>
+                <td>TC-01</td>
+                <td>เข้าสู่ระบบ (Login)</td>
+                <td>ทดสอบล็อกอินด้วยรหัสผ่านแอดมินที่ถูกต้อง (Positive)</td>
+                <td>username: <code>admin1</code><br>password: <code>admin1234</code></td>
+                <td>ระบบล็อกอินผ่าน และพาไปที่หน้า Admin Dashboard</td>
+                <td>ล็อกอินผ่านสำเร็จและพาไปหน้าแอดมินแดชบอร์ด</td>
+                <td><span class="badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+                <td>TC-02</td>
+                <td>เข้าสู่ระบบ (Login)</td>
+                <td>ทดสอบล็อกอินด้วยรหัสผ่านผู้ใช้งานที่ไม่ถูกต้อง (Negative)</td>
+                <td>username: <code>user1</code><br>password: <code>wrong_pass</code></td>
+                <td>ระบบไม่ให้เข้า พร้อมแสดงแจ้งเตือนรหัสผ่านไม่ถูกต้อง และค้างอยู่หน้าเดิม</td>
+                <td>แสดงข้อความสีแดงเตือนชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</td>
+                <td><span class="badge-pass">PASS</span></td>
+            </tr>
+            
+            <!-- Borrow Durable -->
+            <tr>
+                <td>TC-03</td>
+                <td>ขอยืมครุภัณฑ์ (Borrow)</td>
+                <td>ยื่นคำขอยืมครุภัณฑ์ (Durable) ข้อมูลถูกต้องครบถ้วน (Positive)</td>
+                <td>อุปกรณ์: กล้อง Canon EOS<br>วันเวลายืม: <code>20/08/2026 09:00</code><br>จำนวนวัน: <code>3 วัน</code></td>
+                <td>คำขอถูกส่งเข้าระบบ สถานะเป็น 'รอการอนุมัติ' (Pending)</td>
+                <td>บันทึกคำขอเข้าระบบและเปลี่ยนการ์ดเป็นปุ่มรออนุมัติสีส้ม</td>
+                <td><span class="badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+                <td>TC-04</td>
+                <td>ขอยืมครุภัณฑ์ (Borrow)</td>
+                <td>ยื่นคำขอยืมครุภัณฑ์ที่ของหมดคลังชั่วคราว (Negative)</td>
+                <td>อุปกรณ์: แล็ปท็อป (สต็อกคงเหลือ = 0)</td>
+                <td>ระบบไม่ให้ทำรายการ และแจ้งเตือน 'ครุภัณฑ์ชิ้นนี้ไม่ว่างในขณะนี้'</td>
+                <td>แสดง Flash Warning ป้องกันไม่ให้กดส่งคำขอได้สำเร็จ</td>
+                <td><span class="badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+                <td>TC-05</td>
+                <td>ขอยืมครุภัณฑ์ (Borrow)</td>
+                <td>ทดสอบการกดยื่นขอยืมซ้ำซ้อนในอุปกรณ์ชิ้นเดิม (Negative)</td>
+                <td>กดยื่นขอยืมอุปกรณ์ชิ้นที่ตนเองมีสถานะ 'รออนุมัติ' ค้างอยู่แล้ว</td>
+                <td>ระบบบล็อกการทำงาน และแจ้งเตือนคุณมีคำขอที่อยู่ระหว่างรออนุมัติแล้ว</td>
+                <td>ระบบป้องกันไม่ให้ส่งคำขอซ้ำและแสดงข้อความแจ้งเตือน</td>
+                <td><span class="badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+                <td>TC-06</td>
+                <td>ขอยืมครุภัณฑ์ (Borrow)</td>
+                <td>ทดสอบยื่นขอยืมโดยไม่ระบุวันเวลาเดินทางมารับของ (Negative)</td>
+                <td>วันเวลายืม: <code>[ว่าง]</code><br>จำนวนวัน: <code>5 วัน</code></td>
+                <td>ระบบบล็อกไม่ให้ส่ง และแสดงเตือน 'กรุณาระบุวันและเวลาที่ต้องการยืม'</td>
+                <td>แสดง Flash Warning แจ้งเตือนเรื่องการกรอกวันเวลา</td>
+                <td><span class="badge-pass">PASS</span></td>
+            </tr>
+
+            <!-- Approve Request -->
+            <tr>
+                <td>TC-07</td>
+                <td>อนุมัติคำขอ (Approve)</td>
+                <td>แอดมินกดอนุมัติคำขอยืมครุภัณฑ์ (Positive)</td>
+                <td>กดปุ่มอนุมัติ (เช็คผ่าน POST)</td>
+                <td>สถานะใบยืมเปลี่ยนเป็น 'อนุมัติแล้ว' (Approved), สต็อกอุปกรณ์ที่พร้อมให้ยืมลดลง 1 เครื่อง, ส่งอีเมลอนุมัติไปยังผู้ยืมทันที</td>
+                <td>สถานะเปลี่ยน สต็อกคงเหลือลดลง และส่งเมลแจ้งอนุมัติสำเร็จ</td>
+                <td><span class="badge-pass">PASS</span></td>
+            </tr>
+            
+            <!-- Return Equipment -->
+            <tr>
+                <td>TC-08</td>
+                <td>ส่งคืนครุภัณฑ์ (Return)</td>
+                <td>ผู้ใช้กดคืนครุภัณฑ์โดยแนบไฟล์รูปถ่ายหลักฐานถูกต้อง (Positive)</td>
+                <td>ไฟล์ภาพ: <code>receipt.png</code> (อัปโหลดหลักฐานส่งคืน)</td>
+                <td>สถานะเปลี่ยนเป็น 'รอรับคืน' (Return pending), ชื่อไฟล์ภาพถูกจัดเก็บลงฐานข้อมูล, นำภาพไปแสดงในหน้าแอดมิน</td>
+                <td>ระบบรับไฟล์รูป บันทึกลง Supabase และขึ้นแจ้งเตือนรอรับคืนฝั่งแอดมิน</td>
+                <td><span class="badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+                <td>TC-09</td>
+                <td>ส่งคืนครุภัณฑ์ (Return)</td>
+                <td>ผู้ใช้กดส่งคืนโดยไม่เลือกอัปโหลดรูปภาพหลักฐาน (Negative)</td>
+                <td>ไฟล์ภาพ: <code>[ว่าง]</code></td>
+                <td>ระบบล็อกไม่ยอมให้ส่งคืน พร้อมแสดงข้อความเตือนให้แนบรูปภาพก่อน</td>
+                <td>แสดงคำเตือนสีส้มระบุว่าจำเป็นต้องแนบไฟล์รูปหลักฐาน</td>
+                <td><span class="badge-pass">PASS</span></td>
+            </tr>
+
+            <!-- Confirm Return -->
+            <tr>
+                <td>TC-10</td>
+                <td>รับคืนเข้าคลัง (Confirm)</td>
+                <td>แอดมินตรวจสอบรูปหลักฐานและกดยืนยันรับของเข้าคลัง (Positive)</td>
+                <td>กดปุ่มรับของคืน (เช็คผ่าน POST)</td>
+                <td>สถานะใบยืมเป็น 'คืนเรียบร้อย' (Returned), บันทึกเวลาคืนจริง, สต็อกครุภัณฑ์บวกกลับคืนคลัง 1 ชิ้น</td>
+                <td>สถานะเปลี่ยน สต็อกเพิ่มกลับคืนคลัง และบันทึกเวลาส่งคืนสำเร็จ</td>
+                <td><span class="badge-pass">PASS</span></td>
+            </tr>
+
+            <!-- Search and Filter -->
+            <tr>
+                <td>TC-11</td>
+                <td>ค้นหาครุภัณฑ์ (Search)</td>
+                <td>พิมพ์คำค้นหาชื่ออุปกรณ์ที่ต้องการค้นหา (Positive)</td>
+                <td>คำค้นหา: <code>"กล้อง"</code></td>
+                <td>ตัวกรองจาวาสคริปต์กรองการ์ดให้แสดงเฉพาะกล้อง โดยไม่มีความหน่วงขณะพิมพ์ (พิมพ์ลื่นไหลด้วยระบบ Debounce)</td>
+                <td>หน้าจอกรองแสดงเฉพาะกล้องอย่างรวดเร็วและ Snappy ไม่หน่วงคอมพิวเตอร์</td>
+                <td><span class="badge-pass">PASS</span></td>
+            </tr>
+            <tr>
+                <td>TC-12</td>
+                <td>ค้นหาครุภัณฑ์ (Search)</td>
+                <td>พิมพ์ชื่ออุปกรณ์ที่ไม่มีอยู่ในระบบคลัง (Negative)</td>
+                <td>คำค้นหา: <code>"ตู้เย็น"</code></td>
+                <td>หน้าจอซ่อนการ์ดครุภัณฑ์ทั้งหมด และไม่แสดงรายการใดๆ</td>
+                <td>การ์ดอุปกรณ์ทุกใบถูกซ่อนและไม่มีรายการแสดงผล</td>
+                <td><span class="badge-pass">PASS</span></td>
             </tr>
         </tbody>
     </table>
