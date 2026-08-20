@@ -97,12 +97,52 @@
 
     <hr>
 
-    <h2>1. แบบร่างกลุ่มหน้าจอฝั่งผู้ใช้งานทั่วไป และอาจารย์ (User Flow Wireframes)</h2>
+    <h2>1. แบบร่างหน้าจอเข้าสู่ระบบ (Login Page) - สำหรับผู้ใช้งานทุกคน</h2>
+    <p>หน้าจอเข้าสู่ระบบถูกออกแบบในสไตล์มินิมอลลายเส้นสีขาว-เทา-ดำ เพื่อให้เข้าใจโครงร่างหน้าจอและปุ่มกดได้ง่ายที่สุด</p>
+    
+    <div class="image-container">
+        <img src="https://project01-psi-plum.vercel.app/static/img/prototypes/login_wireframe.jpg" alt="Login Page Wireframe">
+        <p class="caption">รูปที่ 1: แบบร่างหน้าจอเข้าสู่ระบบ (Login Page)</p>
+    </div>
+
+    <h3>รายละเอียดฟังก์ชันการทำงาน:</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 25%;">ฟังก์ชัน (Features)</th>
+                <th style="width: 20%;">ผู้เกี่ยวข้อง (Actors)</th>
+                <th style="width: 55%;">รายละเอียดการทำงาน</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>ระบบตรวจสอบสิทธิ์ตรง (Credential Login)</strong></td>
+                <td>
+                    <span class="badge badge-user">User</span>
+                    <span class="badge badge-teacher">Teacher</span>
+                    <span class="badge badge-admin">Admin</span>
+                </td>
+                <td>กรอก Username (ชื่อผู้ใช้) และ Password (รหัสผ่าน) เพื่อเข้าสู่ระบบผ่านการตรวจสอบสิทธิ์บนเซิร์ฟเวอร์โดยตรง</td>
+            </tr>
+            <tr>
+                <td><strong>การลงชื่อเข้าใช้ผ่าน Google (Google OAuth)</strong></td>
+                <td>
+                    <span class="badge badge-user">User</span>
+                    <span class="badge badge-teacher">Teacher</span>
+                </td>
+                <td>ปุ่มล็อกอินด้วยบัญชีอีเมล Google ของสถาบัน (@atcc.ac.th) เพื่อความสะดวกรวดเร็วโดยไม่ต้องจำรหัสผ่าน</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>2. แบบร่างกลุ่มหน้าจอฝั่งผู้ใช้งานทั่วไป และอาจารย์ (User Flow Wireframes)</h2>
     <p>จัดแสดงแบบร่างโครงสร้างหน้ารายการคลังครุภัณฑ์หลัก (User Dashboard / Catalog), กล่องข้อความยืนยันการกดยืมส่งคืน (Borrow/Return Modal), และหน้าประวัติข้อมูลส่วนตัวผู้ใช้ (My Profile Page)</p>
     
     <div class="image-container">
         <img src="https://project01-psi-plum.vercel.app/static/img/prototypes/user_flow_wireframe.jpg" alt="User Flow Wireframe">
-        <p class="caption">รูปที่ 1: แบบร่างหน้าจอฝั่งผู้ใช้ทั่วไปและอาจารย์ (User Catalog, Borrow Modal, and Profile)</p>
+        <p class="caption">รูปที่ 2: แบบร่างหน้าจอฝั่งผู้ใช้ทั่วไปและอาจารย์ (User Catalog, Borrow Modal, and Profile)</p>
     </div>
 
     <h3>คำอธิบายรายฟังก์ชันและระบบย่อย:</h3>
@@ -144,12 +184,12 @@
 
     <hr>
 
-    <h2>2. แบบร่างกลุ่มหน้าจอการจัดการของแอดมิน (Admin Management Wireframes)</h2>
+    <h2>3. แบบร่างกลุ่มหน้าจอการจัดการของแอดมิน (Admin Management Wireframes)</h2>
     <p>จัดแสดงหน้าจอแอปพลิเคชันฝั่งผู้ดูแลระบบ ประกอบด้วย หน้ารายการอาคารและชั้นเรียนห้องปฏิบัติการ (Buildings & Floors List), หน้าจอเพิ่มสถานที่ (Add Building Form) และแบบฟอร์มการอัปเดตรายละเอียดครุภัณฑ์ (Edit Equipment Details Form)</p>
 
     <div class="image-container">
         <img src="https://project01-psi-plum.vercel.app/static/img/prototypes/admin_manage_wireframe.jpg" alt="Admin Management Wireframe">
-        <p class="caption">รูปที่ 2: แบบร่างหน้าจอบริหารข้อมูลสถานที่และอุปกรณ์ของแอดมิน (Admin Catalog & Setup Forms)</p>
+        <p class="caption">รูปที่ 3: แบบร่างหน้าจอบริหารข้อมูลสถานที่และอุปกรณ์ของแอดมิน (Admin Catalog & Setup Forms)</p>
     </div>
 
     <h3>คำอธิบายรายฟังก์ชันและระบบย่อย:</h3>
@@ -182,12 +222,12 @@
 
     <hr>
 
-    <h2>3. แบบร่างหน้าจอบริการอื่นๆ (Auxiliary Screens Wireframes)</h2>
+    <h2>4. แบบร่างหน้าจอบริการอื่นๆ (Auxiliary Screens Wireframes)</h2>
     <p>จัดแสดงแบบร่างหน้าจอเพิ่มเติม ได้แก่ หน้าต่างแจ้งเตือนระบบ (System Notifications), หน้ารายการติดต่อเร่งด่วน (Contact Page) และหน้าแจ้งซ่อมครุภัณฑ์ชำรุด (Repair Request Form)</p>
 
     <div class="image-container">
         <img src="https://project01-psi-plum.vercel.app/static/img/prototypes/auxiliary_screens_wireframe.jpg" alt="Auxiliary Screens Wireframe">
-        <p class="caption">รูปที่ 3: แบบร่างหน้าจอแจ้งเตือน การติดต่อ และหน้าแจ้งซ่อมครุภัณฑ์ชำรุด</p>
+        <p class="caption">รูปที่ 4: แบบร่างหน้าจอแจ้งเตือน การติดต่อ และหน้าแจ้งซ่อมครุภัณฑ์ชำรุด</p>
     </div>
 
     <h3>คำอธิบายรายฟังก์ชันและระบบย่อย:</h3>
