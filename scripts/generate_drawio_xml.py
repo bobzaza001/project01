@@ -78,7 +78,8 @@ def create_drawio_xml():
             style = style_diamond
             
         cell = ET.SubElement(root, 'mxCell', id=nid, value=text, style=style, vertex="1", parent="1")
-        ET.SubElement(cell, 'mxGeometry', x=str(x), y=str(y), width=str(w), height=str(h), as_="geometry")
+        geom = ET.SubElement(cell, 'mxGeometry', x=str(x), y=str(y), width=str(w), height=str(h))
+        geom.set('as', 'geometry')
 
     # Helper function to add edges (lines) with straight orthogonal routing
     edge_idx = 100
@@ -86,7 +87,8 @@ def create_drawio_xml():
         nonlocal edge_idx
         style = f"edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor={color};strokeWidth=1.5;fontColor=#ffffff;fontSize=9;"
         edge = ET.SubElement(root, 'mxCell', id=f"edge_{edge_idx}", value=label, style=style, edge="1", parent="1", source=source, target=target)
-        ET.SubElement(edge, 'mxGeometry', relative="1", as_="geometry")
+        geom = ET.SubElement(edge, 'mxGeometry', relative="1")
+        geom.set('as', 'geometry')
         edge_idx += 1
 
     # Connect nodes
