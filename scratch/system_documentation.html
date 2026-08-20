@@ -235,17 +235,18 @@
 
     <hr>
 
-    <h2>7. พจนานุกรมข้อมูล (Data Dictionary) พร้อมตัวอย่างข้อมูล</h2>
+    <h2>7. พจนานุกรมข้อมูล (Data Dictionary)</h2>
 
     <h3>ตาราง 7.1: โครงสร้างตาราง User (ข้อมูลสมาชิก)</h3>
     <table>
         <thead>
             <tr>
-                <th>ลำดับ</th>
-                <th>ชื่อคอลัมน์ (Field)</th>
-                <th>ประเภทข้อมูล (Type)</th>
-                <th>คีย์ (Key)</th>
-                <th>คำอธิบาย (Description)</th>
+                <th>No.</th>
+                <th>Column</th>
+                <th>Type</th>
+                <th>Size</th>
+                <th>Comment</th>
+                <th>Role</th>
             </tr>
         </thead>
         <tbody>
@@ -253,50 +254,57 @@
                 <td>1</td>
                 <td>id</td>
                 <td>INT</td>
-                <td>PK</td>
+                <td>-</td>
                 <td>รหัสรันอัตโนมัติประจำตัวผู้ใช้งาน</td>
+                <td>PK</td>
             </tr>
             <tr>
                 <td>2</td>
                 <td>username</td>
-                <td>VARCHAR(150)</td>
-                <td>Unique</td>
+                <td>VARCHAR</td>
+                <td>150</td>
                 <td>ชื่อผู้ใช้งานสำหรับเข้าระบบ</td>
+                <td>Unique</td>
             </tr>
             <tr>
                 <td>3</td>
                 <td>full_name</td>
-                <td>VARCHAR(200)</td>
-                <td>-</td>
+                <td>VARCHAR</td>
+                <td>200</td>
                 <td>ชื่อ-นามสกุลจริงของผู้ใช้งาน</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>4</td>
                 <td>email</td>
-                <td>VARCHAR(150)</td>
-                <td>Unique</td>
+                <td>VARCHAR</td>
+                <td>150</td>
                 <td>อีเมลแอดเดรสสำหรับการส่งแจ้งเตือน</td>
+                <td>Unique</td>
             </tr>
             <tr>
                 <td>5</td>
                 <td>password_hash</td>
-                <td>VARCHAR(256)</td>
-                <td>-</td>
+                <td>VARCHAR</td>
+                <td>256</td>
                 <td>รหัสผ่านที่ผ่านการแฮชความปลอดภัย</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>6</td>
                 <td>role</td>
-                <td>VARCHAR(20)</td>
-                <td>-</td>
+                <td>VARCHAR</td>
+                <td>20</td>
                 <td>สิทธิ์การใช้งาน (admin หรือ user)</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>7</td>
                 <td>profile_image</td>
-                <td>VARCHAR(200)</td>
-                <td>-</td>
+                <td>VARCHAR</td>
+                <td>200</td>
                 <td>ชื่อไฟล์รูปโปรไฟล์</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>8</td>
@@ -304,56 +312,7 @@
                 <td>DATETIME</td>
                 <td>-</td>
                 <td>วันและเวลาที่สร้างบัญชี</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <p><strong>ตัวอย่างข้อมูลตาราง User:</strong></p>
-    <table>
-        <thead>
-            <tr>
-                <th>id</th>
-                <th>username</th>
-                <th>full_name</th>
-                <th>email</th>
-                <th>role</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>admin1</td>
-                <td>สมชาย ผู้ดูแลระบบ</td>
-                <td>admin1@lab.ac.th</td>
-                <td>admin</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>user1</td>
-                <td>สมหญิง นักศึกษา</td>
-                <td>user1@student.ac.th</td>
-                <td>user</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>user2</td>
-                <td>สมศักดิ์ บุคลากร</td>
-                <td>user2@student.ac.th</td>
-                <td>user</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>เอกวุฒิ</td>
-                <td>เอกวุฒิ วงศ์มี</td>
-                <td>68302040047@atcc.ac.th</td>
-                <td>user</td>
-            </tr>
-            <tr>
-                <td>5</td>
-                <td>ธีรวัฒน์ ชินรัมย์</td>
-                <td>ธีรวัฒน์ ชินรัมย์</td>
-                <td>68302040056@atcc.ac.th</td>
-                <td>user</td>
+                <td>-</td>
             </tr>
         </tbody>
     </table>
@@ -362,11 +321,12 @@
     <table>
         <thead>
             <tr>
-                <th>ลำดับ</th>
-                <th>ชื่อคอลัมน์ (Field)</th>
-                <th>ประเภทข้อมูล (Type)</th>
-                <th>คีย์ (Key)</th>
-                <th>คำอธิบาย (Description)</th>
+                <th>No.</th>
+                <th>Column</th>
+                <th>Type</th>
+                <th>Size</th>
+                <th>Comment</th>
+                <th>Role</th>
             </tr>
         </thead>
         <tbody>
@@ -374,36 +334,41 @@
                 <td>1</td>
                 <td>id</td>
                 <td>INT</td>
-                <td>PK</td>
+                <td>-</td>
                 <td>รหัสรันอัตโนมัติประจำตัวอุปกรณ์</td>
+                <td>PK</td>
             </tr>
             <tr>
                 <td>2</td>
                 <td>equipment_code</td>
-                <td>VARCHAR(100)</td>
-                <td>Unique</td>
+                <td>VARCHAR</td>
+                <td>100</td>
                 <td>รหัสสติ๊กเกอร์รหัสครุภัณฑ์เพื่อการตรวจสอบ</td>
+                <td>Unique</td>
             </tr>
             <tr>
                 <td>3</td>
                 <td>name</td>
-                <td>VARCHAR(200)</td>
-                <td>-</td>
+                <td>VARCHAR</td>
+                <td>200</td>
                 <td>ชื่อของอุปกรณ์ / ครุภัณฑ์</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>4</td>
                 <td>category</td>
-                <td>VARCHAR(100)</td>
-                <td>-</td>
+                <td>VARCHAR</td>
+                <td>100</td>
                 <td>หมวดหมู่ เช่น ไอที, เครื่องใช้ไฟฟ้า, ทั่วไป</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>5</td>
                 <td>status</td>
-                <td>VARCHAR(50)</td>
-                <td>-</td>
+                <td>VARCHAR</td>
+                <td>50</td>
                 <td>สถานะอุปกรณ์ (available, borrowed, maintenance)</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>6</td>
@@ -411,6 +376,7 @@
                 <td>INT</td>
                 <td>-</td>
                 <td>จำนวนรวมทั้งหมดที่มีในระบบคลัง</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>7</td>
@@ -418,13 +384,15 @@
                 <td>INT</td>
                 <td>-</td>
                 <td>จำนวนครุภัณฑ์ที่พร้อมให้กดยืมได้จริง</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>8</td>
                 <td>item_type</td>
-                <td>VARCHAR(50)</td>
-                <td>-</td>
+                <td>VARCHAR</td>
+                <td>50</td>
                 <td>ประเภทอุปกรณ์ (durable หรือ consumable)</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>9</td>
@@ -432,61 +400,15 @@
                 <td>BOOLEAN</td>
                 <td>-</td>
                 <td>สิทธิ์ในการกดยืมกลับบ้านได้ (True/False)</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>10</td>
                 <td>room_id</td>
                 <td>INT</td>
-                <td>FK</td>
+                <td>-</td>
                 <td>รหัสเชื่อมโยงห้องเก็บครุภัณฑ์</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <p><strong>ตัวอย่างข้อมูลตาราง Equipment:</strong></p>
-    <table>
-        <thead>
-            <tr>
-                <th>id</th>
-                <th>equipment_code</th>
-                <th>name</th>
-                <th>status</th>
-                <th>total_quantity</th>
-                <th>available_quantity</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>2000</td>
-                <td>EQ-248-011</td>
-                <td>ชุดเครื่องคอมพิวเตอร์ ยี่ห้อ AR THUR CPU I5 4440 RAM 4 HD 500 GB</td>
-                <td>available</td>
-                <td>44</td>
-                <td>44</td>
-            </tr>
-            <tr>
-                <td>2001</td>
-                <td>EQ-248-012</td>
-                <td>ชุดเครื่องคอมพิวเตอร์ ยี่ห้อ HP รุ่น Compaq 8200 CPU I5 2500 RAM 4 HD 500 GB</td>
-                <td>available</td>
-                <td>1</td>
-                <td>1</td>
-            </tr>
-            <tr>
-                <td>2002</td>
-                <td>EQ-248-013</td>
-                <td>ชุดเครื่องคอมพิวเตอร์ ยี่ห้อ HP รุ่น Prodesk 400 g3 mt CPU I5-6500 RAM 12 HD 233 GB</td>
-                <td>available</td>
-                <td>1</td>
-                <td>1</td>
-            </tr>
-            <tr>
-                <td>2004</td>
-                <td>EQ-248-015</td>
-                <td>Monitor ยี่ห้อ HP ขนาด 20 นิ้ว สี ดำ</td>
-                <td>available</td>
-                <td>23</td>
-                <td>23</td>
+                <td>FK</td>
             </tr>
         </tbody>
     </table>
@@ -495,11 +417,12 @@
     <table>
         <thead>
             <tr>
-                <th>ลำดับ</th>
-                <th>ชื่อคอลัมน์ (Field)</th>
-                <th>ประเภทข้อมูล (Type)</th>
-                <th>คีย์ (Key)</th>
-                <th>คำอธิบาย (Description)</th>
+                <th>No.</th>
+                <th>Column</th>
+                <th>Type</th>
+                <th>Size</th>
+                <th>Comment</th>
+                <th>Role</th>
             </tr>
         </thead>
         <tbody>
@@ -507,29 +430,33 @@
                 <td>1</td>
                 <td>id</td>
                 <td>INT</td>
-                <td>PK</td>
+                <td>-</td>
                 <td>รหัสใบทำรายการคำร้อง</td>
+                <td>PK</td>
             </tr>
             <tr>
                 <td>2</td>
                 <td>user_id</td>
                 <td>INT</td>
-                <td>FK</td>
+                <td>-</td>
                 <td>รหัสผู้ทำรายการยืม</td>
+                <td>FK</td>
             </tr>
             <tr>
                 <td>3</td>
                 <td>equipment_id</td>
                 <td>INT</td>
-                <td>FK</td>
+                <td>-</td>
                 <td>รหัสครุภัณฑ์ที่ยืม</td>
+                <td>FK</td>
             </tr>
             <tr>
                 <td>4</td>
                 <td>status</td>
-                <td>VARCHAR(50)</td>
-                <td>-</td>
+                <td>VARCHAR</td>
+                <td>50</td>
                 <td>สถานะการทำงาน (pending, approved, returned, etc.)</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>5</td>
@@ -537,6 +464,7 @@
                 <td>DATETIME</td>
                 <td>-</td>
                 <td>วันเวลาที่ส่งคำร้องเข้ามา</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>6</td>
@@ -544,6 +472,7 @@
                 <td>DATETIME</td>
                 <td>-</td>
                 <td>วันเวลาที่แอดมินส่งมอบอุปกรณ์</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>7</td>
@@ -551,6 +480,7 @@
                 <td>DATETIME</td>
                 <td>-</td>
                 <td>กำหนดส่งคืนอุปกรณ์</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>8</td>
@@ -558,6 +488,7 @@
                 <td>DATETIME</td>
                 <td>-</td>
                 <td>วันเวลาที่ส่งคืนจริงในคลัง</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>9</td>
@@ -565,56 +496,15 @@
                 <td>INT</td>
                 <td>-</td>
                 <td>จำนวนที่ขอรับ</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>10</td>
                 <td>return_image_filename</td>
-                <td>VARCHAR(200)</td>
-                <td>-</td>
+                <td>VARCHAR</td>
+                <td>200</td>
                 <td>ชื่อรูปถ่ายหลักฐานยืนยันตอนส่งคืน</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <p><strong>ตัวอย่างข้อมูลตาราง BorrowRequest:</strong></p>
-    <table>
-        <thead>
-            <tr>
-                <th>id</th>
-                <th>user_id</th>
-                <th>equipment_id</th>
-                <th>quantity</th>
-                <th>status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>7</td>
-                <td>2 (สมหญิง)</td>
-                <td>1526</td>
-                <td>1</td>
-                <td>returned</td>
-            </tr>
-            <tr>
-                <td>8</td>
-                <td>2 (สมหญิง)</td>
-                <td>1526</td>
-                <td>1</td>
-                <td>returned</td>
-            </tr>
-            <tr>
-                <td>9</td>
-                <td>2 (สมหญิง)</td>
-                <td>1539</td>
-                <td>1</td>
-                <td>rejected</td>
-            </tr>
-            <tr>
-                <td>10</td>
-                <td>2 (สมหญิง)</td>
-                <td>1530</td>
-                <td>1</td>
-                <td>returned</td>
+                <td>-</td>
             </tr>
         </tbody>
     </table>
