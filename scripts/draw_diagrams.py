@@ -72,35 +72,41 @@ def draw_context_diagram():
     ax.annotate("", xy=(3.3, 4.3), xytext=(2.4, 4.3),
                 arrowprops=dict(arrowstyle="->", color=line_color, lw=1.5))
     ax.text(2.85, 4.45, "1. ยื่นคำขอยืม/เบิก\n2. ส่งคืนครุภัณฑ์ + แนบรูปภาพ", 
-            ha='right', va='bottom', fontsize=8, color='#475569')
+            ha='right', va='bottom', fontsize=8, color='#475569',
+            bbox=dict(facecolor='white', edgecolor='#cbd5e1', boxstyle='round,pad=0.2', alpha=0.9))
 
     # System -> User
     ax.annotate("", xy=(2.4, 3.7), xytext=(3.3, 3.7),
                 arrowprops=dict(arrowstyle="->", color=line_color, lw=1.5))
     ax.text(2.85, 3.55, "1. อีเมลแจ้งอนุมัติ/ปฏิเสธ\n2. เมลเตือนคืนด่วน", 
-            ha='right', va='top', fontsize=8, color='#475569')
+            ha='right', va='top', fontsize=8, color='#475569',
+            bbox=dict(facecolor='white', edgecolor='#cbd5e1', boxstyle='round,pad=0.2', alpha=0.9))
 
     # Admin -> System
     ax.annotate("", xy=(6.9, 4.3), xytext=(7.6, 4.3),
                 arrowprops=dict(arrowstyle="<-", color=line_color, lw=1.5))
     ax.text(7.25, 4.45, "1. อนุมัติ/ปฏิเสธคำขอ\n2. จัดการข้อมูลครุภัณฑ์/สถานที่", 
-            ha='left', va='bottom', fontsize=8, color='#475569')
+            ha='left', va='bottom', fontsize=8, color='#475569',
+            bbox=dict(facecolor='white', edgecolor='#cbd5e1', boxstyle='round,pad=0.2', alpha=0.9))
 
     # System -> Admin
     ax.annotate("", xy=(7.6, 3.7), xytext=(6.9, 3.7),
                 arrowprops=dict(arrowstyle="<-", color=line_color, lw=1.5))
     ax.text(7.25, 3.55, "1. ข้อมูลรายงานสถิติ\n2. รายการร้องขอยืม-คืน", 
-            ha='left', va='top', fontsize=8, color='#475569')
+            ha='left', va='top', fontsize=8, color='#475569',
+            bbox=dict(facecolor='white', edgecolor='#cbd5e1', boxstyle='round,pad=0.2', alpha=0.9))
 
     # System -> SMTP Server
     ax.annotate("", xy=(4.7, 5.7), xytext=(4.7, 5.2),
                 arrowprops=dict(arrowstyle="->", color=line_color, lw=1.5))
-    ax.text(4.6, 5.45, "คำขอส่งเมล", ha='right', va='center', fontsize=8, color='#475569')
+    ax.text(4.6, 5.45, "คำขอส่งเมล", ha='right', va='center', fontsize=8, color='#475569',
+            bbox=dict(facecolor='white', edgecolor='#cbd5e1', boxstyle='round,pad=0.15', alpha=0.9))
 
-    # SMTP Server -> User
-    ax.annotate("", xy=(1.4, 4.95), xytext=(3.9, 6.3),
-                arrowprops=dict(arrowstyle="->", color='#10b981', lw=1.2, connectionstyle="arc3,rad=0.2"))
-    ax.text(2.3, 5.9, "ส่งอีเมลแจ้งเตือนถึงผู้ใช้", ha='center', va='bottom', fontsize=8, color='#10b981', rotation=20)
+    # SMTP Server -> User (Straight Green Line with Boxed Text)
+    ax.annotate("", xy=(1.4, 4.8), xytext=(4.1, 6.3),
+                arrowprops=dict(arrowstyle="->", color='#10b981', lw=1.5))
+    ax.text(2.75, 5.55, "ส่งอีเมลแจ้งเตือนถึงผู้ใช้", ha='center', va='center', fontsize=8, color='#10b981',
+            bbox=dict(facecolor='white', edgecolor='#10b981', boxstyle='round,pad=0.2', alpha=0.95))
 
     save_fig(fig, "context_diagram.png")
     plt.close(fig)
