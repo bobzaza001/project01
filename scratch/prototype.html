@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>แบบร่างหน้าจอระบบ (System Prototypes)</title>
+    <style>
+        body {
+            font-family: 'Tahoma', 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #334155;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: #f8fafc;
+        }
+        h1 {
+            color: #1e3a8a;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        h2 {
+            color: #0284c7;
+            margin-top: 40px;
+            border-left: 5px solid #0284c7;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #0f172a;
+        }
+        .meta-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+        }
+        .image-container {
+            text-align: center;
+            margin: 30px 0;
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+        }
+        .caption {
+            font-style: italic;
+            color: #64748b;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 0.8em;
+            font-weight: bold;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .badge-user { background-color: #dbeafe; color: #1e40af; }
+        .badge-admin { background-color: #fee2e2; color: #991b1b; }
+        .badge-teacher { background-color: #f3e8ff; color: #6b21a8; }
+    </style>
+</head>
+<body>
+
+    <h1>แบบร่างหน้าจอส่วนต่อประสานผู้ใช้ (User Interface Prototypes)</h1>
+    <p class="meta-info">ระบบจัดการยืม-คืนครุภัณฑ์ห้องปฏิบัติการคอมพิวเตอร์ (LAB Equipment Management System)</p>
+
+    <hr>
+
+    <h2>1. แบบร่างหน้าจอเข้าสู่ระบบ (Login Page) - สำหรับผู้ใช้งานทุกคน</h2>
+    <p>หน้าจอเข้าสู่ระบบถูกออกแบบให้อยู่ในรูปแบบ Glassmorphism ธีมมืด (Dark Theme) เพื่อความสวยงามและสบายตาในการใช้งานตอนค่ำคืน รองรับทั้งสิทธิ์ผู้ใช้ทั่วไป อาจารย์ และแอดมิน</p>
+    
+    <div class="image-container">
+        <img src="https://project01-psi-plum.vercel.app/static/img/prototypes/login_prototype.jpg" alt="Login Page Prototype">
+        <p class="caption">รูปที่ 1: แบบร่างหน้าจอเข้าสู่ระบบ (Login Page)</p>
+    </div>
+
+    <h3>รายละเอียดฟังก์ชันการทำงาน:</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 25%;">ฟังก์ชัน (Features)</th>
+                <th style="width: 20%;">ผู้เกี่ยวข้อง (Actors)</th>
+                <th style="width: 55%;">รายละเอียดการทำงาน</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>ระบบตรวจสอบสิทธิ์ตรง (Credential Login)</strong></td>
+                <td>
+                    <span class="badge badge-user">User</span>
+                    <span class="badge badge-teacher">Teacher</span>
+                    <span class="badge badge-admin">Admin</span>
+                </td>
+                <td>กรอก Username (ชื่อผู้ใช้) และ Password (รหัสผ่าน) เพื่อเข้าสู่ระบบผ่านการตรวจสอบสิทธิ์บนเซิร์ฟเวอร์โดยตรง</td>
+            </tr>
+            <tr>
+                <td><strong>การลงชื่อเข้าใช้ผ่าน Google (Google OAuth)</strong></td>
+                <td>
+                    <span class="badge badge-user">User</span>
+                    <span class="badge badge-teacher">Teacher</span>
+                </td>
+                <td>ปุ่มล็อกอินด้วยบัญชีอีเมล Google ของสถาบัน (@atcc.ac.th) เพื่อความสะดวกรวดเร็วโดยไม่ต้องจำรหัสผ่าน</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>2. แบบร่างหน้าจอหลักและคลังอุปกรณ์ (User Dashboard & Catalog) - สำหรับผู้ใช้งานทั่วไป และอาจารย์</h2>
+    <p>หน้ารายการคลังอุปกรณ์หลักหลังผู้ใช้ล็อกอินสำเร็จ แสดงผลการ์ดข้อมูลครุภัณฑ์และวัสดุอย่างครบถ้วน พร้อมระบบดึงตัวกรอง (Filter) ค้นหาอย่างรวดเร็ว</p>
+
+    <div class="image-container">
+        <img src="https://project01-psi-plum.vercel.app/static/img/prototypes/user_catalog_prototype.jpg" alt="User Dashboard & Catalog Prototype">
+        <p class="caption">รูปที่ 2: แบบร่างหน้าจอหลักผู้ใช้ทั่วไปและอาจารย์ (User Dashboard)</p>
+    </div>
+
+    <h3>รายละเอียดฟังก์ชันการทำงาน:</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 25%;">ฟังก์ชัน (Features)</th>
+                <th style="width: 20%;">ผู้เกี่ยวข้อง (Actors)</th>
+                <th style="width: 55%;">รายละเอียดการทำงาน</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>การค้นหาและกรองข้อมูลแบบเรียลไทม์ (Search & Filters)</strong></td>
+                <td>
+                    <span class="badge badge-user">User</span>
+                    <span class="badge badge-teacher">Teacher</span>
+                </td>
+                <td>พิมพ์ค้นหาชื่อรหัสครุภัณฑ์ (มี Debounce 150ms ป้องกันแป้นพิมพ์หน่วง) และกรองเลือกตามหมวดหมู่ อาคาร ชั้น หรือห้องเรียนปฏิบัติการได้</td>
+            </tr>
+            <tr>
+                <td><strong>ยื่นคำขอยืมครุภัณฑ์ (Durable Checkout)</strong></td>
+                <td>
+                    <span class="badge badge-user">User</span>
+                    <span class="badge badge-teacher">Teacher</span>
+                </td>
+                <td>กดปุ่ม "BORROW" เพื่อระบุวันเวลาที่จะเข้ามารับอุปกรณ์ครุภัณฑ์ และจำนวนวันที่จะขอยืม (จำกัด 1-30 วัน) เพื่อส่งเรื่องให้แอดมินอนุมัติ</td>
+            </tr>
+            <tr>
+                <td><strong>ยื่นคำขอเบิกวัสดุสิ้นเปลือง (Consumable Checkout)</strong></td>
+                <td>
+                    <span class="badge badge-user">User</span>
+                    <span class="badge badge-teacher">Teacher</span>
+                </td>
+                <td>กดปุ่ม "CHECKOUT" เพื่อระบุจำนวนชิ้นวัสดุที่จะขอเบิกไปใช้งานทันที (หักยอดคงเหลือเมื่อได้รับการอนุมัติ และไม่ต้องส่งคืน)</td>
+            </tr>
+            <tr>
+                <td><strong>การส่งคืนครุภัณฑ์และแนบรูปภาพ (Return & Upload Image)</strong></td>
+                <td>
+                    <span class="badge badge-user">User</span>
+                    <span class="badge badge-teacher">Teacher</span>
+                </td>
+                <td>เมื่อใช้งานเสร็จ ผู้ใช้ต้องกดคืนในระบบและถ่ายรูปสภาพครุภัณฑ์ ณ เวลาที่ส่งคืนอัปโหลดแนบเป็นหลักฐานการส่งคืน เพื่อให้แอดมินกดยืนยันรับของเข้าคลัง</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>3. แบบร่างหน้าจอควบคุมของผู้ดูแลระบบ (Admin Dashboard Panel) - สำหรับผู้ดูแลระบบ</h2>
+    <p>หน้าหลักของแอดมินสำหรับตรวจดูรายงานวิเคราะห์สต็อก สถิติประเภทครุภัณฑ์ และจัดการคำขอยืม-คืนที่ค้างการทำรายการในระบบ</p>
+
+    <div class="image-container">
+        <img src="https://project01-psi-plum.vercel.app/static/img/prototypes/admin_dashboard_prototype.jpg" alt="Admin Dashboard Prototype">
+        <p class="caption">รูปที่ 3: แบบร่างหน้าจอแดชบอร์ดจัดการของแอดมิน (Admin Dashboard)</p>
+    </div>
+
+    <h3>รายละเอียดฟังก์ชันการทำงาน:</h3>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 25%;">ฟังก์ชัน (Features)</th>
+                <th style="width: 20%;">ผู้เกี่ยวข้อง (Actors)</th>
+                <th style="width: 55%;">รายละเอียดการทำงาน</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>พิจารณาอนุมัติคำขอยืม-คืน (Approve / Reject Requests)</strong></td>
+                <td><span class="badge badge-admin">Admin</span></td>
+                <td>ตรวจสอบคำขอยืมหรือเบิกที่ค้างอยู่ (Pending) แล้วกดปุ่มอนุมัติหรือปฏิเสธ เพื่อทำการหักหรือเพิ่มจำนวนสต็อกจริงในคลัง พร้อมส่งอีเมลแจ้งผลการพิจารณาโดยอัตโนมัติ</td>
+            </tr>
+            <tr>
+                <td><strong>ตรวจสอบหลักฐานภาพถ่ายการคืน (Return Image Inspection)</strong></td>
+                <td><span class="badge badge-admin">Admin</span></td>
+                <td>กดดูรูปถ่ายสภาพครุภัณฑ์ที่ผู้ใช้ถ่ายตอนนำมาส่งคืน เพื่อตรวจจับความเสียหายก่อนที่จะกดยืนยันรับคืนอุปกรณ์เข้าสู่สต็อก</td>
+            </tr>
+            <tr>
+                <td><strong>ระบบแดชบอร์ดรายงานเชิงวิเคราะห์ (Visual Statistics Charts)</strong></td>
+                <td><span class="badge badge-admin">Admin</span></td>
+                <td>แสดงผลแผนภูมิวงกลม (Pie Chart) เปรียบเทียบสัดส่วนระหว่างครุภัณฑ์คงทน (Durable) กับวัสดุสิ้นเปลือง (Consumable) และแผนภูมิแท่งยอดอัตราความนิยมในการกดยืมแต่ละเดือน</td>
+            </tr>
+            <tr>
+                <td><strong>จัดการข้อมูลอุปกรณ์ในคลัง (Equipment Catalog Management)</strong></td>
+                <td><span class="badge badge-admin">Admin</span></td>
+                <td>แบบฟอร์มเพิ่มข้อมูลอุปกรณ์ใหม่ แก้ไขค่า หรือลบครุภัณฑ์ออกจากระบบคลังสะสม</td>
+            </tr>
+            <tr>
+                <td><strong>แจ้งเตือนส่งจดหมายทวงคืนครุภัณฑ์ (Overdue Alert Mailing)</strong></td>
+                <td><span class="badge badge-admin">Admin</span></td>
+                <td>ตรวจคัดกรองใบยืมที่เกินเวลาส่งคืน แล้วสั่งการให้ส่งอีเมลแจ้งเตือนแจ้งภัยสีแดงเตือนคืนด่วน (Overdue warning email) ไปยังนักศึกษาโดยตรง</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
