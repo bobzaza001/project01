@@ -4,141 +4,178 @@ import matplotlib.patches as patches
 
 # Set Font and Style
 plt.rcParams['font.family'] = 'Tahoma'  # Tahoma is standard on Windows and supports Thai
-plt.rcParams['figure.facecolor'] = '#f8fafc'
-plt.rcParams['axes.facecolor'] = '#f8fafc'
+plt.rcParams['figure.facecolor'] = '#ffffff'
+plt.rcParams['axes.facecolor'] = '#ffffff'
 
 # Create output directories
 os.makedirs("static/img/diagrams", exist_ok=True)
 os.makedirs("C:/Users/ACER/.gemini/antigravity/brain/b500e698-6452-4be9-bee4-08259588db82", exist_ok=True)
 
 def draw_system_architecture():
-    fig, ax = plt.subplots(figsize=(12, 9))
-    ax.set_xlim(0, 12)
-    ax.set_ylim(0, 9)
+    fig, ax = plt.subplots(figsize=(11, 10))
+    ax.set_xlim(0, 11)
+    ax.set_ylim(0, 10)
     ax.axis('off')
 
     # Title
-    ax.text(6, 8.5, "สถาปัตยกรรมระบบจัดการยืม-คืนครุภัณฑ์ (LAB Equipment System) - 3-TIER", 
-            ha='center', va='center', fontsize=14, weight='bold', color='#1e3a8a')
-    ax.text(6, 8.1, "โครงงานระบบบริหารจัดการห้องปฏิบัติการคอมพิวเตอร์", 
-            ha='center', va='center', fontsize=10, color='#64748b', style='italic')
+    ax.text(5.5, 9.6, "โครงสร้างการพัฒนาระบบ (System Development Architecture - MVC Architecture)", 
+            ha='center', va='center', fontsize=13, weight='bold', color='#0f172a')
+    ax.text(5.5, 9.3, "ระบบจัดการยืม-คืนครุภัณฑ์ห้องปฏิบัติการคอมพิวเตอร์ (LAB Equipment Management System)", 
+            ha='center', va='center', fontsize=9, color='#475569')
 
-    # Box styles
-    fc_title = '#1e3a8a'
-    fc_box = '#ffffff'
-    border_blue = '#0ea5e9'
-    border_indigo = '#4f46e5'
-    border_emerald = '#10b981'
+    # Styles
+    box_color_user = '#f1f5f9'
+    box_color_server = '#e0f2fe'
+    box_color_db = '#dcfce7'
+    box_color_ext = '#fef3c7'
+    text_color = '#1e293b'
+    line_color = '#64748b'
 
-    # Helper function to draw layer boxes
-    def draw_layer(x, y, w, h, title, details, color):
-        # Layer outer boundary
-        rect = patches.FancyBboxPatch((x, y-h), w, h, boxstyle="round,pad=0.08",
-                                      fc=fc_box, ec=color, lw=2.5, zorder=2)
+    # Helper function to draw simple icons
+    def draw_box(x, y, w, h, title, subtitle="", color='#cbd5e1', is_header=False):
+        rect = patches.FancyBboxPatch((x, y-h), w, h, boxstyle="round,pad=0.04",
+                                      fc=color, ec=line_color, lw=1.2, zorder=3)
         ax.add_patch(rect)
-        # Layer Header
-        header = patches.FancyBboxPatch((x, y-0.45), w, 0.45, boxstyle="round,pad=0.08",
-                                        fc=color, ec=color, zorder=3)
-        ax.add_patch(header)
-        ax.text(x + w/2, y-0.22, title, ha='center', va='center', color='white', weight='bold', fontsize=10, zorder=4)
-        
-        # Details text
-        for i, text in enumerate(details):
-            # Check if text is bold header or normal detail
-            is_header = text.startswith("▶")
-            fs = 8.5 if is_header else 8
-            fw = 'bold' if is_header else 'normal'
-            col = '#0f172a' if is_header else '#475569'
-            ax.text(x + 0.15, y - 0.7 - (i * 0.28), text, ha='left', va='center', 
-                    fontsize=fs, color=col, weight=fw, zorder=4)
+        ax.text(x + w/2, y - 0.22, title, ha='center', va='center', fontsize=9, weight='bold', color=text_color, zorder=4)
+        if subtitle:
+            ax.text(x + w/2, y - 0.5, subtitle, ha='center', va='center', fontsize=7.5, color='#475569', zorder=4)
 
-    # 1. PRESENTATION LAYER (Client)
-    layer1_details = [
-        "▶ USER INTERFACE (ส่วนผู้ใช้งาน)",
-        " - Responsive Web Design (รองรับมือถือ/PC)",
-        " - หน้าจอระบบยืม-เบิกครุภัณฑ์ (User Dashboard)",
-        " - หน้าจอตรวจสอบสต็อกและสถิติ (Admin Dashboard)",
-        " - หน้าจอประวัติยืม-คืนแนบรูปหลักฐานการคืน",
-        "",
-        "▶ TECHNOLOGIES & TOOLS",
-        " - HTML5 / CSS3 (ดีไซน์กระจกโปร่งแสง Glassmorphism)",
-        " - JavaScript (ES6) / CSS Variables (โหมดมืด/สว่าง)",
-        " - FontAwesome Icons (ระบบสัญลักษณ์แจ้งเตือน)",
-        " - Web Browsers (Chrome, Edge, Safari)"
-    ]
-    draw_layer(0.3, 7.3, 3.5, 3.8, "1. PRESENTATION LAYER (CLIENT)", layer1_details, border_indigo)
+    # Helper function to draw speech bubble note
+    def draw_note(x, y, w, h, title, items, color='#f8fafc', border_color='#94a3b8'):
+        rect = patches.FancyBboxPatch((x, y-h), w, h, boxstyle="round,pad=0.04",
+                                      fc=color, ec=border_color, lw=1, zorder=4)
+        ax.add_patch(rect)
+        ax.text(x + 0.15, y - 0.25, title, ha='left', va='center', fontsize=8, weight='bold', color='#0f172a', zorder=5)
+        for i, item in enumerate(items):
+            ax.text(x + 0.15, y - 0.55 - (i * 0.22), item, ha='left', va='center', fontsize=7.5, color='#475569', zorder=5)
 
-    # 2. APPLICATION LAYER (Web Server)
-    layer2_details = [
-        "▶ WEB APP PROCESSING (ส่วนประมวลผลหลัก)",
-        " - การประมวลผลระบบสิทธิ์ Admin และ User",
-        " - อนุมัติยืม-คืน / ระบบล้างคิวค้างเพื่อลดการหน่วง (Debounce)",
-        " - จัดการหมวดหมู่ ตึก ชั้น และเลขห้องปฏิบัติการ",
-        " - การแจ้งปัญหาชำรุดครุภัณฑ์ (Repair System)",
-        "",
-        "▶ SYSTEM ARCHITECTURE & HOSTING",
-        " - Python 3.10+ / Flask Framework",
-        " - Vercel Cloud Hosting (Serverless Deployment)",
-        " - SQLAlchemy (ORM) / Database Connection Pooler",
-        " - SMTP Email Server (จำลองการแจ้งเตือนส่งจดหมายด่วน)"
-    ]
-    draw_layer(4.25, 7.3, 3.5, 3.8, "2. APPLICATION LAYER (WEB SERVER)", layer2_details, border_blue)
+    # Helper function for cloud connection labels
+    def draw_cloud_connection(x, y, text_top, text_bottom):
+        # Draw small cloud representation
+        ellipse1 = patches.Ellipse((x, y), 0.7, 0.4, fc='#f1f5f9', ec=line_color, lw=0.8, zorder=3)
+        ellipse2 = patches.Ellipse((x-0.2, y-0.1), 0.5, 0.3, fc='#f1f5f9', ec=line_color, lw=0.8, zorder=3)
+        ellipse3 = patches.Ellipse((x+0.2, y-0.1), 0.5, 0.3, fc='#f1f5f9', ec=line_color, lw=0.8, zorder=3)
+        ax.add_patch(ellipse1)
+        ax.add_patch(ellipse2)
+        ax.add_patch(ellipse3)
+        # Bidirectional arrows
+        ax.annotate("", xy=(x-0.45, y), xytext=(x+0.45, y), arrowprops=dict(arrowstyle="<->", color=line_color, lw=1))
+        # Text
+        ax.text(x, y+0.28, text_top, ha='center', va='bottom', fontsize=7, color='#475569')
+        ax.text(x, y-0.28, text_bottom, ha='center', va='top', fontsize=7, color='#475569')
 
-    # 3. DATA LAYER (Database Server)
-    layer3_details = [
-        "▶ DATABASE MANAGEMENT (ระบบข้อมูล)",
-        " - Supabase Cloud Database (PostgreSQL)",
-        " - เก็บประวัติการยืม-คืน (ตาราง BorrowRequest)",
-        " - เก็บประวัติการแจ้งซ่อม (ตาราง RepairRequest)",
-        " - เก็บแผนผังห้องเรียน (ตาราง Building/Floor/Room)",
-        " - ล็อกอินผู้ใช้และแอดมิน (ตาราง User)",
-        "",
-        "▶ DATA DICTIONARY STRUCTURE",
-        " - Table Users (เก็บรหัสผ่านเข้ารหัส HASH)",
-        " - Table Equipment (แยกครุภัณฑ์ Durable/Consumable)",
-        " - เชื่อมโยงความสัมพันธ์ข้อมูลแบบ 1-to-Many (1:N)"
-    ]
-    draw_layer(8.2, 7.3, 3.5, 3.8, "3. DATA LAYER (DATABASE SERVER)", layer3_details, border_emerald)
+    # Draw Connections
+    # PC Monitor <-> Web Server
+    draw_cloud_connection(3.6, 7.3, "Request Message", "Response Message")
+    # Admin <-> Web Server
+    draw_cloud_connection(3.6, 5.0, "Request Message", "Response Message")
+    # SmartPhone <-> Google OAuth
+    draw_cloud_connection(3.6, 2.7, "Auth Token", "User Info")
+    # Web Server <-> Database
+    draw_cloud_connection(7.2, 7.3, "Request Message", "Response Message")
+    # Web Server <-> SMTP
+    draw_cloud_connection(7.2, 2.7, "Request Message", "Response Message")
 
-    # Connecting Arrows & Flows
-    # L1 -> L2 (Request)
-    ax.annotate("", xy=(4.15, 5.0), xytext=(3.9, 5.0),
-                arrowprops=dict(arrowstyle="->", color='#4f46e5', lw=1.5))
-    ax.text(4.025, 5.15, "HTTPS Request\n(GET/POST)", ha='center', va='bottom', fontsize=7, color='#4f46e5')
+    # 1. Actors & Devices (Left Column)
+    # Users -> Monitor
+    ax.text(1.2, 8.9, "ผู้ใช้งานทั่วไป\n(นักศึกษา / อาจารย์)", ha='center', va='center', fontsize=8, weight='bold')
+    ax.annotate("", xy=(1.2, 8.1), xytext=(1.2, 8.5), arrowprops=dict(arrowstyle="->", color=line_color, lw=1))
+    
+    draw_box(0.4, 8.0, 1.6, 0.7, "Monitor", "Web Interface (PC)", box_color_user)
+    
+    # Website Admin -> Server
+    ax.text(1.2, 5.6, "ผู้ดูแลระบบ\n(Website Admin)", ha='center', va='center', fontsize=8, weight='bold')
+    ax.annotate("", xy=(1.2, 5.0), xytext=(1.2, 5.3), arrowprops=dict(arrowstyle="->", color=line_color, lw=1))
+    
+    # Smartphone User -> Smartphone Device
+    ax.text(1.2, 3.4, "ผู้ใช้งานเคลื่อนที่\n(Mobile User)", ha='center', va='center', fontsize=8, weight='bold')
+    ax.annotate("", xy=(1.2, 2.7), xytext=(1.2, 3.1), arrowprops=dict(arrowstyle="->", color=line_color, lw=1))
+    
+    draw_box(0.4, 2.6, 1.6, 0.7, "SmartPhone", "Mobile Web Page", box_color_user)
 
-    # L2 -> L1 (Response)
-    ax.annotate("", xy=(3.9, 4.4), xytext=(4.15, 4.4),
-                arrowprops=dict(arrowstyle="->", color='#64748b', lw=1.5))
-    ax.text(4.025, 4.25, "HTTPS Response\n(HTML/JSON)", ha='center', va='top', fontsize=7, color='#64748b')
+    # 2. Main Web Server (Center Column)
+    draw_box(4.7, 7.8, 1.6, 1.2, "Web Server", "Vercel / Flask Server", box_color_server)
+    ax.text(5.5, 7.2, "Application Layer", ha='center', va='center', fontsize=7, color='#64748b', style='italic')
 
-    # L2 -> L3 (Query)
-    ax.annotate("", xy=(8.1, 5.0), xytext=(7.85, 5.0),
-                arrowprops=dict(arrowstyle="->", color='#0ea5e9', lw=1.5))
-    ax.text(7.975, 5.15, "SQL Query\n(SQLAlchemy ORM)", ha='center', va='bottom', fontsize=7, color='#0ea5e9')
+    # Draw lines connecting devices to server
+    # Monitor -> Server
+    ax.plot([2.0, 2.8], [7.65, 7.65], color=line_color, lw=1)
+    ax.plot([4.4, 4.7], [7.3, 7.3], color=line_color, lw=1)
+    
+    # Admin -> Server
+    ax.plot([2.0, 2.8], [4.65, 4.65], color=line_color, lw=1)
+    ax.plot([4.4, 4.7], [4.65, 4.65], color=line_color, lw=1)
+    
+    # Connect Admin line to server (vertical connection)
+    ax.plot([4.7, 4.7], [4.65, 6.6], color=line_color, lw=1)
 
-    # L3 -> L2 (Result Set)
-    ax.annotate("", xy=(7.85, 4.4), xytext=(8.1, 4.4),
-                arrowprops=dict(arrowstyle="->", color='#10b981', lw=1.5))
-    ax.text(7.975, 4.25, "Result Set\n(Data Rows)", ha='center', va='top', fontsize=7, color='#10b981')
+    # Mobile -> OAuth
+    ax.plot([2.0, 2.8], [2.25, 2.25], color=line_color, lw=1)
+    ax.plot([4.4, 4.7], [2.25, 2.25], color=line_color, lw=1)
 
-    # External Component (SMTP Service Box at bottom center)
-    rect_ext = patches.FancyBboxPatch((4.5, 2.5), 3.0, 1.1, boxstyle="round,pad=0.05",
-                                      fc='#f8fafc', ec='#ef4444', lw=1.5, zorder=2)
-    ax.add_patch(rect_ext)
-    ax.text(6.0, 3.3, "EXTERNAL EMAIL SERVICE", ha='center', va='center', color='#b91c1c', weight='bold', fontsize=8.5)
-    ax.text(6.0, 2.9, "SMTP Server (Gmail / Outlook)\nส่งเมลแจ้งเตือนส่งคืนอุปกรณ์ด่วนพิเศษ", ha='center', va='center', color='#475569', fontsize=7.5)
+    # 3. Database & Services (Right Column)
+    draw_box(8.8, 7.8, 1.6, 1.2, "Database", "Supabase PostgreSQL", box_color_db)
+    ax.text(9.6, 7.2, "Data Layer", ha='center', va='center', fontsize=7, color='#64748b', style='italic')
+    
+    # Server -> Database lines
+    ax.plot([6.3, 6.4], [7.3, 7.3], color=line_color, lw=1)
+    ax.plot([8.0, 8.8], [7.3, 7.3], color=line_color, lw=1)
 
-    # Connecting Application to External Service
-    ax.annotate("", xy=(6.0, 2.6), xytext=(6.0, 3.4),
-                arrowprops=dict(arrowstyle="<-", color='#ef4444', lw=1.2))
-    ax.text(6.1, 3.0, "ส่งคำขอส่งอีเมล", ha='left', va='center', fontsize=7, color='#ef4444')
+    # External APIs (Bottom Right)
+    draw_box(8.8, 3.2, 1.6, 1.2, "SMTP Mail Server", "Gmail SMTP Service", box_color_ext)
+    
+    # Server -> SMTP lines
+    ax.plot([6.3, 6.4], [2.7, 2.7], color=line_color, lw=1)
+    ax.plot([8.0, 8.8], [2.7, 2.7], color=line_color, lw=1)
+    # Vertical connecting lines from Server down to SMTP line
+    ax.plot([6.4, 6.4], [7.3, 2.7], color=line_color, lw=1)
+
+    # External OAuth (Bottom Center)
+    draw_box(4.7, 3.2, 1.6, 1.2, "Google OAuth", "Identity Provider", box_color_ext)
+
+    # Note Popups (Speech bubbles matching original diagram)
+    # Controller Note (Top Center)
+    draw_note(4.5, 9.0, 2.0, 1.0, "AuthController", [
+        "BorrowController",
+        "RepairController",
+        "EquipmentController"
+    ], color='#f0fdfa', border_color='#5eead4')
+    
+    # Model Note (Top Right)
+    draw_note(8.6, 9.0, 2.0, 1.0, "UserModel", [
+        "EquipmentModel",
+        "BorrowRequestModel",
+        "RepairRequestModel"
+    ], color='#f0fdfa', border_color='#5eead4')
+
+    # OAuth Model Note (Bottom Center)
+    draw_note(4.5, 1.8, 2.0, 0.7, "OAuth Controller", [
+        "Google Sign-In API"
+    ], color='#fffbeb', border_color='#fde047')
+
+    # SMTP Controller Note (Bottom Right)
+    draw_note(8.6, 1.8, 2.0, 0.7, "SMTP Controller", [
+        "Mail Notification Service"
+    ], color='#fffbeb', border_color='#fde047')
 
     # Save to local image paths and brain artifacts directory
-    local_path = "static/img/diagrams/system_architecture.png"
-    artifact_path = "C:/Users/ACER/.gemini/antigravity/brain/b500e698-6452-4be9-bee4-08259588db82/system_architecture.png"
-    fig.savefig(local_path, bbox_inches='tight', dpi=300)
-    fig.savefig(artifact_path, bbox_inches='tight', dpi=300)
-    print(f"Generated System Architecture at: {local_path} and {artifact_path}")
+    local_paths = [
+        "static/img/diagrams/system_architecture.png",
+        "static/img/diagrams/system_architecture_infographic.png",
+        "static/img/diagrams/system_architecture_infographic.jpg"
+    ]
+    artifact_paths = [
+        "C:/Users/ACER/.gemini/antigravity/brain/b500e698-6452-4be9-bee4-08259588db82/system_architecture.png",
+        "C:/Users/ACER/.gemini/antigravity/brain/b500e698-6452-4be9-bee4-08259588db82/system_architecture_infographic.png"
+    ]
+    
+    # Save fig helper
+    for path in local_paths:
+        fig.savefig(path, bbox_inches='tight', dpi=300)
+    for path in artifact_paths:
+        fig.savefig(path, bbox_inches='tight', dpi=300)
+        
+    print(f"Generated System Architecture Diagram successfully.")
     plt.close(fig)
 
 if __name__ == "__main__":
