@@ -356,6 +356,14 @@
             </tr>
             <tr>
                 <td>4</td>
+                <td>description</td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>รายละเอียดคำอธิบายของครุภัณฑ์</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>5</td>
                 <td>category</td>
                 <td>VARCHAR</td>
                 <td>100</td>
@@ -363,7 +371,15 @@
                 <td>-</td>
             </tr>
             <tr>
-                <td>5</td>
+                <td>6</td>
+                <td>image_filename</td>
+                <td>VARCHAR</td>
+                <td>255</td>
+                <td>ชื่อไฟล์รูปภาพของครุภัณฑ์</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>7</td>
                 <td>status</td>
                 <td>VARCHAR</td>
                 <td>50</td>
@@ -371,7 +387,7 @@
                 <td>-</td>
             </tr>
             <tr>
-                <td>6</td>
+                <td>8</td>
                 <td>total_quantity</td>
                 <td>INT</td>
                 <td>-</td>
@@ -379,7 +395,7 @@
                 <td>-</td>
             </tr>
             <tr>
-                <td>7</td>
+                <td>9</td>
                 <td>available_quantity</td>
                 <td>INT</td>
                 <td>-</td>
@@ -387,7 +403,7 @@
                 <td>-</td>
             </tr>
             <tr>
-                <td>8</td>
+                <td>10</td>
                 <td>item_type</td>
                 <td>VARCHAR</td>
                 <td>50</td>
@@ -395,7 +411,7 @@
                 <td>-</td>
             </tr>
             <tr>
-                <td>9</td>
+                <td>11</td>
                 <td>is_borrowable</td>
                 <td>BOOLEAN</td>
                 <td>-</td>
@@ -403,7 +419,7 @@
                 <td>-</td>
             </tr>
             <tr>
-                <td>10</td>
+                <td>12</td>
                 <td>room_id</td>
                 <td>INT</td>
                 <td>-</td>
@@ -492,18 +508,138 @@
             </tr>
             <tr>
                 <td>9</td>
-                <td>quantity</td>
+                <td>borrow_days</td>
                 <td>INT</td>
                 <td>-</td>
-                <td>จำนวนที่ขอรับ</td>
+                <td>จำนวนวันยืมอุปกรณ์ (ระบุโดยผู้ยืม 1-30 วัน)</td>
                 <td>-</td>
             </tr>
             <tr>
                 <td>10</td>
+                <td>quantity</td>
+                <td>INT</td>
+                <td>-</td>
+                <td>จำนวนที่ขอรับ (เบิกวัสดุสิ้นเปลือง)</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>damage_status</td>
+                <td>VARCHAR</td>
+                <td>20</td>
+                <td>สถานะความชำรุดของครุภัณฑ์หลังส่งคืน (normal / damaged)</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td>damage_note</td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>บันทึกรายละเอียดอาการชำรุดตอนคืนของ</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>13</td>
                 <td>return_image_filename</td>
                 <td>VARCHAR</td>
-                <td>200</td>
+                <td>255</td>
                 <td>ชื่อรูปถ่ายหลักฐานยืนยันตอนส่งคืน</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>14</td>
+                <td>warning_message</td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>ข้อความเตือนที่แอดมินพิมพ์ส่งแนบอีเมลทวงคืน</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>15</td>
+                <td>overdue_notified</td>
+                <td>BOOLEAN</td>
+                <td>-</td>
+                <td>เคยส่งเมลเตือนค้างส่งแล้วหรือยัง (True/False)</td>
+                <td>-</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>ตาราง 7.4: โครงสร้างตาราง RepairRequest (ประวัติการแจ้งซ่อม)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Column</th>
+                <th>Type</th>
+                <th>Size</th>
+                <th>Comment</th>
+                <th>Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>id</td>
+                <td>INT</td>
+                <td>-</td>
+                <td>รหัสรันอัตโนมัติประจำการแจ้งซ่อม</td>
+                <td>PK</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>equipment_id</td>
+                <td>INT</td>
+                <td>-</td>
+                <td>รหัสครุภัณฑ์ที่ต้องการแจ้งซ่อม</td>
+                <td>FK</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>user_id</td>
+                <td>INT</td>
+                <td>-</td>
+                <td>รหัสผู้ใช้ที่ยื่นแจ้งซ่อม</td>
+                <td>FK</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>issue_description</td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>คำอธิบายรายละเอียดอาการชำรุดเสียหาย</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>status</td>
+                <td>VARCHAR</td>
+                <td>20</td>
+                <td>สถานะแจ้งซ่อม (pending, in_progress, completed)</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>reported_at</td>
+                <td>DATETIME</td>
+                <td>-</td>
+                <td>วันและเวลาที่ส่งรายงานแจ้งซ่อมเข้ามา</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>resolved_at</td>
+                <td>DATETIME</td>
+                <td>-</td>
+                <td>วันและเวลาที่แก้ไขการซ่อมแซมเสร็จสิ้น</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>admin_note</td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>บันทึกหมายเหตุเพิ่มเติมโดยแอดมินหลังดำเนินการ</td>
                 <td>-</td>
             </tr>
         </tbody>

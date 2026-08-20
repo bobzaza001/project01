@@ -161,6 +161,7 @@ class RepairRequest(db.Model):
     status = db.Column(db.String(20), default='pending') # pending, in_progress, completed
     reported_at = db.Column(db.DateTime, default=get_local_now)
     resolved_at = db.Column(db.DateTime, nullable=True)
+    admin_note = db.Column(db.Text, default='')
     
     equipment = db.relationship('Equipment', backref=db.backref('repair_requests', lazy='dynamic'))
     reporter = db.relationship('User', backref=db.backref('repair_requests', lazy='dynamic'))

@@ -115,13 +115,13 @@ def draw_context_diagram():
 # 2. ER Diagram
 # ==========================================
 def draw_er_diagram():
-    fig, ax = plt.subplots(figsize=(12, 10))
-    ax.set_xlim(0, 12)
-    ax.set_ylim(0, 10)
+    fig, ax = plt.subplots(figsize=(14, 13))
+    ax.set_xlim(0, 14)
+    ax.set_ylim(0, 13)
     ax.axis('off')
 
     # Title
-    ax.text(6, 9.5, "แผนภาพความสัมพันธ์ข้อมูล (ER Diagram)", 
+    ax.text(7, 12.5, "แผนภาพความสัมพันธ์ข้อมูล (ER Diagram)", 
             ha='center', va='center', fontsize=14, weight='bold', color='#1e3a8a')
 
     # Draw Entities
@@ -133,7 +133,7 @@ def draw_er_diagram():
         ax.add_patch(rect)
         # Header Box
         header_rect = patches.FancyBboxPatch((x, y-0.45), 2.2, 0.45, boxstyle="round,pad=0.05",
-                                             fc=color, ec=color, zorder=3)
+                                              fc=color, ec=color, zorder=3)
         ax.add_patch(header_rect)
         ax.text(x+1.1, y-0.22, name, ha='center', va='center', color='white', weight='bold', fontsize=9, zorder=4)
         
@@ -142,25 +142,83 @@ def draw_er_diagram():
             ax.text(x+0.1, y-0.7-(i*0.25), attr, ha='left', va='center', fontsize=8, color='#334155', zorder=4)
 
     # 1. User
-    draw_entity(0.5, 8.5, "User (ผู้ใช้)", ["PK: id (INT)", "username (VARCHAR)", "full_name (VARCHAR)", "email (VARCHAR)", "password_hash (VARCHAR)", "role (VARCHAR)", "created_at (DATETIME)"], '#1e3a8a')
+    draw_entity(0.5, 11.5, "User (ผู้ใช้)", [
+        "PK: id (INT)", 
+        "username (VARCHAR)", 
+        "full_name (VARCHAR)", 
+        "email (VARCHAR)", 
+        "password_hash (VARCHAR)", 
+        "role (VARCHAR)", 
+        "profile_image (VARCHAR)", 
+        "created_at (DATETIME)"
+    ], '#1e3a8a')
     
     # 2. BorrowRequest
-    draw_entity(4.8, 8.5, "BorrowRequest (การยืม)", ["PK: id (INT)", "FK: user_id (INT)", "FK: equipment_id (INT)", "status (VARCHAR)", "requested_at (DATETIME)", "borrow_datetime (DATETIME)", "return_due_datetime (DATETIME)", "returned_at (DATETIME)", "quantity (INT)", "return_image_filename (VARCHAR)", "overdue_notified (BOOLEAN)"], '#0ea5e9')
+    draw_entity(4.8, 11.5, "BorrowRequest (การยืม)", [
+        "PK: id (INT)", 
+        "FK: user_id (INT)", 
+        "FK: equipment_id (INT)", 
+        "status (VARCHAR)", 
+        "requested_at (DATETIME)", 
+        "borrow_datetime (DATETIME)", 
+        "return_due_datetime (DATETIME)", 
+        "returned_at (DATETIME)", 
+        "borrow_days (INT)", 
+        "quantity (INT)", 
+        "damage_status (VARCHAR)", 
+        "damage_note (TEXT)", 
+        "return_image_filename (VARCHAR)", 
+        "warning_message (TEXT)", 
+        "overdue_notified (BOOLEAN)"
+    ], '#0ea5e9')
 
     # 3. Equipment
-    draw_entity(9.3, 8.5, "Equipment (ครุภัณฑ์)", ["PK: id (INT)", "FK: room_id (INT)", "equipment_code (VARCHAR)", "name (VARCHAR)", "category (VARCHAR)", "status (VARCHAR)", "quantity (INT)", "available_quantity (INT)", "item_type (VARCHAR)", "is_borrowable (BOOLEAN)"], '#1e3a8a')
+    draw_entity(9.3, 11.5, "Equipment (ครุภัณฑ์)", [
+        "PK: id (INT)", 
+        "FK: room_id (INT)", 
+        "equipment_code (VARCHAR)", 
+        "name (VARCHAR)", 
+        "description (TEXT)", 
+        "category (VARCHAR)", 
+        "image_filename (VARCHAR)", 
+        "status (VARCHAR)", 
+        "total_quantity (INT)", 
+        "available_quantity (INT)", 
+        "item_type (VARCHAR)", 
+        "is_borrowable (BOOLEAN)"
+    ], '#1e3a8a')
 
     # 4. RepairRequest
-    draw_entity(4.8, 4.5, "RepairRequest (แจ้งซ่อม)", ["PK: id (INT)", "FK: user_id (INT)", "FK: equipment_id (INT)", "description (TEXT)", "status (VARCHAR)", "reported_at (DATETIME)", "resolved_at (DATETIME)", "admin_note (TEXT)"], '#ef4444')
+    draw_entity(4.8, 6.0, "RepairRequest (แจ้งซ่อม)", [
+        "PK: id (INT)", 
+        "FK: user_id (INT)", 
+        "FK: equipment_id (INT)", 
+        "issue_description (TEXT)", 
+        "status (VARCHAR)", 
+        "reported_at (DATETIME)", 
+        "resolved_at (DATETIME)", 
+        "admin_note (TEXT)"
+    ], '#ef4444')
 
     # 5. Room
-    draw_entity(9.3, 4.5, "Room (ห้อง)", ["PK: id (INT)", "FK: floor_id (INT)", "name (VARCHAR)"], '#8b5cf6')
+    draw_entity(9.3, 6.0, "Room (ห้อง)", [
+        "PK: id (INT)", 
+        "FK: floor_id (INT)", 
+        "name (VARCHAR)"
+    ], '#8b5cf6')
 
     # 6. Floor
-    draw_entity(9.3, 2.2, "Floor (ชั้น)", ["PK: id (INT)", "FK: building_id (INT)", "name (VARCHAR)"], '#8b5cf6')
+    draw_entity(9.3, 3.8, "Floor (ชั้น)", [
+        "PK: id (INT)", 
+        "FK: building_id (INT)", 
+        "name (VARCHAR)"
+    ], '#8b5cf6')
 
     # 7. Building
-    draw_entity(5.5, 2.2, "Building (อาคาร)", ["PK: id (INT)", "name (VARCHAR)"], '#8b5cf6')
+    draw_entity(4.8, 3.8, "Building (อาคาร)", [
+        "PK: id (INT)", 
+        "name (VARCHAR)"
+    ], '#8b5cf6')
 
     # Draw Relationships (Lines with labels)
     def draw_line(x1, y1, x2, y2, label_start, label_end, text="", style='-'):
@@ -171,25 +229,25 @@ def draw_er_diagram():
             ax.text((x1+x2)/2, (y1+y2)/2, text, fontsize=8, color='#64748b', ha='center', va='center', backgroundcolor='white')
 
     # User (1) -- (N) BorrowRequest
-    draw_line(2.7, 7.35, 4.8, 7.35, "1", "N", "ยื่นคำขอ")
+    draw_line(2.7, 10.0, 4.8, 10.0, "1", "N", "ยื่นคำขอ")
     
     # Equipment (1) -- (N) BorrowRequest
-    draw_line(9.3, 7.0, 7.0, 7.0, "1", "N", "ถูกยืม")
+    draw_line(9.3, 9.5, 7.0, 9.5, "1", "N", "ถูกยืม")
 
     # User (1) -- (N) RepairRequest
-    draw_line(2.7, 6.5, 4.8, 3.5, "1", "N", "แจ้งปัญหา", style='--')
+    draw_line(2.7, 9.25, 4.8, 4.8, "1", "N", "แจ้งปัญหา", style='--')
 
     # Equipment (1) -- (N) RepairRequest
-    draw_line(9.3, 5.8, 7.0, 3.5, "1", "N", "ชำรุด", style='--')
+    draw_line(9.3, 8.5, 7.0, 4.8, "1", "N", "ชำรุด", style='--')
 
     # Room (1) -- (N) Equipment
-    draw_line(10.4, 4.5, 10.4, 5.5, "1", "N", "เก็บอยู่ที่")
+    draw_line(10.4, 6.0, 10.4, 8.0, "1", "N", "เก็บอยู่ที่")
 
     # Floor (1) -- (N) Room
-    draw_line(10.4, 2.2, 10.4, 3.25, "1", "N", "สังกัด")
+    draw_line(10.4, 3.8, 10.4, 4.75, "1", "N", "สังกัด")
 
     # Building (1) -- (N) Floor
-    draw_line(7.7, 1.7, 9.3, 1.575, "1", "N", "ตั้งอยู่ใน")
+    draw_line(7.0, 3.15, 9.3, 3.15, "1", "N", "ตั้งอยู่ใน")
 
     save_fig(fig, "er_diagram.png")
     plt.close(fig)
