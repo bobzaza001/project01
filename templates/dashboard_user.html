@@ -165,7 +165,16 @@
                                         {% elif req.status == 'rejected' %}❌ ปฏิเสธ
                                         {% endif %}
                                     </span>
-                                    {% if req.warning_message %}
+                                    {% if req.status == 'rejected' and req.warning_message %}
+                                    <details style="margin-top: 5px;">
+                                        <summary style="font-size: 0.75rem; color: #f87171; cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 4px; padding: 2px 4px; border-radius: 4px;">
+                                            <i class="fas fa-chevron-down" style="font-size: 0.65rem;"></i> ดูเหตุผล
+                                        </summary>
+                                        <div style="font-size: 0.76rem; color: #fca5a5; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.25); border-radius: 6px; padding: 6px 8px; margin-top: 4px; line-height: 1.35; max-width: 220px; word-break: break-word;">
+                                            {{ req.warning_message }}
+                                        </div>
+                                    </details>
+                                    {% elif req.warning_message %}
                                     <div style="margin-top: 8px; color: #ff6b6b; font-size: 0.85rem; padding: 4px; border: 1px solid rgba(255,107,107,0.3); border-radius: 4px; background: rgba(255,107,107,0.1);">
                                         <i class="fas fa-exclamation-circle"></i> <strong>Admin:</strong> {{ req.warning_message }}
                                     </div>
