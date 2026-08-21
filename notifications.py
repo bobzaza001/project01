@@ -137,6 +137,15 @@ def notify_user_rejected(borrow_req):
     user = borrow_req.requester
     eq = borrow_req.equipment
 
+    reason_html = ""
+    if borrow_req.warning_message:
+        reason_html = f"""
+        <tr>
+            <td style="padding: 6px 0; font-weight: 600; color: #dc2626;">💬 เหตุผล:</td>
+            <td style="padding: 6px 0; color: #dc2626;">{borrow_req.warning_message}</td>
+        </tr>
+        """
+
     content = f"""
     <h2 style="color: #0f172a; margin: 0 0 16px; font-size: 1.15rem;">
         ❌ คำขอยืมครุภัณฑ์ของคุณถูกปฏิเสธ
@@ -154,6 +163,7 @@ def notify_user_rejected(borrow_req):
                 <td style="padding: 6px 0; font-weight: 600;">🏷️ รหัส:</td>
                 <td style="padding: 6px 0;"><code style="background: #fee2e2; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem;">{eq.equipment_code}</code></td>
             </tr>
+            {reason_html}
         </table>
     </div>
     <p style="color: #475569; line-height: 1.6; margin: 0;">

@@ -103,9 +103,25 @@ def reject_borrow(req_id):
     if borrow_req.status != 'pending':
         flash('คำขอนี้ได้รับการดำเนินการแล้ว', 'warning')
         return redirect(url_for('admin.dashboard'))
+    
+    # ดึงเหตุผล / หมายเหตุการปฏิเสธ
+    reason = request.form.get('reason', '').strip()
+    note = request.form.get('note', '').strip()
+    
+    rejection_msg = reason
+    if note:
+        if rejection_msg and rejection_msg != 'อื่นๆ':
+            rejection_msg += f" ({note})"
+        else:
+            rejection_msg = note
+            
+    if not rejection_msg:
+        rejection_msg = "ไม่ผ่านเกณฑ์การอนุมัติคำขอ"
+        
+    borrow_req.warning_message = rejection_msg
     borrow_req.status = 'rejected'
     db.session.commit()
-    flash(f'ปฏิเสธคำขอยืม "{borrow_req.equipment.name}"', 'info')
+    flash(f'ปฏิเสธคำขอยืม "{borrow_req.equipment.name}" เรียบร้อยแล้ว (เหตุผล: {rejection_msg})', 'info')
     
     # 📧 ส่งอีเมลแจ้งผู้ยืม
     try:

@@ -204,7 +204,13 @@
                                             </a>
                                         </div>
                                         {% endif %}
-                                    {% elif req.status == 'rejected' %}❌ ปฏิเสธ
+                                    {% elif req.status == 'rejected' %}
+                                        <span style="color: #f87171;">❌ ปฏิเสธ</span>
+                                        {% if req.warning_message %}
+                                        <div style="font-size: 0.75rem; color: #fca5a5; margin-top: 4px; line-height: 1.3;">
+                                            <i class="fas fa-comment-dots"></i> {{ req.warning_message }}
+                                        </div>
+                                        {% endif %}
                                     {% endif %}
                                 </span>
                             </td>
@@ -212,15 +218,14 @@
                                 {% if req.status == 'pending' %}
                                 <div class="action-btns">
                                     <form method="POST" action="{{ url_for('admin.approve_borrow', req_id=req.id) }}" style="display:inline;">
-                                        <button type="submit" class="btn btn-sm btn-success" title="อนุมัติ">
+                                        <button type="submit" class="btn btn-sm btn-success" title="อนุมัติ" onclick="return confirm('ยืนยันอนุมัติคำขอยืมนี้?');">
                                             <i class="fas fa-check"></i>
                                         </button>
                                     </form>
-                                    <form method="POST" action="{{ url_for('admin.reject_borrow', req_id=req.id) }}" style="display:inline;">
-                                        <button type="submit" class="btn btn-sm btn-danger" title="ปฏิเสธ">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-danger" title="ปฏิเสธคำขอยืม" 
+                                            onclick="openRejectModal({{ req.id }}, '{{ req.requester.full_name | replace("'", "\\'") }}', '{{ req.equipment.name | replace("'", "\\'") }}', '{{ req.equipment.equipment_code }}')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
                                 </div>
                                 {% elif req.status == 'approved' %}
                                 <form method="POST" action="{{ url_for('admin.send_warning', req_id=req.id) }}" style="display:flex; gap: 5px; margin-top: 5px; flex-direction: column;">
@@ -460,9 +465,71 @@
     </div>
 </div>
 
+<!-- Reject Request Modal -->
+<div id="rejectModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.65); backdrop-filter: blur(4px);">
+    <div class="modal-content fade-in" style="background: linear-gradient(145deg, #1e1b4b, #312e81); margin: 8% auto; padding: 2rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 480px; color: white; position: relative;">
+        <span class="close-modal" onclick="closeRejectModal()" style="color: #aaa; position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        <h2 style="margin-bottom: 0.5rem; color: #f87171; font-size: 1.35rem;">
+            <i class="fas fa-circle-xmark"></i> ยืนยันการปฏิเสธคำขอ
+        </h2>
+        <p style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 1.2rem;">
+            กรุณาระบุเหตุผลหรือหมายเหตุประกอบการปฏิเสธคำขอยืม เพื่อแจ้งให้ผู้ยื่นคำขอทราบ
+        </p>
+        
+        <div style="background: rgba(0,0,0,0.25); border-radius: 10px; padding: 0.8rem 1rem; margin-bottom: 1.2rem; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="font-size: 0.9rem; color: #e2e8f0;">ผู้ยื่นคำขอ: <strong id="rejectUserName" style="color: #93c5fd;">-</strong></div>
+            <div style="font-size: 0.9rem; color: #e2e8f0; margin-top: 4px;">ครุภัณฑ์: <strong id="rejectEquipmentName" style="color: #fff;">-</strong> (<span id="rejectEquipmentCode" class="code-badge">-</span>)</div>
+        </div>
+
+        <form id="rejectForm" method="POST" action="">
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label for="rejectReason" style="display: block; margin-bottom: 0.4rem; color: #e2e8f0; font-size: 0.9rem;">
+                    สาเหตุการปฏิเสธ <span style="color: #f87171;">*</span>
+                </label>
+                <select id="rejectReason" name="reason" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #1e1b4b; color: white; font-size: 0.95rem;">
+                    <option value="อุปกรณ์ติดภารกิจการเรียนการสอนในคาบเวลาดังกล่าว">อุปกรณ์ติดภารกิจการเรียนการสอนในคาบเวลาดังกล่าว</option>
+                    <option value="อุปกรณ์อยู่ระหว่างการตรวจสภาพหรือซ่อมบำรุง">อุปกรณ์อยู่ระหว่างการตรวจสภาพหรือซ่อมบำรุง</option>
+                    <option value="ไม่อนุญาตให้นำอุปกรณ์ออกนอกสถานที่">ไม่อนุญาตให้นำอุปกรณ์ออกนอกสถานที่</option>
+                    <option value="ข้อมูลหรือวัตถุประสงค์การยืมไม่ชัดเจน">ข้อมูลหรือวัตถุประสงค์การยืมไม่ชัดเจน</option>
+                    <option value="มีรายการยืมอื่นที่ค้างส่งคืน">มีรายการยืมอื่นที่ค้างส่งคืน</option>
+                    <option value="อื่นๆ">อื่นๆ (ระบุในหมายเหตุ)</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="rejectNote" style="display: block; margin-bottom: 0.4rem; color: #e2e8f0; font-size: 0.9rem;">หมายเหตุเพิ่มเติม / ข้อความถึงผู้ยืม</label>
+                <textarea id="rejectNote" name="note" rows="3" placeholder="ระบุคำแนะนำหรือเหตุผลเพิ่มเติมถึงผู้ยื่นคำขอ..." 
+                          style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white; font-size: 0.9rem;"></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-secondary" onclick="closeRejectModal()" style="border-radius: 8px; padding: 0.5rem 1.2rem;">
+                    ยกเลิก
+                </button>
+                <button type="submit" class="btn btn-danger" style="border-radius: 8px; padding: 0.5rem 1.4rem; font-weight: bold;">
+                    <i class="fas fa-times"></i> ยืนยันปฏิเสธ
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Load Chart.js and render beautiful dark neon charts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    function openRejectModal(id, userName, eqName, eqCode) {
+        document.getElementById('rejectUserName').textContent = userName;
+        document.getElementById('rejectEquipmentName').textContent = eqName;
+        document.getElementById('rejectEquipmentCode').textContent = eqCode;
+        document.getElementById('rejectNote').value = '';
+        document.getElementById('rejectForm').action = '/admin/reject_borrow/' + id;
+        document.getElementById('rejectModal').style.display = 'block';
+    }
+
+    function closeRejectModal() {
+        document.getElementById('rejectModal').style.display = 'none';
+    }
+
     function openDisposeModal(id, name, code, availableQty, totalQty) {
         document.getElementById('disposeEquipmentName').textContent = name;
         document.getElementById('disposeEquipmentCode').textContent = code;
@@ -482,9 +549,13 @@
     }
 
     window.onclick = function(event) {
-        const modal = document.getElementById('disposeModal');
-        if (event.target == modal) {
+        const disposeModal = document.getElementById('disposeModal');
+        if (event.target == disposeModal) {
             closeDisposeModal();
+        }
+        const rejectModal = document.getElementById('rejectModal');
+        if (event.target == rejectModal) {
+            closeRejectModal();
         }
     };
 
