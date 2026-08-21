@@ -199,3 +199,24 @@ def report_repair(eq_id):
     
     flash(f'ส่งเรื่องแจ้งซ่อม "{equipment.name}" เรียบร้อยแล้ว', 'success')
     return redirect(url_for('user.dashboard'))
+
+
+@user_bp.route('/delete-history/<int:req_id>', methods=['POST'])
+@login_required
+def delete_history(req_id):
+    """ผู้ใช้ลบประวัติการยืมของตนเองออกจาก Dashboard (เฉพาะรายการที่สิ้นสุดแล้ว เช่น คืนแล้ว หรือ ปฏิเสธ)"""
+    borrow_req = BorrowRequest.query.get_or_404(req_id)
+    
+    if borrow_req.user_id != current_user.id and not current_user.is_admin():
+        flash('คุณไม่มีสิทธิ์ลบประวัติของผู้อื่น', 'danger')
+        return redirect(url_for('user.dashboard'))
+        
+    if borrow_req.status not in ('returned', 'rejected'):
+        flash('สามารถลบได้เฉพาะรายการที่คืนแล้วหรือถูกปฏิเสธเท่านั้น', 'warning')
+        return redirect(url_for('user.dashboard'))
+        
+    borrow_req.hidden_by_user = True
+    db.session.commit()
+    flash('ลบรายการประวัติออกจากแดชบอร์ดของคุณเรียบร้อยแล้ว', 'success')
+    return redirect(url_for('user.dashboard'))
+

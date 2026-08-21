@@ -8,15 +8,13 @@ from . import admin_bp
 @admin_bp.route('/dashboard')
 @admin_required
 def dashboard():
-    all_requests = BorrowRequest.query.order_by(BorrowRequest.requested_at.desc()).all()
+    recent_requests = BorrowRequest.query.filter_by(hidden_by_admin=False).order_by(BorrowRequest.requested_at.desc()).all()
     all_equipment = Equipment.query.all()
     repair_requests = RepairRequest.query.order_by(RepairRequest.reported_at.desc()).all()
     
-    # นับรายการที่เกินกำหนด
-    overdue_count = 0
-    for req in all_requests:
-        if req.is_overdue():
-            overdue_count += 1
+    # นับรายการที่เกินกำหนดจากทุกคำขอที่กำลังยืมอยู่
+    all_active = BorrowRequest.query.filter_by(status='approved').all()
+    overdue_count = sum(1 for req in all_active if req.is_overdue())
     
     stats = {
         'total_equipment': Equipment.query.count(),
@@ -27,7 +25,7 @@ def dashboard():
         'overdue_count': overdue_count,
     }
     return render_template('dashboard_admin.html',
-                           requests=all_requests,
+                           requests=recent_requests,
                            equipment=all_equipment,
                            repair_requests=repair_requests,
                            stats=stats)
@@ -196,3 +194,80 @@ def update_repair(repair_id):
     
     db.session.commit()
     return redirect(url_for('admin.dashboard'))
+
+
+@admin_bp.route('/borrow-history')
+@admin_required
+def borrow_history():
+    """หน้าแยกรวมประวัติการยืม-คืนทั้งหมดสำหรับ Admin พร้อมระบบค้นหาและกรองสถานะ"""
+    status_filter = request.args.get('status', 'all')
+    search_query = request.args.get('q', '').strip()
+    
+    query = BorrowRequest.query
+    
+    if status_filter == 'active':
+        query = query.filter(BorrowRequest.status.in_(['pending', 'approved', 'return_pending']))
+    elif status_filter == 'pending':
+        query = query.filter_by(status='pending')
+    elif status_filter == 'approved':
+        query = query.filter_by(status='approved')
+    elif status_filter == 'return_pending':
+        query = query.filter_by(status='return_pending')
+    elif status_filter == 'returned':
+        query = query.filter_by(status='returned')
+    elif status_filter == 'rejected':
+        query = query.filter_by(status='rejected')
+    
+    all_records = query.order_by(BorrowRequest.requested_at.desc()).all()
+    
+    # ถ้ามีการค้นหา ให้กรองตามชื่อ/รหัสอุปกรณ์ หรือชื่อ/อีเมลผู้ยืม
+    if search_query:
+        search_lower = search_query.lower()
+        all_records = [
+            r for r in all_records
+            if (r.equipment and (search_lower in r.equipment.name.lower() or search_lower in r.equipment.equipment_code.lower()))
+            or (r.requester and (search_lower in r.requester.full_name.lower() or search_lower in r.requester.username.lower() or search_lower in r.requester.email.lower()))
+        ]
+    
+    stats = {
+        'total': BorrowRequest.query.count(),
+        'active': BorrowRequest.query.filter(BorrowRequest.status.in_(['approved', 'return_pending'])).count(),
+        'pending': BorrowRequest.query.filter_by(status='pending').count(),
+        'returned': BorrowRequest.query.filter_by(status='returned').count(),
+        'rejected': BorrowRequest.query.filter_by(status='rejected').count(),
+    }
+    
+    return render_template('admin_borrow_history.html',
+                           records=all_records,
+                           stats=stats,
+                           current_status=status_filter,
+                           search_query=search_query)
+
+
+@admin_bp.route('/dismiss-request/<int:req_id>', methods=['POST'])
+@admin_required
+def dismiss_request(req_id):
+    """Admin ลบ/ซ่อนรายการคำขอออกจากหน้า Dashboard (รายการยังคงอยู่ในหน้าประวัติรวม)"""
+    borrow_req = BorrowRequest.query.get_or_404(req_id)
+    if borrow_req.status in ('pending', 'approved', 'return_pending'):
+        flash('ไม่สามารถลบรายการที่กำลังดำเนินการหรือยังไม่ส่งคืนได้', 'warning')
+        return redirect(url_for('admin.dashboard'))
+        
+    borrow_req.hidden_by_admin = True
+    db.session.commit()
+    flash(f'ลบรายการ "{borrow_req.equipment.name}" ออกจากหน้าแดชบอร์ดแล้ว (ดูย้อนหลังได้ในหน้าประวัติการยืม)', 'success')
+    return redirect(url_for('admin.dashboard'))
+
+
+@admin_bp.route('/delete-request-permanent/<int:req_id>', methods=['POST'])
+@admin_required
+def delete_request_permanent(req_id):
+    """Admin ลบรายการประวัติออกจากฐานข้อมูลอย่างถาวร (จากหน้าประวัติรวม)"""
+    borrow_req = BorrowRequest.query.get_or_404(req_id)
+    eq_name = borrow_req.equipment.name if borrow_req.equipment else 'รายการ'
+    
+    db.session.delete(borrow_req)
+    db.session.commit()
+    flash(f'ลบประวัติ "{eq_name}" ออกจากระบบอย่างถาวรเรียบร้อยแล้ว', 'info')
+    return redirect(request.referrer or url_for('admin.borrow_history'))
+

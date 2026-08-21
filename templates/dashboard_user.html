@@ -181,18 +181,20 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if not current_user.is_student() %}
-                                        {% if req.status == 'approved' and req.equipment.item_type == 'durable' %}
-                                        <button onclick="openReturnModal({{ req.id }}, '{{ req.equipment.name }}')" class="btn btn-sm btn-info" style="border-radius: 50px;">
-                                            <i class="fas fa-undo"></i> แจ้งส่งคืน
+                                    {% if req.status == 'approved' and req.equipment.item_type == 'durable' and not current_user.is_student() %}
+                                    <button onclick="openReturnModal({{ req.id }}, '{{ req.equipment.name }}')" class="btn btn-sm btn-info" style="border-radius: 50px;">
+                                        <i class="fas fa-undo"></i> แจ้งส่งคืน
+                                    </button>
+                                    {% elif req.status == 'return_pending' %}
+                                    <span class="text-muted" style="font-size: 0.85rem;"><i class="fas fa-clock"></i> รอแอดมินรับของ</span>
+                                    {% elif req.status in ['returned', 'rejected'] %}
+                                    <form method="POST" action="{{ url_for('user.delete_history', req_id=req.id) }}" style="display:inline;" onsubmit="return confirm('ลบรายการนี้ออกจากประวัติบนแดชบอร์ดของคุณ?');">
+                                        <button type="submit" class="btn btn-sm btn-secondary" style="border-radius: 8px; padding: 4px 8px; font-size: 0.78rem; opacity: 0.85;" title="ลบประวัติ">
+                                            <i class="fas fa-trash-alt"></i> ลบ
                                         </button>
-                                        {% elif req.status == 'return_pending' %}
-                                        <span class="text-muted" style="font-size: 0.85rem;"><i class="fas fa-clock"></i> รอแอดมินรับของ</span>
-                                        {% else %}
-                                        <span class="text-muted">—</span>
-                                        {% endif %}
+                                    </form>
                                     {% else %}
-                                        <span class="text-muted">—</span>
+                                    <span class="text-muted">—</span>
                                     {% endif %}
                                 </td>
                             </tr>

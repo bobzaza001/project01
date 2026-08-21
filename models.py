@@ -142,6 +142,8 @@ class BorrowRequest(db.Model):
     damage_note = db.Column(db.Text, default='')                         # รายละเอียดความเสียหาย
     return_image_filename = db.Column(db.String(255), default='')        # รูปแนบส่งคืน
     overdue_notified = db.Column(db.Boolean, default=False)              # เคยส่งแจ้งเตือนเกินกำหนดหรือยัง
+    hidden_by_user = db.Column(db.Boolean, default=False)                # ซ่อนจากแดชบอร์ดของผู้ใช้
+    hidden_by_admin = db.Column(db.Boolean, default=False)               # ซ่อนจากแดชบอร์ดของแอดมิน (แต่ยังคงอยู่ในหน้าประวัติรวม)
     
     def is_overdue(self):
         """ตรวจว่ายืมเกินกำหนดหรือไม่"""

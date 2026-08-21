@@ -10,7 +10,7 @@ def dashboard():
     if current_user.is_admin():
         return redirect(url_for('admin.dashboard'))
         
-    my_requests = BorrowRequest.query.filter_by(user_id=current_user.id) \
+    my_requests = BorrowRequest.query.filter_by(user_id=current_user.id, hidden_by_user=False) \
         .order_by(BorrowRequest.requested_at.desc()).all()
     my_repair_requests = RepairRequest.query.filter_by(user_id=current_user.id) \
         .order_by(RepairRequest.reported_at.desc()).all()
