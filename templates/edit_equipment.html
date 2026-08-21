@@ -71,21 +71,88 @@
                 </div>
             </div>
             
-            <div class="form-options" style="margin-top: 1rem; flex-wrap: wrap;">
-                <a href="{{ url_for('user.dashboard') }}" class="btn btn-warning" style="width: auto;">
-                    <i class="fas fa-arrow-left"></i> ยกเลิก
+            <div class="form-options" style="margin-top: 1rem; flex-wrap: wrap; gap: 8px;">
+                <a href="{{ url_for('user.dashboard') }}" class="btn btn-secondary" style="width: auto;">
+                    <i class="fas fa-arrow-left"></i> ย้อนกลับ
                 </a>
                 
-                <a href="#" class="btn btn-danger" style="margin-left: 1rem;" onclick="if(confirm('คุณแน่ใจหรือไม่ว่าต้องการลบอุปกรณ์นี้? การกระทำนี้ไม่สามารถยกเลิกได้')){document.getElementById('deleteForm').submit();}; return false;">
-                    <i class="fas fa-trash"></i> ลบอุปกรณ์
+                {% if equipment.available_quantity > 0 %}
+                <button type="button" class="btn btn-warning" onclick="openDisposeModal()">
+                    <i class="fas fa-boxes-packing"></i> ตัดจำหน่าย
+                </button>
+                {% endif %}
+
+                <a href="#" class="btn btn-danger" onclick="if(confirm('คุณแน่ใจหรือไม่ว่าต้องการลบอุปกรณ์นี้ทั้งหมด? การกระทำนี้ไม่สามารถยกเลิกได้')){document.getElementById('deleteForm').submit();}; return false;">
+                    <i class="fas fa-trash"></i> ลบทั้งหมด
                 </a>
                 
-                <button type="submit" class="btn btn-primary" style="flex: 1; margin-left: 1rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1; min-width: 140px;">
                     <i class="fas fa-save"></i> บันทึกข้อมูล
                 </button>
             </div>
         </form>
         <form id="deleteForm" method="POST" action="{{ url_for('admin.delete_equipment', eq_id=equipment.id) }}" style="display: none;"></form>
+    </div>
+</div>
+
+<!-- Dispose Equipment Modal -->
+<div id="disposeModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.65); backdrop-filter: blur(4px);">
+    <div class="modal-content fade-in" style="background: linear-gradient(145deg, #1e1b4b, #312e81); margin: 8% auto; padding: 2rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 480px; color: white; position: relative;">
+        <span class="close-modal" onclick="closeDisposeModal()" style="color: #aaa; position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        <h2 style="margin-bottom: 0.5rem; color: #fbbf24; font-size: 1.4rem;">
+            <i class="fas fa-boxes-packing"></i> ตัดจำหน่ายครุภัณฑ์
+        </h2>
+        <p style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 1.2rem;">
+            ปรับลดยอดจำนวนครุภัณฑ์/วัสดุออกจากระบบคลัง (เช่น ชำรุด เสื่อมสภาพ หรือโอนย้าย)
+        </p>
+        
+        <div style="background: rgba(0,0,0,0.25); border-radius: 10px; padding: 0.8rem 1rem; margin-bottom: 1.2rem; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="font-size: 0.95rem; font-weight: bold; color: #fff;">{{ equipment.name }}</div>
+            <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">
+                รหัส: <span class="code-badge">{{ equipment.equipment_code }}</span> | 
+                คงเหลือในคลัง: <span style="color: #34d399; font-weight: bold;">{{ equipment.available_quantity }} / {{ equipment.total_quantity }} ชิ้น</span>
+            </div>
+        </div>
+
+        <form id="disposeForm" method="POST" action="{{ url_for('admin.dispose_equipment', eq_id=equipment.id) }}">
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label for="disposeQuantity" style="display: block; margin-bottom: 0.4rem; color: #e2e8f0; font-size: 0.9rem;">
+                    จำนวนที่ต้องการจำหน่ายออก (ชิ้น/เครื่อง) <span style="color: #f87171;">*</span>
+                </label>
+                <input type="number" id="disposeQuantity" name="dispose_quantity" min="1" max="{{ equipment.available_quantity }}" value="1" required 
+                       style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white; font-size: 1rem;">
+                <small style="color: #94a3b8; font-size: 0.8rem; display: block; margin-top: 4px;">ตัดจำหน่ายได้สูงสุด {{ equipment.available_quantity }} ชิ้น (เท่ากับยอดว่างในคลัง)</small>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label for="disposeReason" style="display: block; margin-bottom: 0.4rem; color: #e2e8f0; font-size: 0.9rem;">
+                    สาเหตุ/เหตุผลการตัดจำหน่าย <span style="color: #f87171;">*</span>
+                </label>
+                <select id="disposeReason" name="reason" style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: #1e1b4b; color: white; font-size: 0.95rem;">
+                    <option value="เสื่อมสภาพตามอายุการใช้งาน">เสื่อมสภาพตามอายุการใช้งาน</option>
+                    <option value="ชำรุดเสียหายจนไม่คุ้มค่าซ่อม">ชำรุดเสียหายจนไม่คุ้มค่าซ่อม</option>
+                    <option value="โอนย้าย/ส่งมอบให้หน่วยงานอื่น">โอนย้าย / ส่งมอบให้หน่วยงานอื่น</option>
+                    <option value="บริจาค">บริจาค</option>
+                    <option value="สูญหาย/จำหน่ายพัสดุประจำปี">สูญหาย / จำหน่ายพัสดุประจำปี</option>
+                    <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="disposeNote" style="display: block; margin-bottom: 0.4rem; color: #e2e8f0; font-size: 0.9rem;">หมายเหตุเพิ่มเติม (ถ้ามี)</label>
+                <textarea id="disposeNote" name="note" rows="2" placeholder="เช่น อ้างอิงเลขที่บันทึกข้อความจำหน่ายพัสดุ..." 
+                          style="width: 100%; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white; font-size: 0.9rem;"></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-secondary" onclick="closeDisposeModal()" style="border-radius: 8px; padding: 0.5rem 1.2rem;">
+                    ยกเลิก
+                </button>
+                <button type="submit" class="btn btn-warning" style="border-radius: 8px; padding: 0.5rem 1.4rem; font-weight: bold;" onclick="return confirm('ยืนยันการตัดจำหน่ายอุปกรณ์ตามจำนวนที่ระบุ?');">
+                    <i class="fas fa-check"></i> ยืนยันตัดจำหน่าย
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}
@@ -102,5 +169,20 @@ function previewImage(input) {
         reader.readAsDataURL(input.files[0]);
     }
 }
+
+function openDisposeModal() {
+    document.getElementById('disposeModal').style.display = 'block';
+}
+
+function closeDisposeModal() {
+    document.getElementById('disposeModal').style.display = 'none';
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('disposeModal');
+    if (event.target == modal) {
+        closeDisposeModal();
+    }
+};
 </script>
 {% endblock %}

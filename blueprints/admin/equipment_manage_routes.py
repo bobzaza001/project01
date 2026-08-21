@@ -129,3 +129,53 @@ def delete_equipment(eq_id):
     db.session.commit()
     flash(f'ลบอุปกรณ์ "{eq.name}" เรียบร้อยแล้ว', 'info')
     return redirect(url_for('admin.dashboard'))
+
+
+@admin_bp.route('/dispose-equipment/<int:eq_id>', methods=['POST'])
+@admin_required
+def dispose_equipment(eq_id):
+    """ตัดจำหน่าย / ปรับลดยอดครุภัณฑ์หรือวัสดุออกบางส่วน"""
+    eq = Equipment.query.get_or_404(eq_id)
+    
+    try:
+        dispose_qty = int(request.form.get('dispose_quantity', '0'))
+    except ValueError:
+        flash('กรุณาระบุจำนวนที่ถูกต้องสำหรับการตัดจำหน่าย', 'danger')
+        return redirect(request.referrer or url_for('admin.dashboard'))
+    
+    reason = request.form.get('reason', 'เสื่อมสภาพตามอายุการใช้งาน').strip()
+    note = request.form.get('note', '').strip()
+    
+    if dispose_qty <= 0:
+        flash('จำนวนที่ตัดจำหน่ายต้องมากกว่า 0', 'warning')
+        return redirect(request.referrer or url_for('admin.dashboard'))
+    
+    if dispose_qty > eq.available_quantity:
+        flash(f'ไม่สามารถตัดจำหน่าย {dispose_qty} ชิ้นได้ เนื่องจากมีของว่างในคลังเพียง {eq.available_quantity} ชิ้น (อาจมีรายการถูกยืมใช้งานอยู่)', 'danger')
+        return redirect(request.referrer or url_for('admin.dashboard'))
+    
+    # หักลดยอดจำนวนทั้งหมดและจำนวนที่ว่างอยู่
+    eq.total_quantity -= dispose_qty
+    eq.available_quantity -= dispose_qty
+    
+    # หากจำนวนทั้งหมดเหลือ 0 ให้ปรับสถานะ
+    if eq.total_quantity <= 0:
+        eq.total_quantity = 0
+        eq.available_quantity = 0
+        eq.status = 'disposed'
+        eq.is_borrowable = False
+    
+    # บันทึกรายละเอียดลง description หรือ log เพื่อเก็บประวัติ
+    timestamp_str = datetime.now().strftime('%d/%m/%Y %H:%M')
+    log_entry = f"\n[ตัดจำหน่าย {dispose_qty} ชิ้น เมื่อ {timestamp_str} | สาเหตุ: {reason}"
+    if note:
+        log_entry += f" | หมายเหตุ: {note}"
+    log_entry += "]"
+    
+    eq.description = (eq.description or '') + log_entry
+    
+    db.session.commit()
+    
+    flash(f'ตัดจำหน่าย "{eq.name}" จำนวน {dispose_qty} ชิ้น เรียบร้อยแล้ว (คงเหลือ {eq.available_quantity}/{eq.total_quantity} ชิ้น)', 'success')
+    return redirect(request.referrer or url_for('admin.dashboard'))
+
