@@ -239,7 +239,7 @@ HTML_CONTENT = """<!DOCTYPE html>
 
     <h2>7. พจนานุกรมข้อมูล (Data Dictionary)</h2>
 
-    <h3>ตาราง 7.1: โครงสร้างตาราง User (ข้อมูลสมาชิก)</h3>
+    <h3>ตาราง 7.1: โครงสร้างตาราง User (users - ข้อมูลผู้ใช้งานระบบ)</h3>
     <table>
         <thead>
             <tr>
@@ -257,55 +257,55 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>id</td>
                 <td>INT</td>
                 <td>-</td>
-                <td>รหัสรันอัตโนมัติประจำตัวผู้ใช้งาน</td>
+                <td>รหัสประจำตัวผู้ใช้งาน (รันอัตโนมัติ)</td>
                 <td>PK</td>
             </tr>
             <tr>
                 <td>2</td>
                 <td>username</td>
                 <td>VARCHAR</td>
-                <td>150</td>
-                <td>ชื่อผู้ใช้งานสำหรับเข้าระบบ</td>
+                <td>80</td>
+                <td>ชื่อผู้ใช้งานสำหรับเข้าสู่ระบบ</td>
                 <td>Unique</td>
             </tr>
             <tr>
                 <td>3</td>
-                <td>full_name</td>
+                <td>password_hash</td>
                 <td>VARCHAR</td>
-                <td>200</td>
-                <td>ชื่อ-นามสกุลจริงของผู้ใช้งาน</td>
+                <td>256</td>
+                <td>รหัสผ่านที่ผ่านการเข้ารหัสความปลอดภัย (Hash)</td>
                 <td>-</td>
             </tr>
             <tr>
                 <td>4</td>
-                <td>email</td>
+                <td>full_name</td>
                 <td>VARCHAR</td>
                 <td>150</td>
-                <td>อีเมลแอดเดรสสำหรับการส่งแจ้งเตือน</td>
-                <td>Unique</td>
+                <td>ชื่อ-นามสกุลจริงของผู้ใช้งาน</td>
+                <td>-</td>
             </tr>
             <tr>
                 <td>5</td>
-                <td>password_hash</td>
+                <td>email</td>
                 <td>VARCHAR</td>
-                <td>256</td>
-                <td>รหัสผ่านที่ผ่านการแฮชความปลอดภัย</td>
-                <td>-</td>
+                <td>120</td>
+                <td>ที่อยู่อีเมลสถาบัน (@atcc.ac.th) สำหรับส่งแจ้งเตือน</td>
+                <td>Unique</td>
             </tr>
             <tr>
                 <td>6</td>
                 <td>role</td>
                 <td>VARCHAR</td>
-                <td>20</td>
-                <td>สิทธิ์การใช้งาน (admin หรือ user)</td>
+                <td>10</td>
+                <td>สิทธิ์การใช้งานระบบ ('admin' หรือ 'user')</td>
                 <td>-</td>
             </tr>
             <tr>
                 <td>7</td>
                 <td>profile_image</td>
                 <td>VARCHAR</td>
-                <td>200</td>
-                <td>ชื่อไฟล์รูปโปรไฟล์</td>
+                <td>255</td>
+                <td>ชื่อไฟล์รูปภาพโปรไฟล์ประจำตัวผู้ใช้</td>
                 <td>-</td>
             </tr>
             <tr>
@@ -313,13 +313,13 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>created_at</td>
                 <td>DATETIME</td>
                 <td>-</td>
-                <td>วันและเวลาที่สร้างบัญชี</td>
+                <td>วันและเวลาที่สร้างบัญชีผู้ใช้งาน</td>
                 <td>-</td>
             </tr>
         </tbody>
     </table>
 
-    <h3>ตาราง 7.2: โครงสร้างตาราง Equipment (ข้อมูลครุภัณฑ์/วัสดุ)</h3>
+    <h3>ตาราง 7.2: โครงสร้างตาราง Equipment (equipment - ข้อมูลครุภัณฑ์และวัสดุ)</h3>
     <table>
         <thead>
             <tr>
@@ -337,23 +337,23 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>id</td>
                 <td>INT</td>
                 <td>-</td>
-                <td>รหัสรันอัตโนมัติประจำตัวอุปกรณ์</td>
+                <td>รหัสประจำตัวอุปกรณ์ (รันอัตโนมัติ)</td>
                 <td>PK</td>
             </tr>
             <tr>
                 <td>2</td>
                 <td>equipment_code</td>
                 <td>VARCHAR</td>
-                <td>100</td>
-                <td>รหัสสติ๊กเกอร์รหัสครุภัณฑ์เพื่อการตรวจสอบ</td>
+                <td>50</td>
+                <td>รหัสครุภัณฑ์เพื่อการตรวจสอบและระบุตัวตน</td>
                 <td>Unique</td>
             </tr>
             <tr>
                 <td>3</td>
                 <td>name</td>
                 <td>VARCHAR</td>
-                <td>200</td>
-                <td>ชื่อของอุปกรณ์ / ครุภัณฑ์</td>
+                <td>150</td>
+                <td>ชื่อของอุปกรณ์ / ครุภัณฑ์ / วัสดุ</td>
                 <td>-</td>
             </tr>
             <tr>
@@ -361,7 +361,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>description</td>
                 <td>TEXT</td>
                 <td>-</td>
-                <td>รายละเอียดคำอธิบายของครุภัณฑ์</td>
+                <td>รายละเอียดและคุณสมบัติของอุปกรณ์</td>
                 <td>-</td>
             </tr>
             <tr>
@@ -369,7 +369,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>category</td>
                 <td>VARCHAR</td>
                 <td>100</td>
-                <td>หมวดหมู่ เช่น ไอที, เครื่องใช้ไฟฟ้า, ทั่วไป</td>
+                <td>หมวดหมู่อุปกรณ์ (เช่น ไอที, เครื่องใช้ไฟฟ้า, ทั่วไป)</td>
                 <td>-</td>
             </tr>
             <tr>
@@ -377,27 +377,19 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>image_filename</td>
                 <td>VARCHAR</td>
                 <td>255</td>
-                <td>ชื่อไฟล์รูปภาพของครุภัณฑ์</td>
+                <td>ชื่อไฟล์รูปภาพประจำตัวครุภัณฑ์</td>
                 <td>-</td>
             </tr>
             <tr>
                 <td>7</td>
-                <td>status</td>
-                <td>VARCHAR</td>
-                <td>50</td>
-                <td>สถานะอุปกรณ์ (available, borrowed, maintenance)</td>
+                <td>total_quantity</td>
+                <td>INT</td>
+                <td>-</td>
+                <td>จำนวนรวมทั้งหมดที่มีอยู่ในระบบคลัง</td>
                 <td>-</td>
             </tr>
             <tr>
                 <td>8</td>
-                <td>total_quantity</td>
-                <td>INT</td>
-                <td>-</td>
-                <td>จำนวนรวมทั้งหมดที่มีในระบบคลัง</td>
-                <td>-</td>
-            </tr>
-            <tr>
-                <td>9</td>
                 <td>available_quantity</td>
                 <td>INT</td>
                 <td>-</td>
@@ -405,33 +397,41 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>-</td>
             </tr>
             <tr>
-                <td>10</td>
+                <td>9</td>
                 <td>item_type</td>
                 <td>VARCHAR</td>
-                <td>50</td>
-                <td>ประเภทอุปกรณ์ (durable หรือ consumable)</td>
+                <td>20</td>
+                <td>ประเภทอุปกรณ์ ('durable' ครุภัณฑ์ หรือ 'consumable' วัสดุ)</td>
                 <td>-</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>room_id</td>
+                <td>INT</td>
+                <td>-</td>
+                <td>รหัสห้องปฏิบัติการที่จัดเก็บอุปกรณ์</td>
+                <td>FK</td>
             </tr>
             <tr>
                 <td>11</td>
                 <td>is_borrowable</td>
                 <td>BOOLEAN</td>
                 <td>-</td>
-                <td>สิทธิ์ในการกดยืมกลับบ้านได้ (True/False)</td>
+                <td>สถานะการเปิดให้กดยืมใช้งาน (True/False)</td>
                 <td>-</td>
             </tr>
             <tr>
                 <td>12</td>
-                <td>room_id</td>
-                <td>INT</td>
+                <td>status</td>
+                <td>VARCHAR</td>
+                <td>20</td>
+                <td>สถานะการใช้งาน (available, borrowed, maintenance, disposed)</td>
                 <td>-</td>
-                <td>รหัสเชื่อมโยงห้องเก็บครุภัณฑ์</td>
-                <td>FK</td>
             </tr>
         </tbody>
     </table>
 
-    <h3>ตาราง 7.3: โครงสร้างตาราง BorrowRequest (ประวัติการยืม-คืน)</h3>
+    <h3>ตาราง 7.3: โครงสร้างตาราง BorrowRequest (borrow_requests - ข้อมูลคำขอยืม-คืนครุภัณฑ์และเบิกวัสดุ)</h3>
     <table>
         <thead>
             <tr>
@@ -449,7 +449,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>id</td>
                 <td>INT</td>
                 <td>-</td>
-                <td>รหัสใบทำรายการคำร้อง</td>
+                <td>รหัสใบทำรายการคำร้อง (รันอัตโนมัติ)</td>
                 <td>PK</td>
             </tr>
             <tr>
@@ -457,7 +457,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>user_id</td>
                 <td>INT</td>
                 <td>-</td>
-                <td>รหัสผู้ทำรายการยืม</td>
+                <td>รหัสผู้ใช้งานที่ยื่นคำขอยืมหรือเบิก</td>
                 <td>FK</td>
             </tr>
             <tr>
@@ -465,15 +465,15 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>equipment_id</td>
                 <td>INT</td>
                 <td>-</td>
-                <td>รหัสครุภัณฑ์ที่ยืม</td>
+                <td>รหัสครุภัณฑ์หรือวัสดุที่ต้องการยืม</td>
                 <td>FK</td>
             </tr>
             <tr>
                 <td>4</td>
                 <td>status</td>
                 <td>VARCHAR</td>
-                <td>50</td>
-                <td>สถานะการทำงาน (pending, approved, returned, etc.)</td>
+                <td>20</td>
+                <td>สถานะคำขอ (pending, approved, return_pending, returned, rejected)</td>
                 <td>-</td>
             </tr>
             <tr>
@@ -481,7 +481,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>requested_at</td>
                 <td>DATETIME</td>
                 <td>-</td>
-                <td>วันเวลาที่ส่งคำร้องเข้ามา</td>
+                <td>วันและเวลาที่ส่งคำร้องเข้ามาในระบบ</td>
                 <td>-</td>
             </tr>
             <tr>
@@ -489,7 +489,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>borrow_datetime</td>
                 <td>DATETIME</td>
                 <td>-</td>
-                <td>วันเวลาที่แอดมินส่งมอบอุปกรณ์</td>
+                <td>วันและเวลาที่ต้องการยืมหรือรับมอบอุปกรณ์</td>
                 <td>-</td>
             </tr>
             <tr>
@@ -497,19 +497,27 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>return_due_datetime</td>
                 <td>DATETIME</td>
                 <td>-</td>
-                <td>กำหนดส่งคืนอุปกรณ์</td>
+                <td>กำหนดวันและเวลาที่ต้องนำมาส่งคืน</td>
                 <td>-</td>
             </tr>
             <tr>
                 <td>8</td>
-                <td>returned_at</td>
+                <td>approved_at</td>
                 <td>DATETIME</td>
                 <td>-</td>
-                <td>วันเวลาที่ส่งคืนจริงในคลัง</td>
+                <td>วันและเวลาที่แอดมินอนุมัติคำขอ</td>
                 <td>-</td>
             </tr>
             <tr>
                 <td>9</td>
+                <td>returned_at</td>
+                <td>DATETIME</td>
+                <td>-</td>
+                <td>วันและเวลาที่ส่งคืนอุปกรณ์เข้าคลังจริง</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>10</td>
                 <td>borrow_days</td>
                 <td>INT</td>
                 <td>-</td>
@@ -517,57 +525,73 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>-</td>
             </tr>
             <tr>
-                <td>10</td>
+                <td>11</td>
                 <td>quantity</td>
                 <td>INT</td>
                 <td>-</td>
-                <td>จำนวนที่ขอรับ (เบิกวัสดุสิ้นเปลือง)</td>
-                <td>-</td>
-            </tr>
-            <tr>
-                <td>11</td>
-                <td>damage_status</td>
-                <td>VARCHAR</td>
-                <td>20</td>
-                <td>สถานะความชำรุดของครุภัณฑ์หลังส่งคืน (normal / damaged)</td>
+                <td>จำนวนที่ขอเบิก (สำหรับวัสดุสิ้นเปลือง)</td>
                 <td>-</td>
             </tr>
             <tr>
                 <td>12</td>
-                <td>damage_note</td>
-                <td>TEXT</td>
-                <td>-</td>
-                <td>บันทึกรายละเอียดอาการชำรุดตอนคืนของ</td>
+                <td>damage_status</td>
+                <td>VARCHAR</td>
+                <td>20</td>
+                <td>สภาพความชำรุดของครุภัณฑ์หลังส่งคืน ('normal' หรือ 'damaged')</td>
                 <td>-</td>
             </tr>
             <tr>
                 <td>13</td>
-                <td>return_image_filename</td>
-                <td>VARCHAR</td>
-                <td>255</td>
-                <td>ชื่อรูปถ่ายหลักฐานยืนยันตอนส่งคืน</td>
+                <td>damage_note</td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>รายละเอียดอาการชำรุดเสียหายที่บันทึกตอนส่งคืน</td>
                 <td>-</td>
             </tr>
             <tr>
                 <td>14</td>
-                <td>warning_message</td>
-                <td>TEXT</td>
-                <td>-</td>
-                <td>ข้อความเตือนที่แอดมินพิมพ์ส่งแนบอีเมลทวงคืน</td>
+                <td>return_image_filename</td>
+                <td>VARCHAR</td>
+                <td>255</td>
+                <td>ชื่อไฟล์รูปถ่ายหลักฐานสภาพอุปกรณ์ตอนส่งคืน</td>
                 <td>-</td>
             </tr>
             <tr>
                 <td>15</td>
+                <td>warning_message</td>
+                <td>TEXT</td>
+                <td>-</td>
+                <td>ข้อความเตือนหรือเหตุผลการปฏิเสธจากผู้ดูแลระบบ</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>16</td>
                 <td>overdue_notified</td>
                 <td>BOOLEAN</td>
                 <td>-</td>
-                <td>เคยส่งเมลเตือนค้างส่งแล้วหรือยัง (True/False)</td>
+                <td>เคยส่งอีเมลแจ้งเตือนค้างส่งเกินกำหนดแล้วหรือยัง (True/False)</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>17</td>
+                <td>hidden_by_user</td>
+                <td>BOOLEAN</td>
+                <td>-</td>
+                <td>ซ่อนรายการจากหน้าแดชบอร์ดของผู้ใช้ (True/False)</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>18</td>
+                <td>hidden_by_admin</td>
+                <td>BOOLEAN</td>
+                <td>-</td>
+                <td>ซ่อนรายการจากหน้าแดชบอร์ดของผู้ดูแลระบบ (True/False)</td>
                 <td>-</td>
             </tr>
         </tbody>
     </table>
 
-    <h3>ตาราง 7.4: โครงสร้างตาราง RepairRequest (ประวัติการแจ้งซ่อม)</h3>
+    <h3>ตาราง 7.4: โครงสร้างตาราง RepairRequest (repair_requests - ข้อมูลคำขอแจ้งซ่อมครุภัณฑ์)</h3>
     <table>
         <thead>
             <tr>
@@ -585,7 +609,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>id</td>
                 <td>INT</td>
                 <td>-</td>
-                <td>รหัสรันอัตโนมัติประจำการแจ้งซ่อม</td>
+                <td>รหัสรายการแจ้งซ่อม (รันอัตโนมัติ)</td>
                 <td>PK</td>
             </tr>
             <tr>
@@ -601,7 +625,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>user_id</td>
                 <td>INT</td>
                 <td>-</td>
-                <td>รหัสผู้ใช้ที่ยื่นแจ้งซ่อม</td>
+                <td>รหัสผู้ใช้งานที่ยื่นเรื่องแจ้งซ่อม</td>
                 <td>FK</td>
             </tr>
             <tr>
@@ -617,7 +641,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>status</td>
                 <td>VARCHAR</td>
                 <td>20</td>
-                <td>สถานะแจ้งซ่อม (pending, in_progress, completed)</td>
+                <td>สถานะการแจ้งซ่อม ('pending', 'in_progress', 'completed')</td>
                 <td>-</td>
             </tr>
             <tr>
@@ -633,7 +657,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>resolved_at</td>
                 <td>DATETIME</td>
                 <td>-</td>
-                <td>วันและเวลาที่แก้ไขการซ่อมแซมเสร็จสิ้น</td>
+                <td>วันและเวลาที่ดำเนินการซ่อมแซมเสร็จสิ้น</td>
                 <td>-</td>
             </tr>
             <tr>
@@ -641,8 +665,120 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td>admin_note</td>
                 <td>TEXT</td>
                 <td>-</td>
-                <td>บันทึกหมายเหตุเพิ่มเติมโดยแอดมินหลังดำเนินการ</td>
+                <td>บันทึกหมายเหตุเพิ่มเติมโดยแอดมินหรือช่างซ่อม</td>
                 <td>-</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>ตาราง 7.5: โครงสร้างตาราง Building (buildings - ข้อมูลอาคาร)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Column</th>
+                <th>Type</th>
+                <th>Size</th>
+                <th>Comment</th>
+                <th>Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>id</td>
+                <td>INT</td>
+                <td>-</td>
+                <td>รหัสประจำตัวอาคาร (รันอัตโนมัติ)</td>
+                <td>PK</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>name</td>
+                <td>VARCHAR</td>
+                <td>100</td>
+                <td>ชื่ออาคาร (เช่น อาคาร 1, อาคารปฏิบัติการคอมพิวเตอร์)</td>
+                <td>-</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>ตาราง 7.6: โครงสร้างตาราง Floor (floors - ข้อมูลชั้นของอาคาร)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Column</th>
+                <th>Type</th>
+                <th>Size</th>
+                <th>Comment</th>
+                <th>Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>id</td>
+                <td>INT</td>
+                <td>-</td>
+                <td>รหัสประจำตัวชั้น (รันอัตโนมัติ)</td>
+                <td>PK</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>name</td>
+                <td>VARCHAR</td>
+                <td>50</td>
+                <td>ชื่อหรือหมายเลขชั้น (เช่น ชั้น 1, ชั้น 2, ชั้น 3)</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>building_id</td>
+                <td>INT</td>
+                <td>-</td>
+                <td>รหัสอาคารที่ชั้นนี้สังกัดอยู่</td>
+                <td>FK</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>ตาราง 7.7: โครงสร้างตาราง Room (rooms - ข้อมูลห้องปฏิบัติการ/ห้องจัดเก็บ)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Column</th>
+                <th>Type</th>
+                <th>Size</th>
+                <th>Comment</th>
+                <th>Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>id</td>
+                <td>INT</td>
+                <td>-</td>
+                <td>รหัสประจำตัวห้อง (รันอัตโนมัติ)</td>
+                <td>PK</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>name</td>
+                <td>VARCHAR</td>
+                <td>100</td>
+                <td>ชื่อหรือหมายเลขห้องปฏิบัติการ (เช่น Lab 301, Server Room)</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>floor_id</td>
+                <td>INT</td>
+                <td>-</td>
+                <td>รหัสชั้นที่ห้องนี้ตั้งอยู่</td>
+                <td>FK</td>
             </tr>
         </tbody>
     </table>
