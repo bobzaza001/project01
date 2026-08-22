@@ -1,0 +1,474 @@
+<!-- HTML5-QRCode and QRCodeJS Libraries -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<!-- ========================================== -->
+<!-- 1. MODAL: กล้องสแกน QR Code / Barcode (Live Scanner) -->
+<!-- ========================================== -->
+<div id="qrScannerModal" class="modal" style="display: none; position: fixed; z-index: 99999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center;">
+    <div class="modal-content fade-in" style="background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 24px; max-width: 500px; width: 92%; padding: 1.5rem; box-shadow: 0 20px 50px rgba(0,0,0,0.7); position: relative; color: white; max-height: 92vh; overflow-y: auto;">
+        
+        <!-- Close Button -->
+        <button onclick="closeQrScanner()" style="position: absolute; right: 18px; top: 18px; background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; transition: all 0.2s;">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <!-- Header -->
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
+            <div style="background: linear-gradient(135deg, #0284c7, #38bdf8); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);">
+                <i class="fas fa-qrcode"></i>
+            </div>
+            <div>
+                <h2 style="font-size: 1.25rem; margin: 0; color: #fff; font-weight: 700;">สแกน QR Code / Barcode</h2>
+                <p style="margin: 0; color: #94a3b8; font-size: 0.8rem;">ส่องกล้องไปที่สติ๊กเกอร์บนตัวครุภัณฑ์เพื่อยืมหรือคืนทันที</p>
+            </div>
+        </div>
+
+        <!-- Scanner Viewport Area -->
+        <div id="scannerSection" style="position: relative; width: 100%; border-radius: 16px; overflow: hidden; background: #000; min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid rgba(56, 189, 248, 0.4);">
+            <div id="qr-reader" style="width: 100%;"></div>
+            
+            <!-- Scanning Overlay animation (visual aid) -->
+            <div id="scanLaser" style="position: absolute; top: 10%; left: 10%; right: 10%; height: 2px; background: linear-gradient(90deg, transparent, #38bdf8, #818cf8, transparent); box-shadow: 0 0 12px #38bdf8; animation: scanAnim 2s infinite alternate; pointer-events: none; z-index: 10;"></div>
+            
+            <!-- Scanner Loading State -->
+            <div id="scannerLoading" style="position: absolute; display: flex; flex-direction: column; align-items: center; gap: 10px; color: #94a3b8; font-size: 0.9rem;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #38bdf8;"></i>
+                <span>กำลังเปิดกล้อง...</span>
+            </div>
+        </div>
+
+        <!-- Camera Controls -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; gap: 8px;">
+            <button id="btnSwitchCamera" onclick="switchCamera()" class="btn btn-sm btn-secondary" style="border-radius: 10px; font-size: 0.8rem; padding: 6px 12px; display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-camera-rotate"></i> สลับกล้อง
+            </button>
+            <label for="qrFileInput" class="btn btn-sm btn-secondary" style="border-radius: 10px; font-size: 0.8rem; padding: 6px 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0;">
+                <i class="fas fa-image"></i> เลือกรูป QR
+            </label>
+            <input type="file" id="qrFileInput" accept="image/*" style="display: none;" onchange="scanFromImageFile(this)">
+        </div>
+
+        <!-- Manual Code Input Fallback -->
+        <div style="margin-top: 15px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="manualQrInput" placeholder="หรือพิมพ์รหัสครุภัณฑ์ เช่น EQ-231-005..." 
+                       style="flex: 1; padding: 0.6rem 0.9rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.3); color: white; font-size: 0.85rem;"
+                       onkeypress="if(event.key === 'Enter') handleManualLookup()">
+                <button type="button" onclick="handleManualLookup()" class="btn btn-primary" style="border-radius: 10px; padding: 0.6rem 1rem; font-size: 0.85rem;">
+                    ค้นหา
+                </button>
+            </div>
+        </div>
+
+        <!-- Result Preview Card (Appears upon successful scan) -->
+        <div id="scanResultCard" style="display: none; margin-top: 15px; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 16px; padding: 1.2rem; animation: fadeInUp 0.3s ease-out;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+                <div id="scanEqImgWrapper" style="width: 70px; height: 70px; border-radius: 12px; overflow: hidden; background: #000; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                    <img id="scanEqImg" src="" alt="Equipment" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                    <i id="scanEqImgPlaceholder" class="fas fa-box-open" style="font-size: 1.8rem; color: #64748b;"></i>
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <span id="scanEqCode" class="code-badge" style="font-size: 0.75rem;">EQ-000</span>
+                        <span id="scanEqTypeBadge" style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; background: #38bdf8; color: #0f172a;">ครุภัณฑ์</span>
+                    </div>
+                    <h3 id="scanEqName" style="font-size: 1rem; margin: 4px 0 2px 0; color: #fff; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">ชื่ออุปกรณ์</h3>
+                    <div id="scanEqLoc" style="font-size: 0.75rem; color: #94a3b8;"><i class="fas fa-map-marker-alt"></i> ห้อง Lab 301</div>
+                    <div id="scanEqStock" style="font-size: 0.75rem; color: #34d399; margin-top: 2px;">คงเหลือ: 2 / 2 ชิ้น</div>
+                </div>
+            </div>
+
+            <div id="scanActionMsg" style="margin-top: 10px; font-size: 0.8rem; padding: 6px 10px; border-radius: 8px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25); color: #bae6fd;">
+                ข้อความแจ้งสถานะ
+            </div>
+
+            <!-- Action Buttons -->
+            <div id="scanActionButtons" style="display: flex; gap: 8px; margin-top: 12px;">
+                <button id="btnScanMainAction" onclick="executeScanAction()" class="btn btn-primary" style="flex: 1; border-radius: 10px; padding: 0.7rem; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <i class="fas fa-check"></i> ดำเนินการ
+                </button>
+                <button type="button" onclick="resumeScanner()" class="btn btn-secondary" style="border-radius: 10px; padding: 0.7rem 1rem; font-size: 0.85rem;" title="สแกนใหม่อีกครั้ง">
+                    <i class="fas fa-redo"></i> สแกนใหม่
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ========================================== -->
+<!-- 2. MODAL: สร้างและพิมพ์สติ๊กเกอร์ QR Code (Admin Sticker Generator) -->
+<!-- ========================================== -->
+<div id="qrStickerModal" class="modal" style="display: none; position: fixed; z-index: 99999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); align-items: center; justify-content: center;">
+    <div class="modal-content fade-in" style="background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; max-width: 440px; width: 90%; padding: 1.8rem; box-shadow: 0 20px 40px rgba(0,0,0,0.6); position: relative; color: white; text-align: center;">
+        
+        <button onclick="closeQrStickerModal()" style="position: absolute; right: 15px; top: 15px; background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.2rem; color: #fff;">
+            <i class="fas fa-qrcode" style="color: #38bdf8;"></i> สติ๊กเกอร์ QR Code ครุภัณฑ์
+        </h3>
+        <p style="margin: 0 0 1.2rem 0; font-size: 0.82rem; color: #94a3b8;">
+            พิมพ์และตัดแปะติดบนตัวเครื่อง เพื่อให้ผู้ใช้สแกนยืม-คืนได้ทันที
+        </p>
+
+        <!-- Printable Physical Label Card -->
+        <div id="printableStickerCard" style="background: white; color: #0f172a; border: 2px solid #0f172a; border-radius: 12px; padding: 15px; margin: 0 auto 1.5rem auto; max-width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); text-align: center;">
+            <div style="font-size: 9pt; font-weight: 700; color: #0369a1; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <i class="fas fa-graduation-cap"></i> วิทยาลัยเทคโนโลยีพณิชยการอยุธยา
+            </div>
+            
+            <div id="qrcodeContainer" style="display: flex; justify-content: center; margin: 8px 0; min-height: 140px; align-items: center;"></div>
+
+            <div id="stickerEqName" style="font-size: 11pt; font-weight: 700; color: #0f172a; line-height: 1.2; margin-top: 4px;">ชื่ออุปกรณ์</div>
+            <div style="display: inline-block; background: #0f172a; color: white; font-family: monospace; font-size: 10pt; font-weight: bold; padding: 2px 10px; border-radius: 4px; margin: 4px 0;">
+                <span id="stickerEqCode">EQ-000-000</span>
+            </div>
+            <div id="stickerEqLoc" style="font-size: 8.5pt; color: #475569;">ห้องปฏิบัติการ Lab 301</div>
+            <div style="font-size: 7.5pt; color: #94a3b8; margin-top: 4px; border-top: 1px dashed #cbd5e1; padding-top: 3px;">
+                📷 สแกนด้วยมือถือเพื่อ ยืม / ส่งคืน
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button type="button" onclick="printSingleSticker()" class="btn btn-primary" style="border-radius: 10px; padding: 0.65rem 1.2rem; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-print"></i> สั่งพิมพ์สติ๊กเกอร์
+            </button>
+            <button type="button" onclick="closeQrStickerModal()" class="btn btn-secondary" style="border-radius: 10px; padding: 0.65rem 1rem; font-size: 0.9rem;">
+                ปิด
+            </button>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Scanner & QR Script Logic -->
+<style>
+@keyframes scanAnim {
+    0% { top: 12%; opacity: 0.8; }
+    100% { top: 88%; opacity: 0.8; }
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<script>
+let html5QrCode = null;
+let currentCameraIndex = 0;
+let availableCameras = [];
+let scannedEquipmentData = null;
+
+function openQrScanner() {
+    document.getElementById('qrScannerModal').style.display = 'flex';
+    document.getElementById('scanResultCard').style.display = 'none';
+    document.getElementById('scannerLoading').style.display = 'flex';
+    document.getElementById('scanLaser').style.display = 'block';
+
+    setTimeout(() => {
+        startCameraScanner();
+    }, 300);
+}
+
+function closeQrScanner() {
+    stopCameraScanner();
+    document.getElementById('qrScannerModal').style.display = 'none';
+    document.getElementById('scanResultCard').style.display = 'none';
+}
+
+function startCameraScanner() {
+    if (html5QrCode) {
+        try { html5QrCode.stop(); } catch(e) {}
+    }
+
+    html5QrCode = new Html5Qrcode("qr-reader");
+
+    Html5Qrcode.getCameras().then(devices => {
+        if (devices && devices.length) {
+            availableCameras = devices;
+            // Prefer back/environment camera if available
+            let selectedCameraId = devices[0].id;
+            for (let i = 0; i < devices.length; i++) {
+                if (devices[i].label.toLowerCase().includes('back') || devices[i].label.toLowerCase().includes('environment') || devices[i].label.toLowerCase().includes('rear')) {
+                    selectedCameraId = devices[i].id;
+                    currentCameraIndex = i;
+                    break;
+                }
+            }
+
+            const config = {
+                fps: 15,
+                qrbox: { width: 220, height: 220 },
+                aspectRatio: 1.0
+            };
+
+            html5QrCode.start(
+                selectedCameraId,
+                config,
+                (decodedText, decodedResult) => {
+                    onQrCodeScanned(decodedText);
+                },
+                (errorMessage) => {
+                    // Scanning ongoing...
+                }
+            ).then(() => {
+                document.getElementById('scannerLoading').style.display = 'none';
+            }).catch(err => {
+                console.error("Camera start error:", err);
+                document.getElementById('scannerLoading').innerHTML = '<span style="color: #f87171;"><i class="fas fa-exclamation-triangle"></i> ไม่สามารถเข้าถึงกล้องได้ กรุณาอนุญาตการใช้กล้อง หรือเลือกใช้การอัปโหลดรูปภาพ</span>';
+            });
+        } else {
+            document.getElementById('scannerLoading').innerHTML = '<span style="color: #f87171;">ไม่พบอุปกรณ์กล้องบนอุปกรณ์ของคุณ</span>';
+        }
+    }).catch(err => {
+        console.error("GetCameras error:", err);
+        document.getElementById('scannerLoading').innerHTML = '<span style="color: #f87171;"><i class="fas fa-camera"></i> กรุณาอนุญาตสิทธิ์การเข้าถึงกล้องบนเบราว์เซอร์</span>';
+    });
+}
+
+function stopCameraScanner() {
+    if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().then(() => {
+            html5QrCode.clear();
+        }).catch(err => console.error("Stop error:", err));
+    }
+}
+
+function switchCamera() {
+    if (availableCameras.length <= 1) {
+        alert("พบกล้องเพียง 1 ตัวบนอุปกรณ์ของคุณ");
+        return;
+    }
+    currentCameraIndex = (currentCameraIndex + 1) % availableCameras.length;
+    stopCameraScanner();
+    document.getElementById('scannerLoading').style.display = 'flex';
+    setTimeout(() => {
+        startCameraScanner();
+    }, 300);
+}
+
+function scanFromImageFile(input) {
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    
+    if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("qr-reader");
+    }
+
+    html5QrCode.scanFile(file, true)
+        .then(decodedText => {
+            onQrCodeScanned(decodedText);
+        })
+        .catch(err => {
+            alert("ไม่สามารถอ่าน QR Code จากรูปภาพนี้ได้ กรุณาลองใหม่อีกครั้ง");
+        });
+}
+
+function handleManualLookup() {
+    const code = document.getElementById('manualQrInput').value.trim();
+    if (!code) {
+        alert("กรุณากรอกรหัสครุภัณฑ์");
+        return;
+    }
+    onQrCodeScanned(code);
+}
+
+function onQrCodeScanned(decodedText) {
+    // Play subtle audio beep or vibration if supported
+    if (navigator.vibrate) {
+        navigator.vibrate(100);
+    }
+
+    // Pause laser animation
+    document.getElementById('scanLaser').style.display = 'none';
+
+    // Stop camera temporarily
+    if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.pause();
+    }
+
+    // Call API Lookup
+    fetch(`{{ url_for('user.scan_lookup') }}?code=${encodeURIComponent(decodedText)}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                displayScanResult(data);
+            } else {
+                alert(data.message || "ไม่พบข้อมูลครุภัณฑ์นี้");
+                resumeScanner();
+            }
+        })
+        .catch(err => {
+            console.error("Scan lookup error:", err);
+            alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่");
+            resumeScanner();
+        });
+}
+
+function displayScanResult(data) {
+    scannedEquipmentData = data;
+    const eq = data.equipment;
+    const action = data.action;
+
+    document.getElementById('scanEqCode').textContent = eq.code;
+    document.getElementById('scanEqName').textContent = eq.name;
+    document.getElementById('scanEqLoc').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${eq.location}`;
+    document.getElementById('scanEqStock').textContent = `จำนวนว่าง: ${eq.available_quantity} / ${eq.total_quantity} ชิ้น`;
+
+    const typeBadge = document.getElementById('scanEqTypeBadge');
+    if (eq.item_type === 'consumable') {
+        typeBadge.textContent = 'วัสดุสิ้นเปลือง';
+        typeBadge.style.background = '#f59e0b';
+        typeBadge.style.color = '#000';
+    } else {
+        typeBadge.textContent = 'ครุภัณฑ์ (ยืม-คืน)';
+        typeBadge.style.background = '#38bdf8';
+        typeBadge.style.color = '#0f172a';
+    }
+
+    // Image
+    const imgEl = document.getElementById('scanEqImg');
+    const placeholderEl = document.getElementById('scanEqImgPlaceholder');
+    if (eq.image_filename) {
+        imgEl.src = `{{ url_for('static', filename='uploads/') }}${eq.image_filename}`;
+        imgEl.style.display = 'block';
+        placeholderEl.style.display = 'none';
+    } else {
+        imgEl.style.display = 'none';
+        placeholderEl.style.display = 'block';
+    }
+
+    // Message & Button setup
+    const actionMsg = document.getElementById('scanActionMsg');
+    const mainBtn = document.getElementById('btnScanMainAction');
+    actionMsg.textContent = data.action_message;
+
+    if (action === 'return') {
+        actionMsg.style.background = 'rgba(234, 88, 12, 0.15)';
+        actionMsg.style.borderColor = 'rgba(234, 88, 12, 0.4)';
+        actionMsg.style.color = '#fdba74';
+        mainBtn.className = 'btn btn-warning';
+        mainBtn.innerHTML = '<i class="fas fa-undo"></i> แจ้งส่งคืนครุภัณฑ์นี้';
+        mainBtn.style.display = 'flex';
+    } else if (action === 'borrow') {
+        actionMsg.style.background = 'rgba(16, 185, 129, 0.15)';
+        actionMsg.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        actionMsg.style.color = '#6ee7b7';
+        mainBtn.className = 'btn btn-success';
+        mainBtn.innerHTML = '<i class="fas fa-hand-holding"></i> ยื่นคำขอยืมครุภัณฑ์';
+        mainBtn.style.display = 'flex';
+    } else if (action === 'consumable') {
+        actionMsg.style.background = 'rgba(245, 158, 11, 0.15)';
+        actionMsg.style.borderColor = 'rgba(245, 158, 11, 0.4)';
+        actionMsg.style.color = '#fde68a';
+        mainBtn.className = 'btn btn-primary';
+        mainBtn.innerHTML = '<i class="fas fa-tags"></i> ยื่นคำขอเบิกวัสดุ';
+        mainBtn.style.display = 'flex';
+    } else {
+        actionMsg.style.background = 'rgba(239, 68, 68, 0.15)';
+        actionMsg.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+        actionMsg.style.color = '#fca5a5';
+        mainBtn.style.display = 'none';
+    }
+
+    document.getElementById('scanResultCard').style.display = 'block';
+}
+
+function resumeScanner() {
+    document.getElementById('scanResultCard').style.display = 'none';
+    document.getElementById('scanLaser').style.display = 'block';
+    if (html5QrCode) {
+        try { html5QrCode.resume(); } catch(e) {}
+    }
+}
+
+function executeScanAction() {
+    if (!scannedEquipmentData) return;
+    const eq = scannedEquipmentData.equipment;
+    const action = scannedEquipmentData.action;
+
+    closeQrScanner();
+
+    if (action === 'return') {
+        // If return modal function exists on this page
+        if (typeof openReturnModal === 'function' && scannedEquipmentData.active_borrow_id) {
+            openReturnModal(scannedEquipmentData.active_borrow_id, eq.name);
+        } else {
+            window.location.href = `{{ url_for('user.dashboard') }}?action=return&req_id=${scannedEquipmentData.active_borrow_id}&eq_name=${encodeURIComponent(eq.name)}`;
+        }
+    } else if (action === 'borrow' || action === 'consumable') {
+        // If borrow modal function exists on this page (equipment_list)
+        if (typeof openBorrowModal === 'function') {
+            openBorrowModal(eq.id, eq.name, eq.item_type, eq.item_type === 'consumable');
+        } else {
+            window.location.href = `{{ url_for('user.equipment_list') }}?action=borrow&eq_id=${eq.id}&eq_name=${encodeURIComponent(eq.name)}&item_type=${eq.item_type}&is_consumable=${eq.item_type === 'consumable' ? '1' : '0'}`;
+        }
+    }
+}
+
+
+// ==========================================
+// QR CODE STICKER GENERATOR (For Admin)
+// ==========================================
+function openQrStickerModal(eqId, eqCode, eqName, eqLoc) {
+    document.getElementById('stickerEqName').textContent = eqName;
+    document.getElementById('stickerEqCode').textContent = eqCode;
+    document.getElementById('stickerEqLoc').textContent = eqLoc || 'ประจำห้องปฏิบัติการ';
+
+    const container = document.getElementById('qrcodeContainer');
+    container.innerHTML = '';
+
+    // Direct scan URL encoding
+    const directScanUrl = `${window.location.origin}/scan/${encodeURIComponent(eqCode)}`;
+
+    new QRCode(container, {
+        text: directScanUrl,
+        width: 140,
+        height: 140,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    document.getElementById('qrStickerModal').style.display = 'flex';
+}
+
+function closeQrStickerModal() {
+    document.getElementById('qrStickerModal').style.display = 'none';
+}
+
+function printSingleSticker() {
+    const printContent = document.getElementById('printableStickerCard').outerHTML;
+    const printWindow = window.open('', '_blank', 'width=450,height=550');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>พิมพ์สติ๊กเกอร์ QR Code</title>
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
+                body {
+                    font-family: 'Sarabun', sans-serif;
+                    margin: 0;
+                    padding: 10px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                @media print {
+                    @page { size: auto; margin: 5mm; }
+                }
+            </style>
+        </head>
+        <body onload="window.print(); window.close();">
+            ${printContent}
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+</script>

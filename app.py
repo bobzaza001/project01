@@ -55,6 +55,11 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(user_bp)
 
+@app.route('/scan/<path:eq_code>')
+def top_level_scan(eq_code):
+    from flask import redirect, url_for
+    return redirect(url_for('user.direct_scan', eq_code=eq_code))
+
 # === ตั้งค่า APScheduler — ตรวจสอบรายการใกล้ครบกำหนดทุกวัน 08:00 น. ===
 from flask_apscheduler import APScheduler
 

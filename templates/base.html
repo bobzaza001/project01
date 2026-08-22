@@ -51,6 +51,9 @@
             <a href="{{ url_for('user.equipment_list') }}" class="nav-link {% if request.endpoint == 'user.equipment_list' %}active{% endif %}">
                 <i class="fas fa-boxes"></i> คลังอุปกรณ์
             </a>
+            <button type="button" onclick="openQrScanner()" class="nav-link" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 20px; padding: 5px 14px; cursor: pointer; color: #38bdf8; display: flex; align-items: center; gap: 6px; font-size: 0.9rem;" title="สแกน QR Code ครุภัณฑ์เพื่อยืม-คืน">
+                <i class="fas fa-qrcode"></i> สแกน QR
+            </button>
             {% if current_user.is_admin() %}
             <a href="{{ url_for('admin.borrow_history') }}" class="nav-link {% if request.endpoint == 'admin.borrow_history' %}active{% endif %}">
                 <i class="fas fa-history"></i> ประวัติการยืม
@@ -118,6 +121,9 @@
     </main>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% if current_user.is_authenticated %}
+    {% include 'components/qr_scanner_modal.html' %}
+    {% endif %}
     {% block scripts %}{% endblock %}
 </body>
 </html>

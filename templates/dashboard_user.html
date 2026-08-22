@@ -408,6 +408,18 @@ document.addEventListener('DOMContentLoaded', function() {
             chevron.classList.toggle('rotated');
         });
     });
+
+    // Auto-open return modal if redirected from QR scan
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('action') === 'return') {
+        const reqId = urlParams.get('req_id');
+        const eqName = urlParams.get('eq_name') || 'ครุภัณฑ์';
+        if (reqId && typeof openReturnModal === 'function') {
+            setTimeout(() => {
+                openReturnModal(reqId, eqName);
+            }, 300);
+        }
+    }
 });
 </script>
 {% endblock %}

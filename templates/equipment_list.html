@@ -7,11 +7,14 @@
 
 <!-- หน้าคลังอุปกรณ์ (Equipment Gallery) -->
 <div class="equipment-page">
-    <!-- Back Button -->
-    <div style="margin-bottom: 1.25rem; display: flex; justify-content: flex-start;" class="fade-in">
+    <!-- Back & Scanner Buttons -->
+    <div style="margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;" class="fade-in">
         <a href="{{ url_for('admin.dashboard') if current_user.is_admin() else url_for('user.dashboard') }}" class="btn btn-secondary btn-sm" style="border-radius: 50px; padding: 0.5rem 1.25rem; font-weight: 600;">
             <i class="fas fa-arrow-left"></i> กลับสู่หน้าหลัก
         </a>
+        <button type="button" onclick="openQrScanner()" class="btn btn-primary btn-sm" style="border-radius: 50px; padding: 0.5rem 1.25rem; font-weight: 600; background: linear-gradient(135deg, #0284c7, #38bdf8); border: none; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3); display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fas fa-qrcode"></i> สแกน QR Code ครุภัณฑ์
+        </button>
     </div>
 
     <div class="equipment-page-header fade-in">
@@ -182,9 +185,14 @@
                         {% endif %}
 
                         {% if current_user.is_admin() %}
-                        <a href="{{ url_for('admin.edit_equipment', eq_id=eq.id) }}" class="btn-eq btn-admin-edit">
-                            <i class="fas fa-pen-to-square"></i> แก้ไขข้อมูล
-                        </a>
+                        <div style="display: flex; gap: 6px; width: 100%;">
+                            <a href="{{ url_for('admin.edit_equipment', eq_id=eq.id) }}" class="btn-eq btn-admin-edit" style="flex: 1;">
+                                <i class="fas fa-pen-to-square"></i> แก้ไข
+                            </a>
+                            <button type="button" class="btn-eq" onclick="openQrStickerModal({{ eq.id }}, '{{ eq.equipment_code }}', '{{ eq.name | replace("'", "\\'") }}', '{{ (eq.room.name if eq.room else '') | replace("'", "\\'") }}')" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); padding: 0.5rem 0.8rem;" title="พิมพ์สติ๊กเกอร์ QR Code">
+                                <i class="fas fa-qrcode"></i> QR
+                            </button>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
@@ -429,6 +437,23 @@ document.addEventListener('DOMContentLoaded', function() {
             card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
         });
     });
+
+    // Auto-open borrow modal if redirected from QR scan
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('action') === 'borrow') {
+        const eqId = urlParams.get('eq_id');
+        const eqName = urlParams.get('eq_name') || 'ครุภัณฑ์';
+        const isConsumable = urlParams.get('is_consumable') === '1';
+        if (eqId) {
+            setTimeout(() => {
+                if (isConsumable) {
+                    openConsumableModal(eqId, eqName, 10);
+                } else {
+                    openBorrowModal(eqId, eqName);
+                }
+            }, 300);
+        }
+    }
 });
 </script>
 {% endblock %}
