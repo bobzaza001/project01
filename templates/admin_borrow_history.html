@@ -13,7 +13,10 @@
                 ศูนย์รวมประวัติการยืม ครุภัณฑ์ และการเบิกวัสดุของสถาบันทั้งหมด (บันทึกถาวร)
             </p>
         </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button onclick="openExportModal()" class="btn btn-primary" style="border-radius: 10px; display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #0284c7, #2563eb); border: none; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">
+                <i class="fas fa-file-export"></i> ออกรายงาน (Excel / PDF)
+            </button>
             <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary" style="border-radius: 10px;">
                 <i class="fas fa-arrow-left"></i> กลับหน้าแดชบอร์ด
             </a>
@@ -238,4 +241,132 @@
         {% endif %}
     </div>
 </div>
+
+<!-- Modal สำหรับเลือก Export รายงาน (Excel / PDF) -->
+<div id="exportModal" class="modal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); align-items: center; justify-content: center;">
+    <div class="modal-content fade-in" style="background: #1e1b4b; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; max-width: 520px; width: 92%; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; color: white;">
+        <button onclick="closeExportModal()" style="position: absolute; right: 20px; top: 20px; background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.2rem;">
+            <div style="background: rgba(56, 189, 248, 0.2); width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 1.3rem;">
+                <i class="fas fa-file-export"></i>
+            </div>
+            <div>
+                <h2 style="font-size: 1.3rem; margin: 0; color: #fff;">ออกรายงานสรุปข้อมูล</h2>
+                <p style="margin: 0; color: #94a3b8; font-size: 0.85rem;">ดาวน์โหลดเป็นไฟล์ Excel หรือเปิดพิมพ์รายงานทางการ (A4/PDF)</p>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 1.2rem;">
+            <label style="display: block; font-size: 0.9rem; margin-bottom: 6px; color: #cbd5e1; font-weight: 600;">
+                <i class="fas fa-list"></i> เลือกประเภทรายงาน:
+            </label>
+            <select id="exportReportType" onchange="toggleMonthSelector()" style="width: 100%; padding: 0.65rem 1rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white; font-size: 0.95rem;">
+                <option value="borrow">📜 รายงานสรุปประวัติการยืม-คืน และเบิกวัสดุ</option>
+                <option value="repairs">🔧 รายงานครุภัณฑ์ชำรุดและการแจ้งซ่อมบำรุง</option>
+                <option value="inventory">📦 รายงานสรุปยอดคงคลังครุภัณฑ์และวัสดุ</option>
+            </select>
+        </div>
+
+        <div id="periodSelectionGroup" style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 0.9rem; margin-bottom: 6px; color: #cbd5e1; font-weight: 600;">
+                <i class="fas fa-calendar-alt"></i> ช่วงเวลาที่ต้องการสรุป:
+            </label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <select id="exportMonth" style="width: 100%; padding: 0.65rem 0.8rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white; font-size: 0.9rem;">
+                    <option value="">-- ทุกช่วงเวลา (ทั้งหมด) --</option>
+                    <option value="1">มกราคม</option>
+                    <option value="2">กุมภาพันธ์</option>
+                    <option value="3">มีนาคม</option>
+                    <option value="4">เมษายน</option>
+                    <option value="5">พฤษภาคม</option>
+                    <option value="6">มิถุนายน</option>
+                    <option value="7">กรกฎาคม</option>
+                    <option value="8" selected>สิงหาคม</option>
+                    <option value="9">กันยายน</option>
+                    <option value="10">ตุลาคม</option>
+                    <option value="11">พฤศจิกายน</option>
+                    <option value="12">ธันวาคม</option>
+                </select>
+
+                <select id="exportYear" style="width: 100%; padding: 0.65rem 0.8rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white; font-size: 0.9rem;">
+                    <option value="2026" selected>2569 (2026)</option>
+                    <option value="2025">2568 (2025)</option>
+                    <option value="2024">2567 (2024)</option>
+                </select>
+            </div>
+            <div style="font-size: 0.78rem; color: #94a3b8; margin-top: 4px;">* หากเลือก "-- ทุกช่วงเวลา --" ระบบจะดึงข้อมูลทั้งหมดตั้งแต่เริ่มระบบ</div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <button type="button" onclick="triggerExport('excel')" class="btn" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 12px; padding: 0.8rem 1rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);">
+                <i class="fas fa-file-excel" style="font-size: 1.2rem;"></i> ดาวน์โหลด Excel
+            </button>
+            <button type="button" onclick="triggerExport('pdf')" class="btn" style="background: linear-gradient(135deg, #0284c7, #2563eb); color: white; border: none; border-radius: 12px; padding: 0.8rem 1rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);">
+                <i class="fas fa-file-pdf" style="font-size: 1.2rem;"></i> พิมพ์ / บันทึก PDF
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function openExportModal() {
+    document.getElementById('exportModal').style.display = 'flex';
+}
+
+function closeExportModal() {
+    document.getElementById('exportModal').style.display = 'none';
+}
+
+function toggleMonthSelector() {
+    const type = document.getElementById('exportReportType').value;
+    const periodGroup = document.getElementById('periodSelectionGroup');
+    if (type === 'borrow') {
+        periodGroup.style.display = 'block';
+    } else {
+        periodGroup.style.display = 'none';
+    }
+}
+
+function triggerExport(format) {
+    const type = document.getElementById('exportReportType').value;
+    const month = document.getElementById('exportMonth').value;
+    const year = document.getElementById('exportYear').value;
+
+    let url = '';
+    let params = [];
+
+    if (type === 'borrow') {
+        url = format === 'excel' ? '{{ url_for("admin.export_borrow_history_excel") }}' : '{{ url_for("admin.report_borrow_print") }}';
+        if (month && year) {
+            params.push(`month=${month}`);
+            params.push(`year=${year}`);
+        }
+    } else if (type === 'repairs') {
+        url = format === 'excel' ? '{{ url_for("admin.export_repairs_excel") }}' : '{{ url_for("admin.report_repairs_print") }}';
+    } else if (type === 'inventory') {
+        url = format === 'excel' ? '{{ url_for("admin.export_inventory_excel") }}' : '{{ url_for("admin.report_inventory_print") }}';
+    }
+
+    if (params.length > 0) {
+        url += '?' + params.join('&');
+    }
+
+    if (format === 'excel') {
+        window.location.href = url;
+    } else {
+        window.open(url, '_blank');
+    }
+    closeExportModal();
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('exportModal');
+    if (event.target === modal) {
+        closeExportModal();
+    }
+}
+</script>
 {% endblock %}

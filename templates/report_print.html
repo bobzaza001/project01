@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ report_title }} — ATCC LAB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap');
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Segoe UI', Tahoma, sans-serif;
+            font-size: 13pt;
+            color: #1e293b;
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 0;
+            line-height: 1.4;
+        }
+
+        /* Screen Controls Bar */
+        .no-print-bar {
+            background: #1e1b4b;
+            color: white;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 11pt;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-print {
+            background: #38bdf8;
+            color: #0f172a;
+        }
+        .btn-print:hover {
+            background: #7dd3fc;
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+        .btn-back:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* Paper Container (A4 Simulation) */
+        .page-container {
+            max-width: 210mm;
+            min-height: 297mm;
+            margin: 20px auto;
+            background: white;
+            padding: 20mm 18mm;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-radius: 4px;
+        }
+
+        /* Header Section */
+        .report-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 2px solid #0284c7;
+            padding-bottom: 15px;
+            margin-bottom: 18px;
+        }
+
+        .logo-img {
+            width: 75px;
+            height: 75px;
+            object-fit: contain;
+        }
+
+        .header-text h1 {
+            font-size: 16pt;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .header-text h2 {
+            font-size: 13pt;
+            font-weight: 600;
+            color: #0284c7;
+            margin: 2px 0 0 0;
+        }
+
+        .header-text p {
+            font-size: 10pt;
+            color: #64748b;
+            margin: 2px 0 0 0;
+        }
+
+        /* Metadata & Title */
+        .doc-title-box {
+            text-align: center;
+            margin: 15px 0 20px 0;
+        }
+
+        .doc-title-box h3 {
+            font-size: 15pt;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .doc-title-box .period-tag {
+            font-size: 11pt;
+            color: #475569;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* Summary Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 8px 12px;
+            text-align: center;
+        }
+
+        .stat-box .stat-label {
+            font-size: 9.5pt;
+            color: #64748b;
+        }
+
+        .stat-box .stat-val {
+            font-size: 14pt;
+            font-weight: 700;
+            color: #0369a1;
+            margin-top: 2px;
+        }
+
+        /* Table */
+        table.report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9.5pt;
+            margin-bottom: 25px;
+        }
+
+        table.report-table th, 
+        table.report-table td {
+            border: 1px solid #cbd5e1;
+            padding: 6px 8px;
+            vertical-align: middle;
+        }
+
+        table.report-table th {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        table.report-table tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+
+        .badge-status {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 8.5pt;
+            font-weight: 600;
+        }
+        .status-returned { background: #dcfce7; color: #166534; }
+        .status-approved { background: #e0f2fe; color: #075985; }
+        .status-pending { background: #fef9c3; color: #854d0e; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+        .status-completed { background: #dcfce7; color: #166534; }
+        .status-in_progress { background: #e0e7ff; color: #3730a3; }
+
+        /* Signatures Section */
+        .signatures-section {
+            margin-top: 30px;
+            page-break-inside: avoid;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            text-align: center;
+        }
+
+        .sign-box {
+            padding: 10px;
+        }
+
+        .sign-line {
+            margin-top: 50px;
+            border-bottom: 1px dotted #475569;
+            width: 85%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .sign-name {
+            font-size: 10pt;
+            margin-top: 6px;
+            color: #1e293b;
+        }
+
+        .sign-role {
+            font-size: 9pt;
+            color: #64748b;
+        }
+
+        /* Footer */
+        .report-footer {
+            margin-top: 25px;
+            padding-top: 10px;
+            border-top: 1px solid #e2e8f0;
+            font-size: 8.5pt;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Print Media Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            .no-print-bar {
+                display: none !important;
+            }
+            .page-container {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+                border-radius: 0;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 12mm 12mm 12mm 12mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Control Bar (Hidden when printing) -->
+    <div class="no-print-bar">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="javascript:window.history.back()" class="btn-action btn-back">
+                <i class="fas fa-arrow-left"></i> ย้อนกลับ
+            </a>
+            <span style="font-size: 11pt; color: #cbd5e1;">
+                <i class="fas fa-file-invoice"></i> {{ report_title }} ({{ period_text }})
+            </span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="window.print()" class="btn-action btn-print">
+                <i class="fas fa-print"></i> พิมพ์รายงาน / บันทึกเป็น PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Printable A4 Document Body -->
+    <div class="page-container">
+        
+        <!-- Header -->
+        <div class="report-header">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+            <div class="header-text">
+                <h1>วิทยาลัยเทคโนโลยีพณิชยการอยุธยา (ATCC)</h1>
+                <h2>สาขาวิชาเทคโนโลยีสารสนเทศ — ระบบบริหารจัดการห้องปฏิบัติการคอมพิวเตอร์</h2>
+                <p>รายงานเสนอ: อาจารย์หัวหน้าสาขาวิชาเทคโนโลยีสารสนเทศ และ หัวหน้างานพัสดุ</p>
+            </div>
+        </div>
+
+        <!-- Document Title -->
+        <div class="doc-title-box">
+            <h3>{{ report_title }}</h3>
+            <div class="period-tag">{{ period_text }}</div>
+        </div>
+
+        <!-- Report 1: Borrow History -->
+        {% if report_type == 'borrow' %}
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-label">จำนวนคำขอทั้งหมด</div>
+                <div class="stat-val">{{ stats.total }}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">ส่งคืนสำเร็จแล้ว</div>
+                <div class="stat-val" style="color: #16a34a;">{{ stats.returned }}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">กำลังยืมใช้งาน</div>
+                <div class="stat-val" style="color: #0284c7;">{{ stats.active }}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">รายงานชำรุดเสียหาย</div>
+                <div class="stat-val" style="color: #dc2626;">{{ stats.damaged }}</div>
+            </div>
+        </div>
+
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th style="width: 35px;">#</th>
+                    <th style="width: 90px;">วันที่ยื่น</th>
+                    <th>ผู้ยื่นคำขอ</th>
+                    <th>อุปกรณ์ / ครุภัณฑ์</th>
+                    <th style="width: 75px;">รหัสครุภัณฑ์</th>
+                    <th style="width: 75px;">ประเภท</th>
+                    <th style="width: 80px;">กำหนดคืน</th>
+                    <th style="width: 75px;">สถานะ</th>
+                    <th>หมายเหตุ / สภาพ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in records %}
+                <tr>
+                    <td class="text-center">{{ loop.index }}</td>
+                    <td class="text-center">{{ r.requested_at.strftime('%d/%m/%Y') if r.requested_at else '-' }}</td>
+                    <td>
+                        <strong>{{ r.requester.full_name }}</strong>
+                        <div style="font-size: 8pt; color: #64748b;">{{ r.requester.email or r.requester.username }}</div>
+                    </td>
+                    <td>{{ r.equipment.name }}</td>
+                    <td class="text-center"><code>{{ r.equipment.equipment_code }}</code></td>
+                    <td class="text-center">
+                        {% if r.equipment.item_type == 'consumable' %}
+                        วัสดุ ({{ r.quantity }})
+                        {% else %}
+                        ครุภัณฑ์ ({{ r.borrow_days }} วัน)
+                        {% endif %}
+                    </td>
+                    <td class="text-center">{{ r.return_due_datetime.strftime('%d/%m/%Y') if r.return_due_datetime else '-' }}</td>
+                    <td class="text-center">
+                        <span class="badge-status status-{{ r.status }}">
+                            {% if r.status == 'returned' %}คืนแล้ว
+                            {% elif r.status == 'approved' %}กำลังยืม
+                            {% elif r.status == 'return_pending' %}รอรับคืน
+                            {% elif r.status == 'pending' %}รออนุมัติ
+                            {% elif r.status == 'rejected' %}ปฏิเสธ
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        {% if r.damage_status == 'damaged' %}
+                        <span style="color: #dc2626; font-weight: bold;">[ชำรุด]</span> {{ r.damage_note }}
+                        {% elif r.status == 'rejected' and r.warning_message %}
+                        {{ r.warning_message }}
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" class="text-center" style="padding: 20px; color: #94a3b8;">ไม่พบรายการข้อมูลตามช่วงเวลาที่กำหนด</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        <!-- Report 2: Repairs & Damaged -->
+        {% if report_type == 'repairs' %}
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-label">รายการแจ้งซ่อมทั้งหมด</div>
+                <div class="stat-val">{{ stats.total }}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">ซ่อมเสร็จสิ้นแล้ว</div>
+                <div class="stat-val" style="color: #16a34a;">{{ stats.completed }}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">อยู่ระหว่างการซ่อม</div>
+                <div class="stat-val" style="color: #0284c7;">{{ stats.in_progress }}</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">รอดำเนินการ</div>
+                <div class="stat-val" style="color: #ea580c;">{{ stats.pending }}</div>
+            </div>
+        </div>
+
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th style="width: 35px;">#</th>
+                    <th style="width: 85px;">วันที่แจ้ง</th>
+                    <th>ชื่อครุภัณฑ์</th>
+                    <th style="width: 85px;">รหัสครุภัณฑ์</th>
+                    <th>สถานที่จัดเก็บ</th>
+                    <th>ผู้แจ้งเรื่อง</th>
+                    <th>อาการชำรุด / ปัญหาที่พบ</th>
+                    <th style="width: 85px;">สถานะ</th>
+                    <th>บันทึกผลการซ่อม</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in records %}
+                <tr>
+                    <td class="text-center">{{ loop.index }}</td>
+                    <td class="text-center">{{ r.reported_at.strftime('%d/%m/%Y') if r.reported_at else '-' }}</td>
+                    <td><strong>{{ r.equipment.name }}</strong></td>
+                    <td class="text-center"><code>{{ r.equipment.equipment_code }}</code></td>
+                    <td>
+                        {% if r.equipment.room_ref %}
+                        {{ r.equipment.room_ref.floor.building.name if r.equipment.room_ref.floor and r.equipment.room_ref.floor.building else '' }}
+                        {{ r.equipment.room_ref.floor.name if r.equipment.room_ref.floor else '' }}
+                        ({{ r.equipment.room_ref.name }})
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td>{{ r.reporter.full_name }}</td>
+                    <td>{{ r.issue_description }}</td>
+                    <td class="text-center">
+                        <span class="badge-status status-{{ r.status }}">
+                            {% if r.status == 'completed' %}ซ่อมเสร็จ
+                            {% elif r.status == 'in_progress' %}กำลังซ่อม
+                            {% else %}รอดำเนินการ{% endif %}
+                        </span>
+                    </td>
+                    <td>{{ r.admin_note or '-' }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" class="text-center" style="padding: 20px; color: #94a3b8;">ไม่พบรายการแจ้งซ่อม</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        <!-- Report 3: Inventory Stock -->
+        {% if report_type == 'inventory' %}
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-label">รายการครุภัณฑ์/วัสดุ</div>
+                <div class="stat-val">{{ stats.total_items }} รายการ</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">ยอดจำนวนรวมทั้งหมด</div>
+                <div class="stat-val">{{ stats.total_qty }} ชิ้น</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">จำนวนพร้อมใช้งาน</div>
+                <div class="stat-val" style="color: #16a34a;">{{ stats.available_qty }} ชิ้น</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">อยู่ระหว่างใช้งาน/ยืม</div>
+                <div class="stat-val" style="color: #0284c7;">{{ stats.borrowed_qty }} ชิ้น</div>
+            </div>
+        </div>
+
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th style="width: 35px;">#</th>
+                    <th style="width: 80px;">รหัสครุภัณฑ์</th>
+                    <th>ชื่อรายการ</th>
+                    <th>หมวดหมู่</th>
+                    <th>ประเภท</th>
+                    <th>สถานที่จัดเก็บ</th>
+                    <th style="width: 50px;" class="text-center">ทั้งหมด</th>
+                    <th style="width: 50px;" class="text-center">คงเหลือ</th>
+                    <th style="width: 70px;" class="text-center">สถานะ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for eq in items %}
+                <tr>
+                    <td class="text-center">{{ loop.index }}</td>
+                    <td class="text-center"><code>{{ eq.equipment_code }}</code></td>
+                    <td><strong>{{ eq.name }}</strong></td>
+                    <td>{{ eq.category or 'ทั่วไป' }}</td>
+                    <td>{{ 'วัสดุสิ้นเปลือง' if eq.item_type == 'consumable' else 'ครุภัณฑ์' }}</td>
+                    <td>
+                        {% if eq.room_ref %}
+                        {{ eq.room_ref.floor.building.name if eq.room_ref.floor and eq.room_ref.floor.building else '' }}
+                        {{ eq.room_ref.floor.name if eq.room_ref.floor else '' }}
+                        ({{ eq.room_ref.name }})
+                        {% else %}
+                        -
+                        {% endif %}
+                    </td>
+                    <td class="text-center">{{ eq.total_quantity }}</td>
+                    <td class="text-center" style="font-weight: bold; color: #0284c7;">{{ eq.available_quantity }}</td>
+                    <td class="text-center">
+                        <span class="badge-status" style="background: #f1f5f9;">
+                            {% if eq.status == 'available' %}พร้อมใช้
+                            {% elif eq.status == 'borrowed' %}ถูกยืม
+                            {% elif eq.status == 'maintenance' %}ซ่อมบำรุง
+                            {% elif eq.status == 'disposed' %}ตัดจำหน่าย
+                            {% else %}{{ eq.status }}{% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        <!-- Signatures Section -->
+        <div class="signatures-section">
+            <div class="sign-box">
+                <div>ผู้จัดทำรายงาน</div>
+                <div class="sign-line"></div>
+                <div class="sign-name">( .............................................................. )</div>
+                <div class="sign-role">เจ้าหน้าที่ห้องปฏิบัติการคอมพิวเตอร์</div>
+                <div style="font-size: 8.5pt; color: #94a3b8; margin-top: 4px;">วันที่ .......... / .......... / ..............</div>
+            </div>
+
+            <div class="sign-box">
+                <div>ผู้ตรวจสอบรายงาน</div>
+                <div class="sign-line"></div>
+                <div class="sign-name">( .............................................................. )</div>
+                <div class="sign-role">หัวหน้าสาขาวิชาเทคโนโลยีสารสนเทศ</div>
+                <div style="font-size: 8.5pt; color: #94a3b8; margin-top: 4px;">วันที่ .......... / .......... / ..............</div>
+            </div>
+
+            <div class="sign-box">
+                <div>ผู้อนุมัติ / รับทราบ</div>
+                <div class="sign-line"></div>
+                <div class="sign-name">( .............................................................. )</div>
+                <div class="sign-role">หัวหน้างานพัสดุและอาคารสถานที่</div>
+                <div style="font-size: 8.5pt; color: #94a3b8; margin-top: 4px;">วันที่ .......... / .......... / ..............</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="report-footer">
+            <div>ระบบบริหารจัดการครุภัณฑ์ห้องปฏิบัติการคอมพิวเตอร์ — วิทยาลัยเทคโนโลยีพณิชยการอยุธยา (ATCC)</div>
+            <div>พิมพ์เมื่อ: {{ generated_date }}</div>
+        </div>
+
+    </div>
+
+</body>
+</html>
