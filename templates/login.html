@@ -1,55 +1,337 @@
 {% extends 'base.html' %}
 {% block title %}เข้าสู่ระบบ — ระบบยืม-คืนครุภัณฑ์{% endblock %}
 {% block content %}
-<div class="auth-wrapper">
-    <div class="auth-card">
+<!-- Include QR Code Libraries on Login page -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<div class="auth-wrapper fade-in">
+    <div class="auth-card" style="max-width: 460px; width: 100%;">
         <!-- ส่วนหัวของการ์ด -->
         <div class="auth-header">
             <div class="auth-logo-wrapper">
                 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ATCC Logo" class="auth-logo-img">
             </div>
             <h1>ระบบยืม-คืนครุภัณฑ์</h1>
-            <p>ห้องปฏิบัติการ</p>
+            <p>วิทยาลัยเทคโนโลยีพณิชยการอยุธยา</p>
         </div>
 
-        <!-- ฟอร์มเข้าสู่ระบบ -->
-        <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm" class="auth-form">
-            <div class="form-group">
-                <label for="username">
-                    <i class="fas fa-user"></i> ชื่อ-นามสกุล / ชื่อผู้ใช้
-                </label>
-                <input type="text" id="username" name="username" placeholder="กรอกชื่อ-นามสกุล หรือชื่อผู้ใช้" required autocomplete="username">
-            </div>
+        <!-- แท็บเลือกรูปแบบการเข้าสู่ระบบ -->
+        <div class="auth-tabs" style="display: flex; gap: 8px; background: rgba(0,0,0,0.25); padding: 5px; border-radius: 14px; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.08);">
+            <button type="button" id="tabBtnPassword" class="tab-btn active" onclick="switchLoginTab('password')" style="flex: 1; padding: 8px; border: none; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; background: linear-gradient(135deg, #0284c7, #2563eb); color: white;">
+                <i class="fas fa-key"></i> รหัสผ่าน
+            </button>
+            <button type="button" id="tabBtnQr" class="tab-btn" onclick="switchLoginTab('qr')" style="flex: 1; padding: 8px; border: none; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; background: transparent; color: #94a3b8;">
+                <i class="fas fa-qrcode"></i> สแกน QR Code
+            </button>
+        </div>
 
-            <div class="form-group">
-                <label for="password">
-                    <i class="fas fa-lock"></i> รหัสผ่าน
-                </label>
-                <div class="password-wrapper">
-                    <input type="password" id="password" name="password" placeholder="กรอกรหัสผ่าน" required autocomplete="current-password">
-                    <button type="button" class="toggle-password" onclick="togglePassword('password')">
-                        <i class="fas fa-eye" id="password-eye"></i>
+        <!-- 1. ฟอร์มเข้าสู่ระบบด้วยรหัสผ่าน -->
+        <div id="passwordLoginForm">
+            <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i> ชื่อ-นามสกุล / ชื่อผู้ใช้
+                    </label>
+                    <input type="text" id="username" name="username" placeholder="กรอกชื่อ-นามสกุล หรือชื่อผู้ใช้" required autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> รหัสผ่าน
+                    </label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" name="password" placeholder="กรอกรหัสผ่าน" required autocomplete="current-password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                            <i class="fas fa-eye" id="password-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember" value="1">
+                        <span>จดจำฉัน</span>
+                    </label>
+                    <a href="{{ url_for('auth.forgot_password') }}" class="forgot-link">ลืมรหัสผ่าน?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full" id="loginBtn">
+                    <span class="btn-text">เข้าสู่ระบบ</span>
+                    <span class="btn-loader" style="display:none;"><i class="fas fa-spinner fa-spin"></i></span>
+                </button>
+            </form>
+        </div>
+
+        <!-- 2. ส่วนแสดง QR Code สดสำหรับสแกนเข้าสู่ระบบ (Web Screen QR Login) -->
+        <div id="qrLoginForm" style="display: none; text-align: center; padding: 0.5rem 0;">
+            <div style="background: white; border-radius: 16px; padding: 16px; display: inline-block; box-shadow: 0 8px 25px rgba(0,0,0,0.3); border: 2px solid #38bdf8; position: relative; margin-bottom: 1rem;">
+                <div id="qrLoginCodeContainer" style="width: 190px; height: 190px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #0284c7;"></i>
+                </div>
+                <!-- Overlay when expired -->
+                <div id="qrExpiredOverlay" style="display: none; position: absolute; inset: 0; background: rgba(15, 23, 42, 0.9); border-radius: 14px; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 10px;">
+                    <i class="fas fa-clock-rotate-left" style="font-size: 2rem; color: #f87171; margin-bottom: 6px;"></i>
+                    <div style="font-size: 0.85rem; font-weight: bold; margin-bottom: 8px;">QR Code หมดอายุแล้ว</div>
+                    <button type="button" onclick="initQrLogin()" class="btn btn-sm btn-primary" style="font-size: 0.8rem; padding: 5px 12px; border-radius: 8px;">
+                        <i class="fas fa-redo"></i> รีเฟรช QR
                     </button>
                 </div>
             </div>
 
-            <div class="form-options">
-                <label class="checkbox-label">
-                    <input type="checkbox" name="remember" value="1">
-                    <span>จดจำฉัน</span>
-                </label>
-                <a href="{{ url_for('auth.forgot_password') }}" class="forgot-link">ลืมรหัสผ่าน?</a>
+            <!-- Timer Badge -->
+            <div id="qrCountdownText" style="font-size: 0.85rem; color: #38bdf8; margin-bottom: 0.8rem; font-weight: 500;">
+                <i class="fas fa-stopwatch"></i> QR Code จะหมดอายุใน: <span id="countdownSec" style="font-weight: 700; color: #fff;">02:00</span>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-full" id="loginBtn">
-                <span class="btn-text">เข้าสู่ระบบ</span>
-                <span class="btn-loader" style="display:none;"><i class="fas fa-spinner fa-spin"></i></span>
-            </button>
-        </form>
+            <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; margin-bottom: 1.2rem; text-align: left; font-size: 0.82rem; color: #94a3b8; line-height: 1.4;">
+                <div style="color: #fff; font-weight: 600; margin-bottom: 3px;"><i class="fas fa-mobile-screen"></i> วิธีการเข้าสู่ระบบ:</div>
+                1. เปิดกล้องมือถือ หรือเข้าเว็บระบบในมือถือที่ล็อกอินแล้ว<br>
+                2. สแกน QR Code บนหน้านี้ แล้วกดยืนยันบนมือถือ<br>
+                3. หน้าจอนี้จะเข้าสู่ระบบให้อัตโนมัติทันที
+            </div>
+
+            <!-- Alternative: Scan Physical ID Card / Badge -->
+            <div style="border-top: 1px dashed rgba(255,255,255,0.15); padding-top: 12px;">
+                <button type="button" onclick="openBadgeCameraModal()" class="btn btn-secondary btn-full" style="padding: 0.65rem; border-radius: 10px; font-size: 0.88rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fas fa-camera"></i> สแกนบัตรนักศึกษา / บัตร QR ประจำตัว
+                </button>
+            </div>
+        </div>
 
         <div class="auth-footer">
             <p>ยังไม่มีบัญชี? <a href="{{ url_for('auth.register') }}">สมัครสมาชิก</a></p>
         </div>
     </div>
 </div>
+
+
+<!-- Modal กล้องสแกนบัตร QR ประจำตัวที่หน้า Login -->
+<div id="loginBadgeScannerModal" class="modal" style="display: none; position: fixed; z-index: 99999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center;">
+    <div class="modal-content fade-in" style="background: #0f172a; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 24px; max-width: 440px; width: 92%; padding: 1.5rem; box-shadow: 0 20px 50px rgba(0,0,0,0.7); position: relative; color: white; text-align: center;">
+        
+        <button onclick="closeBadgeCameraModal()" style="position: absolute; right: 18px; top: 18px; background: rgba(255,255,255,0.1); border: none; color: #cbd5e1; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer;">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <h3 style="font-size: 1.2rem; margin: 0 0 4px 0; color: #fff; font-weight: 700;">
+            <i class="fas fa-id-card" style="color: #38bdf8;"></i> สแกนบัตร QR Code ประจำตัว
+        </h3>
+        <p style="margin: 0 0 1rem 0; color: #94a3b8; font-size: 0.8rem;">
+            นำบัตรนักศึกษา หรือ บัตรอาจารย์ มาส่องที่หน้ากล้องเพื่อ Login
+        </p>
+
+        <div style="position: relative; width: 100%; border-radius: 16px; overflow: hidden; background: #000; min-height: 250px; display: flex; align-items: center; justify-content: center; border: 2px solid rgba(56, 189, 248, 0.4);">
+            <div id="badge-qr-reader" style="width: 100%;"></div>
+            <div id="badgeScanLoading" style="position: absolute; color: #94a3b8; font-size: 0.9rem;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #38bdf8;"></i><br>กำลังเปิดกล้อง...
+            </div>
+        </div>
+
+        <div id="badgeScanFeedback" style="margin-top: 10px; font-size: 0.85rem; color: #38bdf8; min-height: 20px;"></div>
+    </div>
+</div>
+
+
+<script>
+let currentQrToken = null;
+let qrPollInterval = null;
+let qrCountdownInterval = null;
+let qrExpiryTime = null;
+let badgeScanner = null;
+
+function switchLoginTab(tab) {
+    const pwForm = document.getElementById('passwordLoginForm');
+    const qrForm = document.getElementById('qrLoginForm');
+    const btnPw = document.getElementById('tabBtnPassword');
+    const btnQr = document.getElementById('tabBtnQr');
+
+    if (tab === 'password') {
+        pwForm.style.display = 'block';
+        qrForm.style.display = 'none';
+        btnPw.style.background = 'linear-gradient(135deg, #0284c7, #2563eb)';
+        btnPw.style.color = 'white';
+        btnQr.style.background = 'transparent';
+        btnQr.style.color = '#94a3b8';
+        stopQrLogin();
+    } else {
+        pwForm.style.display = 'none';
+        qrForm.style.display = 'block';
+        btnQr.style.background = 'linear-gradient(135deg, #0284c7, #2563eb)';
+        btnQr.style.color = 'white';
+        btnPw.style.background = 'transparent';
+        btnPw.style.color = '#94a3b8';
+        initQrLogin();
+    }
+}
+
+function initQrLogin() {
+    stopQrLogin();
+    document.getElementById('qrExpiredOverlay').style.display = 'none';
+    const container = document.getElementById('qrLoginCodeContainer');
+    container.innerHTML = '<i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: #0284c7;"></i>';
+
+    fetch('{{ url_for("auth.qr_login_generate") }}')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                currentQrToken = data.token;
+                container.innerHTML = '';
+                
+                new QRCode(container, {
+                    text: data.auth_url,
+                    width: 190,
+                    height: 190,
+                    colorDark: "#0f172a",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+
+                startQrTimer(data.expires_in);
+                startQrPolling();
+            }
+        })
+        .catch(err => {
+            console.error("QR Generate error:", err);
+            container.innerHTML = '<span style="color: #f87171; font-size: 0.8rem;">ไม่สามารถสร้าง QR Code ได้</span>';
+        });
+}
+
+function startQrTimer(seconds) {
+    clearInterval(qrCountdownInterval);
+    let remaining = seconds;
+    const countdownEl = document.getElementById('countdownSec');
+
+    qrCountdownInterval = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+            clearInterval(qrCountdownInterval);
+            stopQrLogin();
+            document.getElementById('qrExpiredOverlay').style.display = 'flex';
+            countdownEl.textContent = '00:00';
+            return;
+        }
+
+        const mins = Math.floor(remaining / 60);
+        const secs = remaining % 60;
+        countdownEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }, 1000);
+}
+
+function startQrPolling() {
+    clearInterval(qrPollInterval);
+    qrPollInterval = setInterval(() => {
+        if (!currentQrToken) return;
+
+        fetch(`{{ url_for("auth.qr_login_status") }}?token=${currentQrToken}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'authenticated') {
+                    clearInterval(qrPollInterval);
+                    clearInterval(qrCountdownInterval);
+                    document.getElementById('qrCountdownText').innerHTML = `<span style="color: #10b981; font-weight: bold;"><i class="fas fa-check-circle"></i> ยืนยันสำเร็จ! ยินดีต้อนรับ ${data.user_name}</span>`;
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 500);
+                } else if (data.status === 'expired') {
+                    clearInterval(qrPollInterval);
+                    clearInterval(qrCountdownInterval);
+                    document.getElementById('qrExpiredOverlay').style.display = 'flex';
+                }
+            })
+            .catch(err => console.error("Poll error:", err));
+    }, 1500);
+}
+
+function stopQrLogin() {
+    clearInterval(qrPollInterval);
+    clearInterval(qrCountdownInterval);
+}
+
+
+// ==========================================
+// BADGE CAMERA SCANNER (ON LOGIN PAGE)
+// ==========================================
+function openBadgeCameraModal() {
+    document.getElementById('loginBadgeScannerModal').style.display = 'flex';
+    document.getElementById('badgeScanLoading').style.display = 'block';
+    document.getElementById('badgeScanFeedback').textContent = '';
+
+    setTimeout(() => {
+        startBadgeCamera();
+    }, 300);
+}
+
+function closeBadgeCameraModal() {
+    if (badgeScanner) {
+        try { badgeScanner.stop(); } catch(e) {}
+    }
+    document.getElementById('loginBadgeScannerModal').style.display = 'none';
+}
+
+function startBadgeCamera() {
+    if (badgeScanner) {
+        try { badgeScanner.stop(); } catch(e) {}
+    }
+
+    badgeScanner = new Html5Qrcode("badge-qr-reader");
+
+    Html5Qrcode.getCameras().then(devices => {
+        if (devices && devices.length) {
+            const config = { fps: 15, qrbox: { width: 200, height: 200 } };
+            badgeScanner.start(
+                devices[0].id,
+                config,
+                (decodedText) => {
+                    handleBadgeDecoded(decodedText);
+                },
+                () => {}
+            ).then(() => {
+                document.getElementById('badgeScanLoading').style.display = 'none';
+            }).catch(err => {
+                document.getElementById('badgeScanLoading').innerHTML = '<span style="color:#f87171;">ไม่สามารถเปิดกล้องได้</span>';
+            });
+        }
+    }).catch(err => {
+        document.getElementById('badgeScanLoading').innerHTML = '<span style="color:#f87171;">ไม่สามารถเข้าถึงกล้องได้</span>';
+    });
+}
+
+function handleBadgeDecoded(token) {
+    if (badgeScanner) {
+        badgeScanner.pause();
+    }
+    document.getElementById('badgeScanFeedback').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบบัตร...';
+
+    fetch('{{ url_for("auth.qr_badge_login") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ badge_token: token })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('badgeScanFeedback').innerHTML = `<span style="color:#10b981; font-weight:bold;"><i class="fas fa-check-circle"></i> ${data.message}</span>`;
+            setTimeout(() => {
+                window.location.href = data.redirect_url;
+            }, 800);
+        } else {
+            document.getElementById('badgeScanFeedback').innerHTML = `<span style="color:#f87171;"><i class="fas fa-times-circle"></i> ${data.message}</span>`;
+            setTimeout(() => {
+                if (badgeScanner) badgeScanner.resume();
+            }, 2000);
+        }
+    })
+    .catch(err => {
+        document.getElementById('badgeScanFeedback').innerHTML = '<span style="color:#f87171;">เกิดข้อผิดพลาดในการเชื่อมต่อ</span>';
+        setTimeout(() => {
+            if (badgeScanner) badgeScanner.resume();
+        }, 2000);
+    });
+}
+
+window.addEventListener('beforeunload', () => {
+    stopQrLogin();
+});
+</script>
 {% endblock %}

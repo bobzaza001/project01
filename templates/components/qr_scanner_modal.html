@@ -292,7 +292,18 @@ function onQrCodeScanned(decodedText) {
         html5QrCode.pause();
     }
 
-    // Call API Lookup
+    // Check if this is a Web Screen QR Login token
+    if (decodedText.includes('/auth/qr-auth/') || decodedText.startsWith('QRLOGIN:')) {
+        let token = decodedText.replace('QRLOGIN:', '').trim();
+        if (token.includes('/')) {
+            token = token.rstrip ? token.rstrip('/') : token.replace(/\/+$/, '');
+            token = token.split('/').pop();
+        }
+        handleQrLoginAuthorize(token);
+        return;
+    }
+
+    // Call API Lookup for Equipment
     fetch(`{{ url_for('user.scan_lookup') }}?code=${encodeURIComponent(decodedText)}`)
         .then(res => res.json())
         .then(data => {
@@ -308,6 +319,32 @@ function onQrCodeScanned(decodedText) {
             alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่");
             resumeScanner();
         });
+}
+
+function handleQrLoginAuthorize(token) {
+    if (confirm("🖥️ ตรวจพบคำขอเข้าสู่ระบบบนคอมพิวเตอร์\\n\\nคุณต้องการอนุญาตให้หน้าจอคอมพิวเตอร์เข้าสู่ระบบในชื่อ '{{ current_user.full_name }}' หรือไม่?")) {
+        fetch('{{ url_for("auth.qr_login_authorize") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: token })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert("✅ " + data.message);
+                closeQrScanner();
+            } else {
+                alert("❌ " + data.message);
+                resumeScanner();
+            }
+        })
+        .catch(err => {
+            alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+            resumeScanner();
+        });
+    } else {
+        resumeScanner();
+    }
 }
 
 function displayScanResult(data) {

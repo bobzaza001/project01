@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บัตร QR Code ประจำตัว — {{ user.full_name }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap');
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: #0f172a;
+            color: #1e293b;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .no-print-bar {
+            background: #1e1b4b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 480px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 10pt;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-print { background: #38bdf8; color: #0f172a; }
+        .btn-back { background: rgba(255,255,255,0.15); color: white; }
+
+        /* CR80 Standard ID Card Container (85.6mm x 54mm equivalent scaled) */
+        .id-card {
+            width: 340px;
+            height: 215px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 2px solid #0284c7;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            padding: 12px 14px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-bg-accent {
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(2, 132, 199, 0.15), rgba(56, 189, 248, 0.05));
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1.5px solid #0284c7;
+            padding-bottom: 6px;
+        }
+
+        .card-header img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        .card-header-text h1 {
+            font-size: 8.5pt;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.1;
+        }
+        .card-header-text h2 {
+            font-size: 7pt;
+            font-weight: 600;
+            color: #0284c7;
+            margin: 1px 0 0 0;
+        }
+
+        .card-body {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 4px 0;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-avatar-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #0284c7;
+        }
+
+        .user-name {
+            font-size: 10.5pt;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role-badge {
+            display: inline-block;
+            font-size: 7pt;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-top: 2px;
+            {% if user.role == 'admin' %}
+            background: #fee2e2; color: #991b1b;
+            {% else %}
+            background: #e0f2fe; color: #0369a1;
+            {% endif %}
+        }
+
+        .user-meta {
+            font-size: 7.5pt;
+            color: #475569;
+            margin-top: 3px;
+            line-height: 1.3;
+        }
+
+        .qr-box {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-footer {
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 6.5pt;
+            color: #64748b;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .no-print-bar {
+                display: none !important;
+            }
+            .id-card {
+                box-shadow: none;
+                margin: 20px auto;
+            }
+            @page {
+                size: auto;
+                margin: 10mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Controls -->
+    <div class="no-print-bar">
+        <a href="javascript:window.history.back()" class="btn-action btn-back">
+            <i class="fas fa-arrow-left"></i> ย้อนกลับ
+        </a>
+        <span style="font-size: 10pt; color: #cbd5e1;">บัตร QR Code ประจำตัว</span>
+        <button onclick="window.print()" class="btn-action btn-print">
+            <i class="fas fa-print"></i> พิมพ์บัตรนี้
+        </button>
+    </div>
+
+    <!-- Official Printable ID Badge Card -->
+    <div class="id-card">
+        <div class="card-bg-accent"></div>
+
+        <div class="card-header">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" onerror="this.style.display='none'">
+            <div class="card-header-text">
+                <h1>วิทยาลัยเทคโนโลยีพณิชยการอยุธยา (ATCC)</h1>
+                <h2>สาขาวิชาเทคโนโลยีสารสนเทศ — บัตรประจำตัวสแกนเข้าสู่ระบบ</h2>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="user-info">
+                <div class="user-avatar-wrapper">
+                    {% if user.profile_image %}
+                    <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}" alt="Avatar" class="user-avatar">
+                    {% else %}
+                    <div style="width: 44px; height: 44px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #0284c7; font-size: 1.3rem; border: 2px solid #0284c7;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <div class="user-name">{{ user.full_name }}</div>
+                        <span class="user-role-badge">
+                            {% if user.role == 'admin' %}ผู้ดูแลระบบ (Admin)
+                            {% elif user.role == 'user' and user.user_type == 'teacher' %}อาจารย์ผู้สอน
+                            {% else %}นักศึกษา (Student){% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="user-meta">
+                    <div><strong>ชื่อผู้ใช้:</strong> {{ user.username }}</div>
+                    <div><strong>อีเมล:</strong> {{ user.email or '-' }}</div>
+                    <div><strong>ออกบัตร:</strong> {{ generated_date }}</div>
+                </div>
+            </div>
+
+            <div class="qr-box">
+                <div id="badgeQrcode"></div>
+                <div style="font-size: 5.5pt; color: #0284c7; font-weight: bold; margin-top: 2px;">SCAN TO LOGIN</div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div>ระบบยืม-คืนครุภัณฑ์ห้องปฏิบัติการคอมพิวเตอร์</div>
+            <div>สแกนบัตรที่หน้ากล้องเพื่อ Login อัตโนมัติ</div>
+        </div>
+    </div>
+
+    <script>
+        new QRCode(document.getElementById("badgeQrcode"), {
+            text: "{{ badge_token }}",
+            width: 75,
+            height: 75,
+            colorDark: "#0f172a",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    </script>
+</body>
+</html>
