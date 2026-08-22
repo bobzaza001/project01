@@ -101,6 +101,11 @@
 
         <div class="auth-footer">
             <p>ยังไม่มีบัญชี? <a href="{{ url_for('auth.register') }}">สมัครสมาชิก</a></p>
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1);">
+                <a href="{{ url_for('auth.qr_poster') }}" target="_blank" style="color: #38bdf8; font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-print"></i> พิมพ์ป้ายโปสเตอร์ QR Code ประชาสัมพันธ์ (A4)
+                </a>
+            </div>
         </div>
     </div>
 </div>

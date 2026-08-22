@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ป้ายโปสเตอร์ QR Code เข้าสู่เว็บไซต์ — ATCC LAB</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&display=swap');
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background: #0f172a;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Top bar on screen */
+        .no-print-bar {
+            background: #1e1b4b;
+            color: white;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 11pt;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-print { background: #38bdf8; color: #0f172a; }
+        .btn-print:hover { background: #7dd3fc; }
+        .btn-back { background: rgba(255,255,255,0.15); color: white; }
+        .btn-back:hover { background: rgba(255,255,255,0.25); }
+
+        /* A4 Poster Container */
+        .poster-container {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 16mm 16mm 14mm 16mm;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 4px solid #0284c7;
+        }
+
+        /* Top Header */
+        .poster-header {
+            text-align: center;
+            border-bottom: 2px solid #0284c7;
+            padding-bottom: 12px;
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
+        .logo-img {
+            width: 65px;
+            height: 65px;
+            object-fit: contain;
+        }
+
+        .college-name {
+            font-size: 16pt;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .department-name {
+            font-size: 13pt;
+            font-weight: 700;
+            color: #0284c7;
+            margin: 2px 0 0 0;
+        }
+
+        .lab-title {
+            font-size: 11pt;
+            color: #64748b;
+            margin: 2px 0 0 0;
+        }
+
+        /* Banner Title */
+        .poster-banner {
+            background: linear-gradient(135deg, #0284c7, #1e3a8a);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 14px 0;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+        }
+
+        .poster-banner h2 {
+            font-size: 17pt;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .poster-banner p {
+            font-size: 10.5pt;
+            margin: 4px 0 0 0;
+            color: #bae6fd;
+            font-weight: 400;
+        }
+
+        /* QR Code Hero Section */
+        .qr-hero-card {
+            background: #f8fafc;
+            border: 2px dashed #0284c7;
+            border-radius: 20px;
+            padding: 20px 20px 16px 20px;
+            text-align: center;
+            margin: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .scan-instruction {
+            font-size: 14pt;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .qr-frame {
+            background: white;
+            padding: 14px;
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            border: 2px solid #e2e8f0;
+            display: inline-block;
+        }
+
+        .url-badge {
+            margin-top: 12px;
+            display: inline-block;
+            background: #0f172a;
+            color: #38bdf8;
+            font-family: monospace;
+            font-size: 11pt;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 30px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Features List Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 14px 0;
+        }
+
+        .feature-item {
+            background: #f1f5f9;
+            border-left: 4px solid #0284c7;
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .feature-icon {
+            background: #0284c7;
+            color: white;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .feature-text h4 {
+            font-size: 11pt;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .feature-text p {
+            font-size: 9pt;
+            color: #64748b;
+            margin: 2px 0 0 0;
+        }
+
+        /* Poster Footer */
+        .poster-footer {
+            border-top: 1.5px solid #cbd5e1;
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9pt;
+            color: #64748b;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .no-print-bar {
+                display: none !important;
+            }
+            .poster-container {
+                box-shadow: none;
+                margin: 0;
+                border: 3px solid #0284c7;
+                width: 100%;
+                min-height: 100vh;
+                border-radius: 0;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 8mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Controls Bar -->
+    <div class="no-print-bar">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="javascript:window.history.back()" class="btn-action btn-back">
+                <i class="fas fa-arrow-left"></i> ย้อนกลับ
+            </a>
+            <span style="font-size: 11pt; color: #cbd5e1;">
+                <i class="fas fa-qrcode"></i> ป้ายโปสเตอร์ QR Code ประชาสัมพันธ์เข้าสู่เว็บไซต์
+            </span>
+        </div>
+        <button onclick="window.print()" class="btn-action btn-print">
+            <i class="fas fa-print"></i> สั่งพิมพ์โปสเตอร์ A4 / บันทึก PDF
+        </button>
+    </div>
+
+    <!-- Printable A4 Poster Body -->
+    <div class="poster-container">
+        
+        <!-- Header -->
+        <div class="poster-header">
+            <div class="logo-wrap">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+                <div>
+                    <h1 class="college-name">วิทยาลัยเทคโนโลยีพณิชยการอยุธยา (ATCC)</h1>
+                    <h2 class="department-name">สาขาวิชาเทคโนโลยีสารสนเทศ</h2>
+                </div>
+            </div>
+            <p class="lab-title">ศูนย์บริการห้องปฏิบัติการคอมพิวเตอร์ อาคารปฏิบัติการ</p>
+        </div>
+
+        <!-- Banner Title -->
+        <div class="poster-banner">
+            <h2>ระบบบริการยืม-คืนครุภัณฑ์ออนไลน์</h2>
+            <p>Computer Laboratory Equipment & Inventory Management System</p>
+        </div>
+
+        <!-- QR Code Hero Card -->
+        <div class="qr-hero-card">
+            <div class="scan-instruction">
+                <i class="fas fa-camera" style="color: #0284c7;"></i> สแกน QR Code ด้วยกล้องมือถือ เพื่อเข้าสู่เว็บไซต์
+            </div>
+
+            <div class="qr-frame">
+                <div id="websiteQrcode"></div>
+            </div>
+
+            <div class="url-badge">
+                <i class="fas fa-globe"></i> {{ site_url }}
+            </div>
+        </div>
+
+        <!-- System Features Grid -->
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-boxes-stacked"></i>
+                </div>
+                <div class="feature-text">
+                    <h4>ตรวจสอบคลังอุปกรณ์</h4>
+                    <p>เช็กสถานะคอมพิวเตอร์และครุภัณฑ์คงเหลือ</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon" style="background: #10b981;">
+                    <i class="fas fa-hand-holding"></i>
+                </div>
+                <div class="feature-text">
+                    <h4>ยื่นคำขอยืม-คืนออนไลน์</h4>
+                    <p>สะดวกรวดเร็ว ไม่ต้องใช้เอกสารกระดาษ</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon" style="background: #f59e0b;">
+                    <i class="fas fa-wrench"></i>
+                </div>
+                <div class="feature-text">
+                    <h4>แจ้งซ่อมแซมครุภัณฑ์</h4>
+                    <p>รายงานปัญหาและแนบรูปภาพส่งช่างได้ทันที</p>
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon" style="background: #6366f1;">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="feature-text">
+                    <h4>ติดตามสถานะ & สแกน Login</h4>
+                    <p>แจ้งเตือนกำหนดคืนและสแกนเข้าสู่ระบบ</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="poster-footer">
+            <div><strong>ติดต่อห้องปฏิบัติการ:</strong> ชั้น 3 สาขาวิชาเทคโนโลยีสารสนเทศ (ATCC)</div>
+            <div>เปิดบริการ: วันจันทร์ - วันศุกร์ (08:30 - 17:00 น.)</div>
+        </div>
+
+    </div>
+
+    <script>
+        new QRCode(document.getElementById("websiteQrcode"), {
+            text: "{{ site_url }}",
+            width: 190,
+            height: 190,
+            colorDark: "#0f172a",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    </script>
+</body>
+</html>

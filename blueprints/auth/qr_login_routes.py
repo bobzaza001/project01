@@ -215,3 +215,12 @@ def print_badge(user_id):
                            user=target_user,
                            badge_token=badge_token,
                            generated_date=get_local_now().strftime('%d/%m/%Y'))
+
+
+# ==========================================
+# 7. PRINTABLE POSTER: ป้ายโปสเตอร์ QR Code ประชาสัมพันธ์เข้าสู่เว็บไซต์จากภายนอก
+# ==========================================
+@auth_bp.route('/qr-poster')
+def qr_poster():
+    site_url = request.host_url.rstrip('/')
+    return render_template('qr_poster_print.html', site_url=site_url)
