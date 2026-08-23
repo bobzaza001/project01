@@ -144,14 +144,25 @@ def return_equipment(req_id):
         
         file = request.files.get('return_image')
         if file and file.filename != '' and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            _, ext = os.path.splitext(filename)
-            new_filename = f"return_{borrow_req.id}_{int(time.time())}{ext}"
-            uploads_dir = os.path.join(current_app.static_folder, 'uploads')
-            os.makedirs(uploads_dir, exist_ok=True)
-            upload_path = os.path.join(uploads_dir, new_filename)
-            file.save(upload_path)
-            borrow_req.return_image_filename = new_filename
+            import base64
+            file_bytes = file.read()
+            if file_bytes:
+                ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else 'jpg'
+                mime = 'image/jpeg' if ext in ('jpg', 'jpeg') else f'image/{ext}'
+                try:
+                    from PIL import Image
+                    import io
+                    img = Image.open(io.BytesIO(file_bytes))
+                    img.thumbnail((600, 600))
+                    if img.mode in ("RGBA", "P") and ext in ('jpg', 'jpeg'):
+                        img = img.convert("RGB")
+                    buf = io.BytesIO()
+                    img.save(buf, format="JPEG" if ext in ('jpg', 'jpeg') else "PNG", quality=85)
+                    b64_str = base64.b64encode(buf.getvalue()).decode('utf-8')
+                    borrow_req.return_image_filename = f"data:{mime};base64,{b64_str}"
+                except Exception:
+                    b64_str = base64.b64encode(file_bytes).decode('utf-8')
+                    borrow_req.return_image_filename = f"data:{mime};base64,{b64_str}"
             
         borrow_req.status = 'return_pending'
         borrow_req.damage_status = damage_status

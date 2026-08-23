@@ -28,10 +28,25 @@ def add_equipment():
         if 'image' in request.files:
             file = request.files['image']
             if file and file.filename and allowed_file(file.filename):
-                ext = file.filename.rsplit('.', 1)[1].lower()
-                safe_name = secure_filename(f"{equipment_code}_{int(datetime.utcnow().timestamp())}.{ext}")
-                file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], safe_name))
-                image_filename = safe_name
+                import base64
+                file_bytes = file.read()
+                if file_bytes:
+                    ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else 'jpg'
+                    mime = 'image/jpeg' if ext in ('jpg', 'jpeg') else f'image/{ext}'
+                    try:
+                        from PIL import Image
+                        import io
+                        img = Image.open(io.BytesIO(file_bytes))
+                        img.thumbnail((600, 600))
+                        if img.mode in ("RGBA", "P") and ext in ('jpg', 'jpeg'):
+                            img = img.convert("RGB")
+                        buf = io.BytesIO()
+                        img.save(buf, format="JPEG" if ext in ('jpg', 'jpeg') else "PNG", quality=85)
+                        b64_str = base64.b64encode(buf.getvalue()).decode('utf-8')
+                        image_filename = f"data:{mime};base64,{b64_str}"
+                    except Exception:
+                        b64_str = base64.b64encode(file_bytes).decode('utf-8')
+                        image_filename = f"data:{mime};base64,{b64_str}"
         
         try:
             qty = max(1, int(total_quantity))
@@ -124,16 +139,26 @@ def edit_equipment(eq_id):
         if 'image' in request.files:
             file = request.files['image']
             if file and file.filename and allowed_file(file.filename):
-                if eq.image_filename:
-                    old_path = os.path.join(current_app.config['UPLOAD_FOLDER'], eq.image_filename)
-                    if os.path.exists(old_path):
-                        os.remove(old_path)
-                
-                ext = file.filename.rsplit('.', 1)[1].lower()
-                safe_name = secure_filename(f"{eq.equipment_code}_{int(datetime.utcnow().timestamp())}.{ext}")
-                file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], safe_name))
-                eq.image_filename = safe_name
-                changes.append("อัปโหลดรูปภาพใหม่")
+                import base64
+                file_bytes = file.read()
+                if file_bytes:
+                    ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else 'jpg'
+                    mime = 'image/jpeg' if ext in ('jpg', 'jpeg') else f'image/{ext}'
+                    try:
+                        from PIL import Image
+                        import io
+                        img = Image.open(io.BytesIO(file_bytes))
+                        img.thumbnail((600, 600))
+                        if img.mode in ("RGBA", "P") and ext in ('jpg', 'jpeg'):
+                            img = img.convert("RGB")
+                        buf = io.BytesIO()
+                        img.save(buf, format="JPEG" if ext in ('jpg', 'jpeg') else "PNG", quality=85)
+                        b64_str = base64.b64encode(buf.getvalue()).decode('utf-8')
+                        eq.image_filename = f"data:{mime};base64,{b64_str}"
+                    except Exception:
+                        b64_str = base64.b64encode(file_bytes).decode('utf-8')
+                        eq.image_filename = f"data:{mime};base64,{b64_str}"
+                    changes.append("อัปโหลดรูปภาพใหม่")
         
         db.session.commit()
         

@@ -103,7 +103,7 @@ class Equipment(db.Model):
     
     # === หมวดหมู่ รูปภาพ จำนวน ===
     category = db.Column(db.String(100), default='ทั่วไป')
-    image_filename = db.Column(db.String(255), default='')
+    image_filename = db.Column(db.Text, default='')
     total_quantity = db.Column(db.Integer, nullable=False, default=1)
     available_quantity = db.Column(db.Integer, nullable=False, default=1)
     
@@ -119,6 +119,15 @@ class Equipment(db.Model):
     
     borrow_requests = db.relationship('BorrowRequest', backref='equipment', lazy='dynamic')
     
+    @property
+    def image_url(self):
+        """ส่งคืน URL ของรูปครุภัณฑ์ รองรับทั้ง Data URL (Base64) และ Static file"""
+        if not self.image_filename:
+            return None
+        if self.image_filename.startswith('data:') or self.image_filename.startswith('http'):
+            return self.image_filename
+        return f"/static/uploads/{self.image_filename}"
+
     def is_durable(self):
         return self.item_type == 'durable'
     
@@ -149,10 +158,19 @@ class BorrowRequest(db.Model):
     quantity = db.Column(db.Integer, nullable=False, default=1)          # จำนวนที่เบิก (สำหรับวัสดุสิ้นเปลือง)
     damage_status = db.Column(db.String(20), default='normal')           # normal / damaged
     damage_note = db.Column(db.Text, default='')                         # รายละเอียดความเสียหาย
-    return_image_filename = db.Column(db.String(255), default='')        # รูปแนบส่งคืน
+    return_image_filename = db.Column(db.Text, default='')               # รูปแนบส่งคืน (รองรับ Data URL Base64)
     overdue_notified = db.Column(db.Boolean, default=False)              # เคยส่งแจ้งเตือนเกินกำหนดหรือยัง
     hidden_by_user = db.Column(db.Boolean, default=False)                # ซ่อนจากแดชบอร์ดของผู้ใช้
     hidden_by_admin = db.Column(db.Boolean, default=False)               # ซ่อนจากแดชบอร์ดของแอดมิน (แต่ยังคงอยู่ในหน้าประวัติรวม)
+    
+    @property
+    def return_image_url(self):
+        """ส่งคืน URL ของรูปส่งคืน รองรับทั้ง Data URL (Base64) และ Static file"""
+        if not self.return_image_filename:
+            return None
+        if self.return_image_filename.startswith('data:') or self.return_image_filename.startswith('http'):
+            return self.return_image_filename
+        return f"/static/uploads/{self.return_image_filename}"
     
     def is_overdue(self):
         """ตรวจว่ายืมเกินกำหนดหรือไม่"""

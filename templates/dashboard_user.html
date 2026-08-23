@@ -107,8 +107,8 @@
                             <tr class="stagger-row">
                                 <td>{{ req.id }}</td>
                                 <td>
-                                    {% if req.equipment.image_filename %}
-                                    <img src="{{ url_for('static', filename='uploads/' + req.equipment.image_filename) }}" class="eq-table-img">
+                                    {% if req.equipment.image_url %}
+                                    <img src="{{ req.equipment.image_url }}" class="eq-table-img">
                                     {% else %}
                                     <div class="eq-table-img" style="background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;"><i class="fas fa-image" style="color: var(--text-muted);"></i></div>
                                     {% endif %}
@@ -147,9 +147,9 @@
                                             {% if req.damage_status == 'damaged' %}
                                             <div style="font-size: 0.75rem; color: #ff6b6b;">🔧 ชำรุด</div>
                                             {% endif %}
-                                            {% if req.return_image_filename %}
+                                            {% if req.return_image_url %}
                                             <div style="font-size: 0.7rem; margin-top: 3px;">
-                                                <a href="{{ url_for('static', filename='uploads/' + req.return_image_filename) }}" target="_blank" style="color: var(--purple-light); text-decoration: underline;"><i class="fas fa-image"></i> รูปแนบแล้ว</a>
+                                                <a href="{{ req.return_image_url }}" target="_blank" style="color: var(--purple-light); text-decoration: underline;"><i class="fas fa-image"></i> รูปแนบแล้ว</a>
                                             </div>
                                             {% endif %}
                                         {% elif req.status == 'returned' %}
@@ -157,9 +157,9 @@
                                             {% if req.damage_status == 'damaged' %}
                                             <div style="font-size: 0.75rem; color: #ff6b6b;">🔧 ชำรุด</div>
                                             {% endif %}
-                                            {% if req.return_image_filename %}
+                                            {% if req.return_image_url %}
                                             <div style="font-size: 0.7rem; margin-top: 3px;">
-                                                <a href="{{ url_for('static', filename='uploads/' + req.return_image_filename) }}" target="_blank" style="color: var(--purple-light); text-decoration: underline;"><i class="fas fa-image"></i> รูปส่งคืน</a>
+                                                <a href="{{ req.return_image_url }}" target="_blank" style="color: var(--purple-light); text-decoration: underline;"><i class="fas fa-image"></i> รูปส่งคืน</a>
                                             </div>
                                             {% endif %}
                                         {% elif req.status == 'rejected' %}❌ ปฏิเสธ

@@ -78,8 +78,8 @@
             
             <!-- รูปภาพ -->
             <div class="eq-image-wrapper">
-                {% if eq.image_filename %}
-                <img src="{{ url_for('static', filename='uploads/' + eq.image_filename) }}" alt="{{ eq.name }}" class="eq-img">
+                {% if eq.image_url %}
+                <img src="{{ eq.image_url }}" alt="{{ eq.name }}" class="eq-img">
                 {% else %}
                 <div class="eq-image-placeholder">
                     <div class="placeholder-icon-circle">
