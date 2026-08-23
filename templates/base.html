@@ -12,6 +12,13 @@
     <!-- Font Awesome สำหรับไอคอน -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- PWA & Mobile Meta Tags -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#0284C7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ATCC LAB">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/logo.png') }}">
     <script>
         // โหลดค่า theme ก่อน render เพื่อไม่ให้เกิด flash
         (function() {
@@ -120,10 +127,56 @@
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Mobile Bottom Navigation Bar (App Dock for Mobile Only) -->
+    {% if current_user.is_authenticated %}
+    <div class="mobile-bottom-nav">
+        <a href="{{ url_for('admin.dashboard' if current_user.is_admin() else 'user.dashboard') }}" class="mobile-nav-item {% if request.endpoint in ['user.dashboard', 'admin.dashboard'] %}active{% endif %}">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>หน้าหลัก</span>
+        </a>
+        <a href="{{ url_for('user.equipment_list') }}" class="mobile-nav-item {% if request.endpoint == 'user.equipment_list' %}active{% endif %}">
+            <i class="fas fa-boxes"></i>
+            <span>คลังอุปกรณ์</span>
+        </a>
+        <button type="button" onclick="openQrScanner()" class="mobile-nav-item mobile-nav-scan" title="สแกน QR Code">
+            <div class="scan-icon-circle">
+                <i class="fas fa-qrcode"></i>
+            </div>
+            <span>สแกน QR</span>
+        </button>
+        {% if current_user.is_admin() %}
+        <a href="{{ url_for('admin.borrow_history') }}" class="mobile-nav-item {% if request.endpoint == 'admin.borrow_history' %}active{% endif %}">
+            <i class="fas fa-history"></i>
+            <span>ประวัติ</span>
+        </a>
+        {% else %}
+        <a href="{{ url_for('user.contact') }}" class="mobile-nav-item {% if request.endpoint == 'user.contact' %}active{% endif %}">
+            <i class="fas fa-headset"></i>
+            <span>ติดต่อ</span>
+        </a>
+        {% endif %}
+        <a href="{{ url_for('user.profile') }}" class="mobile-nav-item {% if request.endpoint == 'user.profile' %}active{% endif %}">
+            <i class="fas fa-user-circle"></i>
+            <span>โปรไฟล์</span>
+        </a>
+    </div>
+    {% endif %}
+
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     {% if current_user.is_authenticated %}
     {% include 'components/qr_scanner_modal.html' %}
     {% endif %}
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/static/sw.js').catch(function(err) {
+                console.log('SW registration error:', err);
+            });
+        });
+    }
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
