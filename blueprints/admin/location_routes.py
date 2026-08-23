@@ -1,6 +1,6 @@
-from flask import render_template, redirect, url_for, flash, request
-from models import db, Building, Floor, Room
-from utils import admin_required
+from flask import render_template, redirect, url_for, flash, request, jsonify
+from models import db, Building, Floor, Room, Equipment
+from utils import admin_required, log_audit
 from . import admin_bp
 
 # ==========================================
@@ -14,9 +14,6 @@ def manage_locations():
     buildings = Building.query.all()
     total_floors = Floor.query.count()
     total_rooms = Room.query.count()
-    
-    # คำนวณจำนวนอุปกรณ์ทั้งหมดที่ถูกติดตั้งในห้อง
-    from models import Equipment
     total_equipments = Equipment.query.filter(Equipment.room_id.isnot(None)).count()
     
     return render_template('admin_locations.html', 
@@ -35,6 +32,17 @@ def add_building():
             new_building = Building(name=name)
             db.session.add(new_building)
             db.session.commit()
+            
+            # บันทึก Audit Log
+            log_audit(
+                action='ADD_BUILDING',
+                category='location',
+                target_type='อาคาร',
+                target_name=name,
+                details=f"เพิ่มอาคารเรียน/สถานที่ใหม่: '{name}'",
+                target_id=new_building.id
+            )
+            
             flash(f'เพิ่มอาคาร "{name}" เรียบร้อยแล้ว', 'success')
             return redirect(url_for('admin.manage_locations'))
         else:
@@ -47,11 +55,23 @@ def add_building():
 def edit_building(b_id):
     """หน้าฟอร์มแก้ไขชื่ออาคาร"""
     building = Building.query.get_or_404(b_id)
+    old_name = building.name
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         if name:
             building.name = name
             db.session.commit()
+            
+            # บันทึก Audit Log
+            log_audit(
+                action='EDIT_BUILDING',
+                category='location',
+                target_type='อาคาร',
+                target_name=name,
+                details=f"เปลี่ยนชื่ออาคารจาก '{old_name}' เป็น '{name}'",
+                target_id=building.id
+            )
+            
             flash(f'แก้ไขอาคารสำเร็จ', 'success')
             return redirect(url_for('admin.manage_locations'))
         else:
@@ -63,8 +83,22 @@ def edit_building(b_id):
 @admin_required
 def delete_building(b_id):
     building = Building.query.get_or_404(b_id)
+    b_name = building.name
+    floors_count = building.floors.count()
+    
     db.session.delete(building)
     db.session.commit()
+    
+    # บันทึก Audit Log
+    log_audit(
+        action='DELETE_BUILDING',
+        category='location',
+        target_type='อาคาร',
+        target_name=b_name,
+        details=f"ลบอาคาร '{b_name}' พร้อมโครงสร้างชั้นและห้องทั้งหมด ({floors_count} ชั้น)",
+        target_id=b_id
+    )
+    
     flash(f'ลบอาคารเรียบร้อยแล้ว', 'success')
     return redirect(url_for('admin.manage_locations'))
 
@@ -94,6 +128,17 @@ def add_floor(b_id):
             new_floor = Floor(name=name, building_id=b_id)
             db.session.add(new_floor)
             db.session.commit()
+            
+            # บันทึก Audit Log
+            log_audit(
+                action='ADD_FLOOR',
+                category='location',
+                target_type='ชั้น',
+                target_name=f"{name} ({building.name})",
+                details=f"เพิ่มชั้นใหม่: '{name}' ในอาคาร '{building.name}'",
+                target_id=new_floor.id
+            )
+            
             flash(f'เพิ่มชั้นเรียบร้อยแล้ว', 'success')
             return redirect(url_for('admin.manage_building_detail', b_id=b_id))
         else:
@@ -107,11 +152,24 @@ def edit_floor(f_id):
     """หน้าฟอร์มแก้ไขชื่อชั้น"""
     floor = Floor.query.get_or_404(f_id)
     b_id = floor.building_id
+    old_name = floor.name
+    b_name = floor.building.name
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         if name:
             floor.name = name
             db.session.commit()
+            
+            # บันทึก Audit Log
+            log_audit(
+                action='EDIT_FLOOR',
+                category='location',
+                target_type='ชั้น',
+                target_name=f"{name} ({b_name})",
+                details=f"เปลี่ยนชื่อชั้นจาก '{old_name}' เป็น '{name}' ในอาคาร '{b_name}'",
+                target_id=floor.id
+            )
+            
             flash(f'แก้ไขชั้นสำเร็จ', 'success')
             return redirect(url_for('admin.manage_building_detail', b_id=b_id))
         else:
@@ -124,8 +182,23 @@ def edit_floor(f_id):
 def delete_floor(f_id):
     floor = Floor.query.get_or_404(f_id)
     b_id = floor.building_id
+    f_name = floor.name
+    b_name = floor.building.name
+    rooms_count = floor.rooms.count()
+    
     db.session.delete(floor)
     db.session.commit()
+    
+    # บันทึก Audit Log
+    log_audit(
+        action='DELETE_FLOOR',
+        category='location',
+        target_type='ชั้น',
+        target_name=f"{f_name} ({b_name})",
+        details=f"ลบชั้น '{f_name}' ในอาคาร '{b_name}' พร้อมห้องภายใน ({rooms_count} ห้อง)",
+        target_id=f_id
+    )
+    
     flash(f'ลบชั้นเรียบร้อยแล้ว', 'success')
     return redirect(url_for('admin.manage_building_detail', b_id=b_id))
 
@@ -145,6 +218,17 @@ def add_room(f_id):
             new_room = Room(name=name, floor_id=f_id)
             db.session.add(new_room)
             db.session.commit()
+            
+            # บันทึก Audit Log
+            log_audit(
+                action='ADD_ROOM',
+                category='location',
+                target_type='ห้อง',
+                target_name=f"ห้อง {name} ({floor.name}, {floor.building.name})",
+                details=f"เพิ่มห้องใหม่: 'ห้อง {name}' ใน {floor.name} อาคาร {floor.building.name}",
+                target_id=new_room.id
+            )
+            
             flash(f'เพิ่มห้อง "{name}" เรียบร้อยแล้ว', 'success')
             return redirect(url_for('admin.manage_building_detail', b_id=b_id))
         else:
@@ -167,16 +251,29 @@ def bulk_add_rooms(f_id):
         return redirect(url_for('admin.manage_building_detail', b_id=b_id))
 
     created_count = 0
+    added_names = []
     for num in range(start_num, end_num + 1):
         room_name = f"{prefix}{num}" if prefix else str(num)
-        # ตรวจสอบว่ามีห้องชื่อนี้ในชั้นหรือยัง
         existing = Room.query.filter_by(floor_id=f_id, name=room_name).first()
         if not existing:
             new_room = Room(name=room_name, floor_id=f_id)
             db.session.add(new_room)
             created_count += 1
+            added_names.append(room_name)
 
     db.session.commit()
+    
+    # บันทึก Audit Log
+    if created_count > 0:
+        log_audit(
+            action='ADD_ROOM_BULK',
+            category='location',
+            target_type='ห้อง',
+            target_name=f"ชุดห้อง {prefix}{start_num}-{prefix}{end_num} ({floor.name}, {floor.building.name})",
+            details=f"เพิ่มห้องแบบกลุ่มจำนวน {created_count} ห้อง ({', '.join(added_names[:5])}{'...' if len(added_names) > 5 else ''}) ใน {floor.name} อาคาร {floor.building.name}",
+            target_id=floor.id
+        )
+        
     flash(f'สร้างห้องใหม่สำเร็จจำนวน {created_count} ห้องในชั้น {floor.name}', 'success')
     return redirect(url_for('admin.manage_building_detail', b_id=b_id))
 
@@ -186,11 +283,26 @@ def edit_room(r_id):
     """หน้าฟอร์มแก้ไขห้อง"""
     room = Room.query.get_or_404(r_id)
     b_id = room.floor.building_id
+    old_name = room.name
+    f_name = room.floor.name
+    b_name = room.floor.building.name
+    
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         if name:
             room.name = name
             db.session.commit()
+            
+            # บันทึก Audit Log
+            log_audit(
+                action='EDIT_ROOM',
+                category='location',
+                target_type='ห้อง',
+                target_name=f"ห้อง {name} ({f_name}, {b_name})",
+                details=f"เปลี่ยนชื่อห้องจาก 'ห้อง {old_name}' เป็น 'ห้อง {name}' ใน {f_name} อาคาร {b_name}",
+                target_id=room.id
+            )
+            
             flash(f'แก้ไขห้องสำเร็จ', 'success')
             return redirect(url_for('admin.manage_building_detail', b_id=b_id))
         else:
@@ -203,11 +315,26 @@ def edit_room(r_id):
 def delete_room(r_id):
     room = Room.query.get_or_404(r_id)
     b_id = room.floor.building_id
+    r_name = room.name
+    f_name = room.floor.name
+    b_name = room.floor.building.name
+    
     if room.equipments.count() > 0:
         flash(f'ไม่สามารถลบห้องที่มีอุปกรณ์อยู่ได้ กรุณาย้ายอุปกรณ์ก่อน', 'danger')
     else:
         db.session.delete(room)
         db.session.commit()
+        
+        # บันทึก Audit Log
+        log_audit(
+            action='DELETE_ROOM',
+            category='location',
+            target_type='ห้อง',
+            target_name=f"ห้อง {r_name} ({f_name}, {b_name})",
+            details=f"ลบห้อง 'ห้อง {r_name}' ใน {f_name} อาคาร {b_name}",
+            target_id=r_id
+        )
+        
         flash(f'ลบห้องเรียบร้อยแล้ว', 'success')
     return redirect(url_for('admin.manage_building_detail', b_id=b_id))
 
@@ -215,7 +342,6 @@ def delete_room(r_id):
 @admin_required
 def api_room_equipments(r_id):
     """ส่งคืนรายการครุภัณฑ์ภายในห้องในรูปแบบ JSON เพื่อแสดงผลใน Modal"""
-    from flask import jsonify
     room = Room.query.get_or_404(r_id)
     items = []
     for eq in room.equipments:
@@ -235,4 +361,3 @@ def api_room_equipments(r_id):
         'floor_name': room.floor.name,
         'equipments': items
     })
-

@@ -65,6 +65,9 @@
             <a href="{{ url_for('admin.borrow_history') }}" class="nav-link {% if request.endpoint == 'admin.borrow_history' %}active{% endif %}">
                 <i class="fas fa-history"></i> ประวัติการยืม
             </a>
+            <a href="{{ url_for('admin.audit_logs') }}" class="nav-link {% if request.endpoint == 'admin.audit_logs' %}active{% endif %}" title="ประวัติการแก้ไขและจัดการข้อมูลระบบ">
+                <i class="fas fa-list-check"></i> ประวัติแก้ไข
+            </a>
             <a href="{{ url_for('admin.manage_locations') }}" class="nav-link {% if request.endpoint == 'admin.manage_locations' %}active{% endif %}">
                 <i class="fas fa-map-marker-alt"></i> สถานที่
             </a>

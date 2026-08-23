@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% block title %}ประวัติการแก้ไขข้อมูล — ผู้ดูแลระบบ{% endblock %}
+
+{% block content %}
+<div class="dashboard-container" style="max-width: 1300px; margin: 0 auto; padding: 1.5rem 1rem;">
+
+    <!-- ส่วนหัวหน้าเพจ -->
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 1.5rem;">
+        <div>
+            <h1 style="font-size: 1.75rem; font-weight: 700; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-history" style="color: #38bdf8;"></i> ประวัติการแก้ไขข้อมูลระบบ
+            </h1>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin: 4px 0 0 0;">
+                บันทึกการเปลี่ยนแปลงครุภัณฑ์, วัสดุ, อาคารเรียน, ชั้น และห้อง ทั้งหมดโดยผู้ดูแลระบบ
+            </p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="{{ url_for('admin.export_audit_logs', category=category, q=search_q, date_from=date_from, date_to=date_to) }}" class="btn btn-success btn-sm" style="border-radius: 20px; padding: 7px 16px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-file-excel"></i> ส่งออก Excel (.xlsx)
+            </a>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary btn-sm" style="border-radius: 20px; padding: 7px 16px;">
+                <i class="fas fa-arrow-left"></i> กลับสู่แดชบอร์ด
+            </a>
+        </div>
+    </div>
+
+    <!-- แถบสถิติสรุป (Stats Grid) -->
+    <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="stat-card" style="background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 1.25rem; display: flex; align-items: center; gap: 15px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+                <i class="fas fa-list-check"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">กิจกรรมทั้งหมด</div>
+                <div style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary);">{{ total_logs }} รายการ</div>
+            </div>
+        </div>
+
+        <div class="stat-card" style="background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 1.25rem; display: flex; align-items: center; gap: 15px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+                <i class="fas fa-boxes-stacked"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">จัดการครุภัณฑ์ & วัสดุ</div>
+                <div style="font-size: 1.4rem; font-weight: 700; color: #10b981;">{{ total_equipment_logs }} ครั้ง</div>
+            </div>
+        </div>
+
+        <div class="stat-card" style="background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 1.25rem; display: flex; align-items: center; gap: 15px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+                <i class="fas fa-building"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">จัดการสถานที่ & ห้อง</div>
+                <div style="font-size: 1.4rem; font-weight: 700; color: #f59e0b;">{{ total_location_logs }} ครั้ง</div>
+            </div>
+        </div>
+
+        <div class="stat-card" style="background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius); padding: 1.25rem; display: flex; align-items: center; gap: 15px;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(168, 85, 247, 0.15); color: #a855f7; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+                <i class="fas fa-calendar-day"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">บันทึกวันนี้</div>
+                <div style="font-size: 1.4rem; font-weight: 700; color: #a855f7;">{{ today_logs }} รายการ</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ส่วนตัวกรองและค้นหา -->
+    <div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+        <form method="GET" action="{{ url_for('admin.audit_logs') }}" style="display: flex; flex-direction: column; gap: 12px;">
+            <input type="hidden" name="category" value="{{ category }}">
+            
+            <!-- Category Tabs -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">
+                <a href="{{ url_for('admin.audit_logs', category='all', q=search_q, date_from=date_from, date_to=date_to) }}" 
+                   class="btn btn-sm {% if category == 'all' %}btn-primary{% else %}btn-secondary{% endif %}" 
+                   style="border-radius: 20px; padding: 5px 16px; font-weight: 600;">
+                    <i class="fas fa-globe"></i> ทั้งหมด ({{ total_logs }})
+                </a>
+                <a href="{{ url_for('admin.audit_logs', category='equipment', q=search_q, date_from=date_from, date_to=date_to) }}" 
+                   class="btn btn-sm {% if category == 'equipment' %}btn-primary{% else %}btn-secondary{% endif %}" 
+                   style="border-radius: 20px; padding: 5px 16px; font-weight: 600;">
+                    <i class="fas fa-boxes"></i> ครุภัณฑ์และวัสดุ ({{ total_equipment_logs }})
+                </a>
+                <a href="{{ url_for('admin.audit_logs', category='location', q=search_q, date_from=date_from, date_to=date_to) }}" 
+                   class="btn btn-sm {% if category == 'location' %}btn-primary{% else %}btn-secondary{% endif %}" 
+                   style="border-radius: 20px; padding: 5px 16px; font-weight: 600;">
+                    <i class="fas fa-door-open"></i> อาคาร/ชั้น/ห้อง ({{ total_location_logs }})
+                </a>
+            </div>
+
+            <!-- Search and Date Filter Row -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; align-items: center;" class="filter-controls-grid">
+                <div>
+                    <input type="text" name="q" value="{{ search_q }}" placeholder="🔍 ค้นหาตามชื่อครุภัณฑ์, ชื่อห้อง, แอดมิน, หรือรายละเอียด..." 
+                           style="width: 100%; padding: 8px 14px; border-radius: 10px; background: var(--bg-input); border: 1px solid var(--glass-border); color: var(--text-primary); font-size: 0.9rem;">
+                </div>
+                <div>
+                    <input type="date" name="date_from" value="{{ date_from }}" title="ตั้งแต่วันที่"
+                           style="width: 100%; padding: 8px 12px; border-radius: 10px; background: var(--bg-input); border: 1px solid var(--glass-border); color: var(--text-primary); font-size: 0.9rem;">
+                </div>
+                <div>
+                    <input type="date" name="date_to" value="{{ date_to }}" title="ถึงวันที่"
+                           style="width: 100%; padding: 8px 12px; border-radius: 10px; background: var(--bg-input); border: 1px solid var(--glass-border); color: var(--text-primary); font-size: 0.9rem;">
+                </div>
+                <div style="display: flex; gap: 6px;">
+                    <button type="submit" class="btn btn-primary btn-sm" style="padding: 8px 16px; border-radius: 10px; font-weight: 600;">
+                        <i class="fas fa-filter"></i> กรอง
+                    </button>
+                    {% if search_q or date_from or date_to or category != 'all' %}
+                    <a href="{{ url_for('admin.audit_logs') }}" class="btn btn-secondary btn-sm" style="padding: 8px 12px; border-radius: 10px;" title="ล้างตัวกรอง">
+                        <i class="fas fa-rotate-left"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- ตารางแสดงประวัติ Audit Logs -->
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <div class="table-responsive">
+            <table class="data-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--glass-border);">
+                        <th style="padding: 12px 16px; text-align: left; font-size: 0.85rem; width: 160px;">วัน-เวลา</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 0.85rem; width: 170px;">ผู้ดำเนินการ</th>
+                        <th style="padding: 12px 16px; text-align: center; font-size: 0.85rem; width: 150px;">กิจกรรม</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 0.85rem; width: 220px;">รายการเป้าหมาย</th>
+                        <th style="padding: 12px 16px; text-align: left; font-size: 0.85rem;">รายละเอียดการแก้ไข</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if logs %}
+                        {% for log in logs %}
+                        <tr style="border-bottom: 1px solid var(--glass-border); transition: background 0.2s;">
+                            <!-- วันที่และเวลา -->
+                            <td style="padding: 12px 16px; font-size: 0.85rem; color: var(--text-muted); white-space: nowrap;">
+                                <div style="font-weight: 600; color: var(--text-primary);">
+                                    {{ log.created_at.strftime('%d/%m/%Y') }}
+                                </div>
+                                <div style="font-size: 0.8rem; color: #38bdf8;">
+                                    <i class="far fa-clock"></i> {{ log.created_at.strftime('%H:%M:%S น.') }}
+                                </div>
+                            </td>
+
+                            <!-- ผู้ดำเนินการ -->
+                            <td style="padding: 12px 16px; font-size: 0.9rem;">
+                                {% if log.user %}
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #0284c7, #2563eb); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.85rem;">
+                                        {{ log.user.full_name[:1] }}
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600; color: var(--text-primary);">{{ log.user.full_name }}</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">@{{ log.user.username }}</div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <span style="color: var(--text-muted); font-style: italic;">ระบบอัตโนมัติ</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- กิจกรรม Action Badge -->
+                            <td style="padding: 12px 16px; text-align: center;">
+                                {% if 'ADD' in log.action %}
+                                <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600;">
+                                    <i class="fas fa-plus-circle"></i> 
+                                    {% if log.action == 'ADD_EQUIPMENT' %}เพิ่มครุภัณฑ์
+                                    {% elif log.action == 'ADD_BUILDING' %}เพิ่มอาคาร
+                                    {% elif log.action == 'ADD_FLOOR' %}เพิ่มชั้น
+                                    {% elif log.action == 'ADD_ROOM' %}เพิ่มห้อง
+                                    {% elif log.action == 'ADD_ROOM_BULK' %}เพิ่มห้องแบบกลุ่ม
+                                    {% else %}เพิ่มข้อมูล{% endif %}
+                                </span>
+                                {% elif 'EDIT' in log.action %}
+                                <span class="badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600;">
+                                    <i class="fas fa-pen"></i> 
+                                    {% if log.action == 'EDIT_EQUIPMENT' %}แก้ไขครุภัณฑ์
+                                    {% elif log.action == 'EDIT_BUILDING' %}แก้ไขอาคาร
+                                    {% elif log.action == 'EDIT_FLOOR' %}แก้ไขชั้น
+                                    {% elif log.action == 'EDIT_ROOM' %}แก้ไขห้อง
+                                    {% else %}แก้ไขข้อมูล{% endif %}
+                                </span>
+                                {% elif 'DISPOSE' in log.action %}
+                                <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600;">
+                                    <i class="fas fa-box-archive"></i> ตัดจำหน่าย
+                                </span>
+                                {% elif 'DELETE' in log.action %}
+                                <span class="badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 4px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 600;">
+                                    <i class="fas fa-trash"></i> 
+                                    {% if log.action == 'DELETE_EQUIPMENT' %}ลบครุภัณฑ์
+                                    {% elif log.action == 'DELETE_BUILDING' %}ลบอาคาร
+                                    {% elif log.action == 'DELETE_FLOOR' %}ลบชั้น
+                                    {% elif log.action == 'DELETE_ROOM' %}ลบห้อง
+                                    {% else %}ลบข้อมูล{% endif %}
+                                </span>
+                                {% else %}
+                                <span class="badge" style="background: rgba(148, 163, 184, 0.2); color: #cbd5e1; padding: 4px 10px; border-radius: 12px; font-size: 0.78rem;">
+                                    {{ log.action }}
+                                </span>
+                                {% endif %}
+                            </td>
+
+                            <!-- รายการเป้าหมาย -->
+                            <td style="padding: 12px 16px; font-size: 0.9rem;">
+                                <div style="font-weight: 600; color: var(--text-primary);">
+                                    {% if log.category == 'equipment' %}
+                                    <i class="fas fa-box" style="color: #38bdf8; margin-right: 4px;"></i>
+                                    {% else %}
+                                    <i class="fas fa-location-dot" style="color: #f59e0b; margin-right: 4px;"></i>
+                                    {% endif %}
+                                    {{ log.target_name }}
+                                </div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                    ประเภท: {{ log.target_type }}
+                                </div>
+                            </td>
+
+                            <!-- รายละเอียดการแก้ไข -->
+                            <td style="padding: 12px 16px; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.4;">
+                                {{ log.details or '-' }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+                                <i class="fas fa-folder-open" style="font-size: 2.5rem; opacity: 0.5; margin-bottom: 10px;"></i>
+                                <div>ไม่พบประวัติการแก้ไขตามเงื่อนไขที่เลือก</div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if pagination.pages > 1 %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-top: 1px solid var(--glass-border); flex-wrap: wrap; gap: 10px;">
+            <div style="font-size: 0.85rem; color: var(--text-muted);">
+                หน้า {{ pagination.page }} จาก {{ pagination.pages }} (ทั้งหมด {{ pagination.total }} รายการ)
+            </div>
+            <div style="display: flex; gap: 6px;">
+                {% if pagination.has_prev %}
+                <a href="{{ url_for('admin.audit_logs', page=pagination.prev_num, category=category, q=search_q, date_from=date_from, date_to=date_to) }}" class="btn btn-sm btn-secondary" style="padding: 4px 12px; border-radius: 8px;">
+                    &laquo; ก่อนหน้า
+                </a>
+                {% endif %}
+                
+                {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if p %}
+                        {% if p == pagination.page %}
+                        <span class="btn btn-sm btn-primary" style="padding: 4px 12px; border-radius: 8px; font-weight: 700;">{{ p }}</span>
+                        {% else %}
+                        <a href="{{ url_for('admin.audit_logs', page=p, category=category, q=search_q, date_from=date_from, date_to=date_to) }}" class="btn btn-sm btn-secondary" style="padding: 4px 12px; border-radius: 8px;">{{ p }}</a>
+                        {% endif %}
+                    {% else %}
+                        <span style="padding: 4px 8px; color: var(--text-muted);">...</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if pagination.has_next %}
+                <a href="{{ url_for('admin.audit_logs', page=pagination.next_num, category=category, q=search_q, date_from=date_from, date_to=date_to) }}" class="btn btn-sm btn-secondary" style="padding: 4px 12px; border-radius: 8px;">
+                    ถัดไป &raquo;
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<style>
+@media (max-width: 768px) {
+    .filter-controls-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+{% endblock %}

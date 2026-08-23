@@ -168,3 +168,22 @@ class RepairRequest(db.Model):
     equipment = db.relationship('Equipment', backref=db.backref('repair_requests', lazy='dynamic'))
     reporter = db.relationship('User', backref=db.backref('repair_requests', lazy='dynamic'))
 
+
+class AuditLog(db.Model):
+    """โมเดลประวัติการแก้ไขและจัดการข้อมูลระบบ (Audit Log / Activity History)"""
+    __tablename__ = 'audit_logs'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
+    user = db.relationship('User', backref=db.backref('audit_logs', lazy='dynamic'))
+    
+    action = db.Column(db.String(50), nullable=False) # e.g. 'ADD_EQUIPMENT', 'EDIT_EQUIPMENT', 'DELETE_EQUIPMENT', 'DISPOSE_EQUIPMENT', 'ADD_BUILDING', etc.
+    category = db.Column(db.String(30), nullable=False) # 'equipment', 'location'
+    target_type = db.Column(db.String(30), nullable=False) # 'ครุภัณฑ์/อุปกรณ์', 'อาคาร', 'ชั้น', 'ห้อง'
+    target_id = db.Column(db.Integer, nullable=True)
+    target_name = db.Column(db.String(255), nullable=False)
+    details = db.Column(db.Text, nullable=True)
+    ip_address = db.Column(db.String(50), nullable=True)
+    created_at = db.Column(db.DateTime, default=get_local_now)
+
+

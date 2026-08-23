@@ -23,3 +23,32 @@ def admin_required(f):
             return redirect(url_for('user.dashboard'))
         return f(*args, **kwargs)
     return decorated_function
+
+def log_audit(action, category, target_type, target_name, details='', target_id=None, user_id=None):
+    """บันทึกประวัติการกระทำของ Admin ลงในตาราง AuditLog"""
+    from flask import request
+    from models import db, AuditLog
+    try:
+        uid = user_id or (current_user.id if current_user and current_user.is_authenticated else None)
+        ip = None
+        try:
+            ip = request.remote_addr
+        except Exception:
+            pass
+        
+        log_entry = AuditLog(
+            user_id=uid,
+            action=action,
+            category=category,
+            target_type=target_type,
+            target_id=target_id,
+            target_name=target_name,
+            details=details,
+            ip_address=ip
+        )
+        db.session.add(log_entry)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error in log_audit: {e}")
+
