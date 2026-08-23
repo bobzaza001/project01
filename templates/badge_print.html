@@ -238,8 +238,8 @@
         <div class="card-body">
             <div class="user-info">
                 <div class="user-avatar-wrapper">
-                    {% if user.profile_image %}
-                    <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}" alt="Avatar" class="user-avatar">
+                    {% if user.avatar_url %}
+                    <img src="{{ user.avatar_url }}" alt="Avatar" class="user-avatar">
                     {% else %}
                     <div style="width: 44px; height: 44px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #0284c7; font-size: 1.3rem; border: 2px solid #0284c7;">
                         <i class="fas fa-user"></i>

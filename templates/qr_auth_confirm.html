@@ -16,8 +16,8 @@
         </p>
 
         <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px; text-align: left;">
-            {% if user.profile_image %}
-            <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}" alt="Avatar" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8;">
+            {% if user.avatar_url %}
+            <img src="{{ user.avatar_url }}" alt="Avatar" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8;">
             {% else %}
             <div style="width: 48px; height: 48px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 1.3rem;">
                 <i class="fas fa-user"></i>

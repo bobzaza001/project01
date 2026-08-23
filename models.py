@@ -44,10 +44,19 @@ class User(UserMixin, db.Model):
     full_name = db.Column(db.String(150), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     role = db.Column(db.String(10), nullable=False, default='user')
-    profile_image = db.Column(db.String(255), default='')
+    profile_image = db.Column(db.Text, default='')
     created_at = db.Column(db.DateTime, default=get_local_now)
     
     borrow_requests = db.relationship('BorrowRequest', backref='requester', lazy='dynamic')
+
+    @property
+    def avatar_url(self):
+        """ส่งคืน URL ของรูปโปรไฟล์ รองรับทั้ง Data URL (Base64) และ Static file"""
+        if not self.profile_image:
+            return None
+        if self.profile_image.startswith('data:') or self.profile_image.startswith('http'):
+            return self.profile_image
+        return f"/static/uploads/{self.profile_image}"
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
