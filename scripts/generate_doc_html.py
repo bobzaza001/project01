@@ -749,96 +749,194 @@ HTML_CONTENT = """<!DOCTYPE html>
     <p class="caption">ภาพที่ 3-11 สถาปัตยกรรมของระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์</p>
     <p>จากภาพที่ 3-11: แสดงแผนภาพสถาปัตยกรรมระบบจัดการยืม-คืนครุภัณฑ์ห้องปฏิบัติการคอมพิวเตอร์แบบ 3 ระดับ (3-Tier Architecture) ที่ประกอบด้วยส่วนแสดงผลหน้าจอ (Presentation Layer) บนอุปกรณ์ที่หลากหลายทั้งคอมพิวเตอร์ แท็บเล็ต และสมาร์ทโฟน ผ่านเทคโนโลยี HTML5, CSS3, JavaScript, ส่วนประมวลผลคำสั่งระบบ (Application Layer) ผ่านเว็บเซิร์ฟเวอร์ด้วยภาษา Python และ Flask Framework โฮสต์บนคลาวด์ Vercel, และส่วนจัดการฐานข้อมูล (Data Layer) ด้วยระบบ PostgreSQL บนบริการ Supabase โดยทั้งสามส่วนทำงานประสานกันและรับส่งข้อมูลผ่านโปรโตคอล HTTPS และคำสั่ง SQL Query อย่างเป็นระบบเพื่อรองรับการทำงานทั้งหมดของโครงการ</p>
 
-    <h2>3.5 การทดสอบระบบ (System Testing)</h2>
+        <h2>3.5 การทดสอบระบบ (System Testing)</h2>
     <h3>3.5.1 ตารางกรณีทดสอบ (Test Case Table)</h3>
-    <p class="caption">ตารางที่ 3-8 ตารางกรณีทดสอบระบบ (Test Case Table)</p>
+    <p class="caption">ตารางที่ 3-8 ตารางกรณีทดสอบระบบแยกตามกลุ่มบทบาทผู้ใช้งาน (Admin, Teacher, User)</p>
     <table>
         <thead>
             <tr>
-                <th style="width: 10%;">รหัส</th>
-                <th style="width: 20%;">ฟังก์ชันที่ทดสอบ</th>
-                <th style="width: 25%;">ข้อมูลนำเข้า (Input)</th>
+                <th style="width: 8%;">รหัส</th>
+                <th style="width: 14%;">กลุ่มผู้ใช้ / สิทธิ์</th>
+                <th style="width: 18%;">ฟังก์ชันที่ทดสอบ</th>
+                <th style="width: 20%;">ข้อมูลนำเข้า (Input)</th>
                 <th style="width: 20%;">ผลลัพธ์ที่คาดหวัง</th>
-                <th style="width: 25%;">ผลการทดสอบ</th>
+                <th style="width: 20%;">ผลการทดสอบ</th>
             </tr>
         </thead>
         <tbody>
+            <!-- กลุ่มที่ 1: การเข้าสู่ระบบและการควบคุมสิทธิ์ -->
+            <tr style="background-color: #e2e8f0; font-weight: bold;">
+                <td colspan="6" style="color: #0f172a;">1. การทดสอบการเข้าสู่ระบบและการควบคุมสิทธิ์ (Authentication & Role-Based Access Control)</td>
+            </tr>
             <tr>
                 <td class="text-center">TC-01</td>
-                <td>เข้าสู่ระบบ (Login)</td>
-                <td>ทดสอบล็อกอินด้วยรหัสผ่านแอดมินที่ถูกต้อง (Positive)</td>
+                <td><strong style="color: #ef4444;">Admin</strong><br>(ผู้ดูแลระบบ)</td>
+                <td>เข้าสู่ระบบผู้ดูแลระบบ<br>(Positive)</td>
                 <td>username: admin1<br>password: admin1234</td>
-                <td>ระบบล็อกอินผ่าน และพาไปที่หน้า Admin Dashboard</td>
+                <td>ระบบยืนยันตัวตนสำเร็จ และนำทางไปยังหน้า <strong>Admin Dashboard</strong> มีเมนูจัดการคลัง, อนุมัติคำขอ, สรุปสถิติ, จัดการอาคาร/ห้อง</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">เข้าสู่หน้า Admin Dashboard พร้อมสิทธิ์จัดการทั้งหมด</span></td>
             </tr>
             <tr>
                 <td class="text-center">TC-02</td>
-                <td>เข้าสู่ระบบ (Login)</td>
-                <td>ทดสอบล็อกอินด้วยรหัสผ่านผู้ใช้งานที่ไม่ถูกต้อง (Negative)</td>
-                <td>username: user1<br>password: wrong_pass</td>
-                <td>ระบบไม่ให้เข้า พร้อมแสดงแจ้งเตือนรหัสผ่านไม่ถูกต้อง และค้างอยู่หน้าเดิม</td>
+                <td><strong style="color: #8b5cf6;">Teacher</strong><br>(อาจารย์/บุคลากร)</td>
+                <td>เข้าสู่ระบบอาจารย์<br>(Positive)</td>
+                <td>username: teacher<br>password: password123</td>
+                <td>ระบบยืนยันตัวตนสำเร็จ และนำทางไปยังหน้า <strong>User Dashboard</strong> แสดงสถานะอาจารย์ มีสิทธิ์ยืมครุภัณฑ์เพื่อการเรียนการสอน, เบิกวัสดุ, แจ้งซ่อม</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">เข้าสู่หน้า Dashboard แสดงสิทธิ์อาจารย์ถูกต้อง</span></td>
             </tr>
             <tr>
                 <td class="text-center">TC-03</td>
-                <td>ขอยืมครุภัณฑ์ (Borrow)</td>
-                <td>ยื่นคำขอยืมครุภัณฑ์ (Durable) ข้อมูลถูกต้องครบถ้วน (Positive)</td>
-                <td>อุปกรณ์: กล้อง Canon EOS<br>วันเวลายืม: 20/08/2026 09:00<br>จำนวนวัน: 3 วัน</td>
-                <td>คำขอถูกส่งเข้าระบบ สถานะเป็น 'รอการอนุมัติ' (Pending)</td>
+                <td><strong style="color: #0284c7;">User</strong><br>(นักเรียน/นักศึกษา)</td>
+                <td>เข้าสู่ระบบนักศึกษา<br>(Positive)</td>
+                <td>username: user1<br>password: user1234</td>
+                <td>ระบบยืนยันตัวตนสำเร็จ และนำทางไปยังหน้า <strong>User Dashboard</strong> มีสิทธิ์ค้นหาอุปกรณ์, ขอยืมครุภัณฑ์, ขอเบิกวัสดุ, ส่งคืนพร้อมแนบรูป, ติดตามสถานะ</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">เข้าสู่หน้า Dashboard แสดงสถานะคำขอของนักศึกษา</span></td>
             </tr>
             <tr>
                 <td class="text-center">TC-04</td>
-                <td>ขอยืมครุภัณฑ์ (Borrow)</td>
-                <td>ยื่นคำขอยืมครุภัณฑ์ที่ของหมดคลังชั่วคราว (Negative)</td>
-                <td>อุปกรณ์: แล็ปท็อป (สต็อกคงเหลือ = 0)</td>
-                <td>ระบบไม่ให้ทำรายการ และแจ้งเตือน 'ครุภัณฑ์ชิ้นนี้ไม่ว่างในขณะนี้'</td>
+                <td>ทุกกลุ่มผู้ใช้</td>
+                <td>เข้าสู่ระบบด้วยรหัสผ่านผิด<br>(Negative)</td>
+                <td>username: user1<br>password: wrong_pass</td>
+                <td>ระบบปฏิเสธการเข้าใช้งาน พร้อมแสดงข้อความแจ้งเตือน <em>"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"</em> และคงอยู่ที่หน้าล็อกอินเดิม</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">ระบบบล็อกไม่ให้เข้า พร้อมแจ้งเตือนถูกต้อง</span></td>
             </tr>
             <tr>
                 <td class="text-center">TC-05</td>
-                <td>ขอยืมครุภัณฑ์ (Borrow)</td>
-                <td>ทดสอบการกดยื่นขอยืมซ้ำซ้อนในอุปกรณ์ชิ้นเดิม (Negative)</td>
-                <td>กดยื่นขอยืมอุปกรณ์ชิ้นที่ตนเองมีสถานะ 'รออนุมัติ' ค้างอยู่แล้ว</td>
-                <td>ระบบบล็อกการทำงาน และแจ้งเตือนคุณมีคำขอที่อยู่ระหว่างรออนุมัติแล้ว</td>
+                <td>User / Teacher</td>
+                <td>ป้องกันการเข้าถึงข้ามสิทธิ์<br>(Security Test)</td>
+                <td>ล็อกอิน User/Teacher แล้วพิมพ์ URL ตรงเข้า <code>/admin/dashboard</code></td>
+                <td>ระบบตรวจสอบสิทธิ์และปฏิเสธการเข้าถึง (Access Denied) โดย Redirect กลับไปยังหน้า User Dashboard พร้อมแจ้งเตือน</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">ระบบป้องกันการเข้าถึงหน้าแอดมินโดยไม่ได้รับอนุญาต 100%</span></td>
+            </tr>
+
+            <!-- กลุ่มที่ 2: ฟังก์ชันการทำงานของผู้ใช้งาน (User & Teacher) -->
+            <tr style="background-color: #e2e8f0; font-weight: bold;">
+                <td colspan="6" style="color: #0f172a;">2. การทดสอบฟังก์ชันการทำงานของผู้ใช้งาน (User & Teacher Functional Testing)</td>
             </tr>
             <tr>
                 <td class="text-center">TC-06</td>
-                <td>ขอยืมครุภัณฑ์ (Borrow)</td>
-                <td>ทดสอบยื่นขอยืมโดยไม่ระบุวันเวลาเดินทางมารับของ (Negative)</td>
-                <td>วันเวลายืม: [ว่าง]<br>จำนวนวัน: 5 วัน</td>
-                <td>ระบบบล็อกไม่ให้ส่ง และแสดงเตือน 'กรุณาระบุวันและเวลาที่ต้องการยืม'</td>
+                <td>User / Teacher</td>
+                <td>ค้นหาและคัดกรองอุปกรณ์<br>(Search & Filter)</td>
+                <td>พิมพ์คำค้นหา <em>"กล้อง"</em> หรือเลือกตัวกรองตามอาคาร/ห้อง</td>
+                <td>ตัวกรองจาวาสคริปต์กรองการ์ดอุปกรณ์ให้แสดงเฉพาะรายการที่ตรงเงื่อนไขอย่างรวดเร็ว (Debounce Filter)</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">แสดงรายการอุปกรณ์ถูกต้อง ไม่มีความหน่วง</span></td>
             </tr>
             <tr>
                 <td class="text-center">TC-07</td>
-                <td>อนุมัติคำขอ (Approve)</td>
-                <td>แอดมินกดอนุมัติคำขอยืมครุภัณฑ์ (Positive)</td>
-                <td>กดปุ่มอนุมัติ (เช็คผ่าน POST)</td>
-                <td>สถานะใบยืมเปลี่ยนเป็น 'อนุมัติแล้ว' (Approved), สต็อกอุปกรณ์ที่พร้อมให้ยืมลดลง 1 เครื่อง, ส่งอีเมลอนุมัติไปยังผู้ยืมทันที</td>
+                <td><strong style="color: #0284c7;">User</strong> (นักศึกษา)</td>
+                <td>ยื่นคำขอยืมครุภัณฑ์<br>(Student Borrow)</td>
+                <td>เลือกกล้อง DSLR, ระบุวันเวลารับของ และจำนวนวันยืม 3 วัน</td>
+                <td>คำขอยืมถูกส่งเข้าระบบ สถานะเป็น <strong>'รอการอนุมัติ (Pending)'</strong> และแสดงในหน้ารายการคำขอของนักศึกษา</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">บันทึกคำขอลงฐานข้อมูล สถานะ Pending ถูกต้อง</span></td>
             </tr>
             <tr>
                 <td class="text-center">TC-08</td>
-                <td>ส่งคืนครุภัณฑ์ (Return)</td>
-                <td>ผู้ใช้กดคืนครุภัณฑ์โดยแนบไฟล์รูปถ่ายหลักฐานถูกต้อง (Positive)</td>
-                <td>ไฟล์ภาพ: receipt.png (อัปโหลดหลักฐานส่งคืน)</td>
-                <td>สถานะเปลี่ยนเป็น 'รอรับคืน' (Return pending), รูปภาพถูกจัดเก็บลงฐานข้อมูล, นำภาพไปแสดงในหน้าแอดมิน</td>
+                <td><strong style="color: #8b5cf6;">Teacher</strong> (อาจารย์)</td>
+                <td>ยื่นขอยืมอุปกรณ์เพื่อการสอน<br>(Teacher Borrow)</td>
+                <td>เลือกโปรเจกเตอร์/แล็ปท็อปเพื่อการสอน ระบุจำนวน 7 วัน</td>
+                <td>คำขอถูกส่งเข้าระบบ พร้อมระบุวัตถุประสงค์การใช้เพื่อการเรียนการสอน สถานะเป็น <strong>'รอการอนุมัติ'</strong></td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">บันทึกข้อมูลและส่งเรื่องให้อนุมัติถูกต้อง</span></td>
             </tr>
             <tr>
                 <td class="text-center">TC-09</td>
-                <td>ส่งคืนครุภัณฑ์ (Return)</td>
-                <td>ผู้ใช้กดส่งคืนโดยไม่เลือกอัปโหลดรูปภาพหลักฐาน (Negative)</td>
-                <td>ไฟล์ภาพ: [ว่าง]</td>
-                <td>ระบบล็อกไม่ยอมให้ส่งคืน พร้อมแสดงข้อความเตือนให้แนบรูปภาพก่อน</td>
+                <td>User / Teacher</td>
+                <td>ยื่นคำขอเบิกวัสดุสิ้นเปลือง<br>(Consumable Request)</td>
+                <td>เลือกกระดาษพิมพ์/หมึก ระบุจำนวน 2 ชุด</td>
+                <td>คำขอเบิกถูกส่งเข้าระบบ สถานะเป็น <strong>'รอการอนุมัติ'</strong> เพื่อรอแอดมินพิจารณาตัดสต็อก</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">บันทึกคำขอเบิกวัสดุเรียบร้อย</span></td>
             </tr>
             <tr>
                 <td class="text-center">TC-10</td>
-                <td>ค้นหาครุภัณฑ์ (Search)</td>
-                <td>พิมพ์คำค้นหาชื่ออุปกรณ์ที่ต้องการค้นหา (Positive)</td>
-                <td>คำค้นหา: "กล้อง"</td>
-                <td>ตัวกรองจาวาสคริปต์กรองการ์ดให้แสดงเฉพาะกล้อง โดยไม่มีความหน่วงขณะพิมพ์ (พิมพ์ลื่นไหลด้วยระบบ Debounce)</td>
+                <td>User / Teacher</td>
+                <td>ยื่นขอยืมอุปกรณ์ที่ของหมดคลัง<br>(Negative)</td>
+                <td>อุปกรณ์: แล็ปท็อป (สต็อกคงเหลือ = 0)</td>
+                <td>ระบบบล็อกไม่ให้ทำรายการ และแจ้งเตือน <em>'ครุภัณฑ์ชิ้นนี้ไม่ว่างในขณะนี้'</em></td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">ระบบป้องกันการยืมอุปกรณ์เกินสต็อก</span></td>
             </tr>
             <tr>
                 <td class="text-center">TC-11</td>
-                <td>ค้นหาครุภัณฑ์ (Search)</td>
-                <td>พิมพ์ชื่ออุปกรณ์ที่ไม่มีอยู่ในระบบคลัง (Negative)</td>
-                <td>คำค้นหา: "ตู้เย็น"</td>
-                <td>หน้าจอซ่อนการ์ดครุภัณฑ์ทั้งหมด และไม่แสดงรายการใดๆ</td>
+                <td>User / Teacher</td>
+                <td>ยื่นขอยืมซ้ำซ้อนในอุปกรณ์เดิม<br>(Negative)</td>
+                <td>กดยื่นขอยืมอุปกรณ์ชิ้นที่ตนเองมีสถานะ 'รออนุมัติ' ค้างอยู่แล้ว</td>
+                <td>ระบบบล็อกการทำงาน และแจ้งเตือน <em>'คุณมีคำขอที่อยู่ระหว่างรออนุมัติแล้ว'</em></td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">ระบบป้องกันการส่งคำขอซ้ำซ้อนสำเร็จ</span></td>
+            </tr>
+            <tr>
+                <td class="text-center">TC-12</td>
+                <td>User / Teacher</td>
+                <td>ยื่นขอยืมโดยไม่ระบุวันเวลา<br>(Negative)</td>
+                <td>วันเวลายืม: [ว่าง], จำนวนวัน: 5 วัน</td>
+                <td>ระบบบล็อกไม่ให้ส่งคำขอ และแจ้งเตือน <em>'กรุณาระบุวันและเวลาที่ต้องการยืม'</em></td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">ระบบตรวจสอบความถูกต้องของข้อมูล (Validation)</span></td>
+            </tr>
+            <tr>
+                <td class="text-center">TC-13</td>
+                <td>User / Teacher</td>
+                <td>แจ้งส่งคืนครุภัณฑ์พร้อมแนบรูป<br>(Return with Photo)</td>
+                <td>กดคืนอุปกรณ์ + แนบไฟล์รูปถ่ายสภาพอุปกรณ์ตอนส่งคืน</td>
+                <td>สถานะเปลี่ยนเป็น <strong>'รอรับคืน (Return pending)'</strong> รูปภาพถูกบันทึกลงฐานข้อมูล (Base64) และส่งไปยังหน้าแอดมิน</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">สถานะเปลี่ยนเป็นรอรับคืนและบันทึกภาพหลักฐานสำเร็จ</span></td>
+            </tr>
+            <tr>
+                <td class="text-center">TC-14</td>
+                <td>User / Teacher</td>
+                <td>ส่งคืนโดยไม่แนบรูปถ่ายหลักฐาน<br>(Negative)</td>
+                <td>กดส่งคืนอุปกรณ์โดยไม่เลือกไฟล์ภาพ</td>
+                <td>ระบบบล็อกไม่ยอมให้ส่งคืน พร้อมแสดงข้อความเตือนให้แนบรูปภาพสภาพอุปกรณ์ก่อน</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">ระบบบังคับแนบรูปถ่ายสภาพของก่อนส่งคืน</span></td>
+            </tr>
+            <tr>
+                <td class="text-center">TC-15</td>
+                <td>User / Teacher</td>
+                <td>ยื่นคำขอแจ้งซ่อมครุภัณฑ์<br>(Repair Request)</td>
+                <td>เลือกอุปกรณ์ชำรุด + กรอกรายละเอียดอาการชำรุดเสียหาย</td>
+                <td>ระบบบันทึกรายการแจ้งซ่อม สถานะเป็น <strong>'รอดำเนินการ (Pending)'</strong> และแจ้งเตือนในระบบคลังใบแจ้งซ่อมของแอดมิน</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">บันทึกรายการแจ้งซ่อมเข้าระบบเรียบร้อย</span></td>
+            </tr>
+
+            <!-- กลุ่มที่ 3: การบริหารจัดการของผู้ดูแลระบบ (Admin) -->
+            <tr style="background-color: #e2e8f0; font-weight: bold;">
+                <td colspan="6" style="color: #0f172a;">3. การทดสอบการบริหารจัดการของผู้ดูแลระบบ (Admin Management Testing)</td>
+            </tr>
+            <tr>
+                <td class="text-center">TC-16</td>
+                <td><strong style="color: #ef4444;">Admin</strong></td>
+                <td>อนุมัติคำขอยืมครุภัณฑ์<br>(Approve Borrow)</td>
+                <td>แอดมินกดปุ่มอนุมัติคำขอยืม (เช็คผ่าน POST)</td>
+                <td>สถานะคำขอเปลี่ยนเป็น <strong>'อนุมัติแล้ว (Approved)'</strong>, สต็อกอุปกรณ์ที่พร้อมให้ยืมลดลง 1 ชิ้น, ระบบส่งอีเมลแจ้งเตือนไปยังผู้ยืมทันที</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">สถานะเปลี่ยนเป็นอนุมัติแล้ว ตัดสต็อก และส่งอีเมลสำเร็จ</span></td>
+            </tr>
+            <tr>
+                <td class="text-center">TC-17</td>
+                <td><strong style="color: #ef4444;">Admin</strong></td>
+                <td>ปฏิเสธคำขอยืมพร้อมระบุเหตุผล<br>(Reject Borrow)</td>
+                <td>แอดมินกดปฏิเสธคำขอ + ระบุเหตุผลการปฏิเสธ</td>
+                <td>สถานะคำขอเปลี่ยนเป็น <strong>'ปฏิเสธ (Rejected)'</strong> และส่งอีเมลแจ้งเหตุผลไปยังผู้ยืม</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">สถานะเปลี่ยนเป็นปฏิเสธ และบันทึกเหตุผลในระบบ</span></td>
+            </tr>
+            <tr>
+                <td class="text-center">TC-18</td>
+                <td><strong style="color: #ef4444;">Admin</strong></td>
+                <td>ตรวจสอบภาพและยืนยันรับของคืน<br>(Approve Return)</td>
+                <td>แอดมินตรวจรูปภาพหลักฐานสภาพของ และกดยืนยันรับของคืนเข้าคลัง</td>
+                <td>สถานะคำขอเปลี่ยนเป็น <strong>'คืนแล้ว (Returned)'</strong> และสต็อกอุปกรณ์ที่พร้อมให้ยืมเพิ่มคืนเข้าคลัง 1 ชิ้น</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">คืนสต็อกอุปกรณ์เข้าคลังและปิดรายการสมบูรณ์</span></td>
+            </tr>
+            <tr>
+                <td class="text-center">TC-19</td>
+                <td><strong style="color: #ef4444;">Admin</strong></td>
+                <td>จัดการครุภัณฑ์และสถานที่<br>(CRUD Management)</td>
+                <td>เพิ่มครุภัณฑ์ใหม่, แก้ไขข้อมูล, เพิ่มอาคาร/ชั้น/ห้อง พร้อมอัปโหลดรูปภาพ</td>
+                <td>ข้อมูลและรูปภาพ (Base64) ถูกบันทึกลงฐานข้อมูล และแสดงผลในหน้าคลังอุปกรณ์ทันที</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">บันทึกข้อมูลและอัปโหลดรูปภาพแสดงผลสมบูรณ์</span></td>
+            </tr>
+            <tr>
+                <td class="text-center">TC-20</td>
+                <td><strong style="color: #ef4444;">Admin</strong></td>
+                <td>ส่งออกรายงานสรุปข้อมูล<br>(Export Report)</td>
+                <td>เลือกประเภทรายงานและช่วงเวลา กดดาวน์โหลด Excel หรือเปิดพิมพ์ PDF</td>
+                <td>ระบบสร้างไฟล์ Excel (.xlsx) และหน้าพิมพ์เอกสาร PDF ได้อย่างถูกต้องตามช่วงเวลาที่เลือก</td>
+                <td style="color: #059669; font-weight: bold;">ผ่าน (Pass)<br><span style="font-size: 0.8rem; font-weight: normal; color: #475569;">ดาวน์โหลด Excel และเปิดพิมพ์รายงาน PDF สำเร็จ 100%</span></td>
             </tr>
         </tbody>
     </table>
