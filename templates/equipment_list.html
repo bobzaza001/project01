@@ -31,14 +31,14 @@
         <div style="display: flex; gap: 10px; width: 100%; max-width: 800px; flex-wrap: wrap;">
             
             <!-- ประเภท -->
-            <select id="typeFilter" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(30, 27, 75, 0.8); color: white; outline: none; cursor: pointer; font-size: 0.95rem;">
+            <select id="typeFilter" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--bg-input); color: var(--text-primary); outline: none; cursor: pointer; font-size: 0.95rem;">
                 <option value="all">📦 ทุกประเภท</option>
                 <option value="durable">🔄 ครุภัณฑ์ (ยืม-คืน)</option>
                 <option value="consumable">📝 วัสดุสิ้นเปลือง</option>
             </select>
 
             <!-- ชั้น/ห้อง -->
-            <select id="floorRoomFilter" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(30, 27, 75, 0.8); color: white; outline: none; cursor: pointer; font-size: 0.95rem;">
+            <select id="floorRoomFilter" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--bg-input); color: var(--text-primary); outline: none; cursor: pointer; font-size: 0.95rem;">
                 <option value="all">🏢 ทุกชั้น / ทุกห้อง</option>
                 {% for b in buildings %}
                     <optgroup label="อาคาร: {{ b.name }}" style="color: black;">
@@ -53,7 +53,7 @@
             </select>
 
             <!-- หมวดหมู่ -->
-            <select id="categoryFilter" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(30, 27, 75, 0.8); color: white; outline: none; cursor: pointer; font-size: 0.95rem;">
+            <select id="categoryFilter" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--bg-input); color: var(--text-primary); outline: none; cursor: pointer; font-size: 0.95rem;">
                 <option value="all">🏷️ ทุกหมวดหมู่</option>
                 <option value="ไอทีและคอมพิวเตอร์">🖥️ ไอทีและคอมพิวเตอร์</option>
                 <option value="เฟอร์นิเจอร์">🪑 เฟอร์นิเจอร์</option>
@@ -62,7 +62,7 @@
                 <option value="ทั่วไป">📦 ทั่วไป</option>
             </select>
             
-            <select id="borrowableFilter" class="filter-dropdown" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(30, 27, 75, 0.8); color: white; outline: none; cursor: pointer; font-size: 0.95rem;">
+            <select id="borrowableFilter" class="filter-dropdown" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--bg-input); color: var(--text-primary); outline: none; cursor: pointer; font-size: 0.95rem;">
                 <option value="all">🔄 ประเภทการใช้งาน (ทั้งหมด)</option>
                 <option value="true">🎒 พกพา/ยืมกลับได้</option>
                 <option value="false">🏢 ประจำห้อง/ยืมไม่ได้</option>

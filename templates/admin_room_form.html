@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="admin-form-wrapper fade-in" style="max-width: 600px; margin: 2rem auto;">
-    <div class="admin-form-card" style="padding: 2rem; border-radius: 20px; background: rgba(30, 27, 75, 0.6); border: 1px solid rgba(255,255,255,0.1);">
+    <div class="admin-form-card" style="padding: 2rem; border-radius: var(--radius-lg); background: var(--bg-card); border: 1px solid var(--glass-border); box-shadow: var(--shadow);">
         
         <div style="display: flex; align-items: center; margin-bottom: 1rem;">
             <a href="{{ url_for('admin.manage_building_detail', b_id=floor.building_id) }}" class="btn btn-secondary btn-sm" style="margin-right: 15px;">
