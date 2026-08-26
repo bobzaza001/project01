@@ -122,15 +122,28 @@ def register():
         return redirect(url_for('user.dashboard'))
     
     if request.method == 'POST':
-        full_name = request.form.get('full_name', '').strip()
-        username = request.form.get('username', '').strip() or full_name
+        account_type = request.form.get('account_type', 'student')
         email = request.form.get('email', '').strip()
         password = request.form.get('password', '')
         confirm_password = request.form.get('confirm_password', '')
         
         errors = []
-        if not full_name or not email or not password:
-            errors.append('กรุณากรอกข้อมูลให้ครบทุกช่อง')
+        if account_type == 'student':
+            student_id = request.form.get('student_id', '').strip()
+            if not student_id:
+                errors.append('กรุณากรอกรหัสนักศึกษา')
+            username = student_id
+            full_name = f"นักศึกษา ({student_id})"
+        else:
+            teacher_name = request.form.get('teacher_name', '').strip()
+            teacher_username = request.form.get('teacher_username', '').strip()
+            if not teacher_name or not teacher_username:
+                errors.append('กรุณากรอกชื่อ-นามสกุลและชื่อผู้ใช้งานของอาจารย์')
+            username = teacher_username
+            full_name = teacher_name
+        
+        if not email or not password:
+            errors.append('กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน')
         if not email.endswith('.ac.th'):
             errors.append('กรุณาใช้อีเมลของสถาบัน (.ac.th) เท่านั้น')
         if len(password) < 8:
@@ -140,12 +153,7 @@ def register():
         if User.query.filter_by(email=email).first():
             errors.append('อีเมลนี้ถูกใช้งานในระบบแล้ว')
         if User.query.filter_by(username=username).first():
-            # หาก username (full_name) ซ้ำ ให้เติมลำดับเพื่อป้องกัน error ใน DB
-            suffix = 1
-            original_username = username
-            while User.query.filter_by(username=username).first():
-                username = f"{original_username}_{suffix}"
-                suffix += 1
+            errors.append(f'ชื่อผู้ใช้ / รหัสนักศึกษา "{username}" มีอยู่ในระบบแล้ว')
         
         if errors:
             for error in errors:
@@ -157,7 +165,10 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         
-        flash('สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ', 'success')
+        if account_type == 'student':
+            flash(f'สมัครสมาชิกสำเร็จด้วยรหัสนักศึกษา {username}! กรุณาเข้าสู่ระบบและไปตั้งชื่อ-นามสกุลจริงที่หน้าโปรไฟล์', 'success')
+        else:
+            flash(f'สมัครสมาชิกสำเร็จ! ยินดีต้อนรับ {full_name}', 'success')
         return redirect(url_for('auth.login'))
     
     return render_template('register.html')
@@ -172,11 +183,38 @@ def logout():
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
+        action_type = request.form.get('action_type', 'find_user')
         email = request.form.get('email', '').strip()
+        
+        if not email:
+            flash('กรุณาระบุอีเมลสถาบัน', 'warning')
+            return redirect(url_for('auth.forgot_password'))
+            
         user = User.query.filter_by(email=email).first()
-        if user:
-            flash('ระบบได้ส่งลิงก์รีเซ็ตรหัสผ่านไปยังอีเมลของคุณแล้ว (จำลอง)', 'info')
-        else:
-            flash('ไม่พบอีเมลนี้ในระบบ', 'danger')
-        return redirect(url_for('auth.forgot_password'))
+        
+        if not user:
+            flash(f'ไม่พบบัญชีผู้ใช้ที่ผูกกับอีเมล "{email}" ในระบบ', 'danger')
+            return redirect(url_for('auth.forgot_password'))
+            
+        if action_type == 'find_user':
+            flash(f'🔍 พบบัญชีของคุณ! ชื่อผู้ใช้ (Username/รหัสนักศึกษา) คือ: "{user.username}" (ชื่อบัญชี: {user.full_name})', 'success')
+            return redirect(url_for('auth.login'))
+            
+        elif action_type == 'reset_password':
+            new_password = request.form.get('new_password', '')
+            confirm_new_password = request.form.get('confirm_new_password', '')
+            
+            if len(new_password) < 8:
+                flash('รหัสผ่านใหม่ต้องมีอย่างน้อย 8 ตัวอักษร', 'danger')
+                return redirect(url_for('auth.forgot_password'))
+                
+            if new_password != confirm_new_password:
+                flash('รหัสผ่านใหม่และยืนยันรหัสผ่านไม่ตรงกัน', 'danger')
+                return redirect(url_for('auth.forgot_password'))
+                
+            user.set_password(new_password)
+            db.session.commit()
+            flash('🎉 ตั้งรหัสผ่านใหม่สำเร็จเรียบร้อยแล้ว! กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่', 'success')
+            return redirect(url_for('auth.login'))
+            
     return render_template('forgot_password.html')

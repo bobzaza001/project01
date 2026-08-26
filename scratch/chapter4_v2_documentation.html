@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>เอกสารบทที่ 4 ผลการดำเนินงาน (Version 2) — โครงงานระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์</title>
+    <style>
+        body {
+            font-family: 'TH Sarabun New', 'Cordia New', AngsanaUPC, sans-serif;
+            font-size: 16pt;
+            line-height: 1.5;
+            color: #000000;
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #ffffff;
+        }
+        .header-project {
+            font-size: 14pt;
+            font-weight: normal;
+            color: #808080; /* Gray 25% */
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 5px;
+        }
+        h1.chapter-title {
+            text-align: center;
+            font-size: 18pt;
+            font-weight: bold;
+            margin: 0 0 5px 0;
+        }
+        h2.chapter-subtitle {
+            text-align: center;
+            font-size: 18pt;
+            font-weight: bold;
+            margin: 0 0 20px 0;
+        }
+        .spacing-line {
+            height: 24px;
+        }
+        h3.section-title {
+            font-size: 16pt;
+            font-weight: bold;
+            margin: 20px 0 10px 0;
+        }
+        h4.subsection-title {
+            font-size: 16pt;
+            font-weight: bold;
+            margin: 15px 0 8px 0;
+            padding-left: 20px;
+        }
+        p {
+            margin: 0 0 10px 0;
+            text-align: justify;
+            text-indent: 40px;
+        }
+        .no-indent {
+            text-indent: 0;
+        }
+        .img-container {
+            width: 100%;
+            max-width: 650px;
+            margin: 15px auto 10px auto;
+            text-align: center;
+        }
+        .img-frame {
+            width: 100%;
+            height: auto;
+            max-height: 380px;
+            object-fit: contain;
+            border: 1px solid #94a3b8;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .img-placeholder {
+            width: 100%;
+            height: 300px;
+            border: 2px dashed #94a3b8;
+            border-radius: 8px;
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 14pt;
+        }
+        .img-caption {
+            text-align: center;
+            font-weight: bold;
+            font-size: 15pt;
+            margin-top: 8px;
+            margin-bottom: 20px;
+            text-indent: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 15pt;
+        }
+        th, td {
+            border: 1px solid #000000;
+            padding: 6px 10px;
+            vertical-align: middle;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            text-align: center;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .table-caption {
+            font-weight: bold;
+            margin-bottom: 6px;
+            text-indent: 0;
+        }
+        .summary-text {
+            text-align: justify;
+            text-indent: 40px;
+            margin-top: 12px;
+            margin-bottom: 15px;
+        }
+        .notice-box {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 16px;
+            margin-bottom: 25px;
+            font-size: 14pt;
+            color: #1e40af;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="notice-box">
+        <strong>💡 คำแนะนำสำหรับการคัดลอกลง Google Docs หรือ Microsoft Word:</strong><br>
+        เอกสารบทที่ 4 (V2) นี้ถูกจัดตามโครงสร้างที่เน้น <strong>4.1 ผลการออกแบบ (แสดงรูปหน้าจอ Front-End ครบทุกหน้า)</strong> และ <strong>4.2 ผลการประเมินความพึงพอใจ</strong><br>
+        กด <strong>Ctrl + A</strong> (เลือกทั้งหมด) &gt; <strong>Ctrl + C</strong> (คัดลอก) &gt; วาง <strong>Ctrl + V</strong> ใน Google Docs หรือ Word ได้ทันทีครับ
+    </div>
+
+    <!-- Header หน้า -->
+    <div class="header-project">
+        <span>โครงงานระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์</span>
+        <span>หน้า 1</span>
+    </div>
+
+    <h1 class="chapter-title">บทที่ 4</h1>
+    <h2 class="chapter-subtitle">ผลการดำเนินงาน</h2>
+
+    <div class="spacing-line"></div>
+
+    <p>โครงงานระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์ มีผลการดำเนินงาน ดังนี้</p>
+
+    <h3 class="section-title">4.1 ผลการออกแบบ</h3>
+    <p>
+        ผู้จัดทำโครงงานได้ดำเนินการออกแบบและพัฒนาส่วนติดต่อผู้ใช้งาน (User Interface: Front-End) ของระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์ โดยแบ่งหน้าจอการทำงานออกเป็นส่วนต่างๆ เพื่อรองรับการใช้งานของนักเรียน นักศึกษา อาจารย์ และผู้ดูแลระบบได้อย่างครบถ้วน ดังนี้
+    </p>
+
+    <!-- 4.1.1 หน้าเข้าสู่ระบบ -->
+    <h4 class="subsection-title">4.1.1 หน้าเข้าสู่ระบบ (Login Page)</h4>
+    <p>
+        หน้าเข้าสู่ระบบถูกออกแบบให้ผู้ใช้งานสามารถเข้าสู่ระบบด้วยชื่อผู้ใช้ (Username) หรืออีเมลสถาบัน พร้อมรหัสผ่าน นอกจากนี้ยังมีแท็บสแกน QR Code เพื่อเข้าสู่ระบบผ่านสมาร์ตโฟน และส่วนจำลองบัญชีทดสอบระบบสำหรับผู้ดูแลระบบและผู้ใช้ทั่วไป
+    </p>
+    <div class="img-container">
+        <img src="https://project01-psi-plum.vercel.app/static/img/prototypes/login_prototype.jpg" alt="หน้าเข้าสู่ระบบ" class="img-frame" onerror="this.outerHTML='<div class=\'img-placeholder\'><i class=\'fas fa-image\'></i> [รูปหน้าต่างเข้าสู่ระบบ (Login Page)]</div>';">
+        <div class="img-caption">ภาพที่ 4-1 แสดงหน้าต่างเข้าสู่ระบบ (Login Page)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <!-- 4.1.2 หน้าสมัครสมาชิก -->
+    <h4 class="subsection-title">4.1.2 หน้าสมัครสมาชิก (Register Page)</h4>
+    <p>
+        หน้าต่างสำหรับลงทะเบียนผู้ใช้งานใหม่ โดยผู้ใช้จะต้องระบุชื่อผู้ใช้งาน, ชื่อ-นามสกุลจริง, อีเมลสถาบัน (@atcc.ac.th), และรหัสผ่านความปลอดภัย เพื่อสร้างบัญชีเข้าใช้งานระบบยืม-คืนอุปกรณ์
+    </p>
+    <div class="img-container">
+        <div class="img-placeholder">
+            <strong>[รูปหน้าต่างสมัครสมาชิก (Register Page)]</strong>
+            <span>(แสดงฟอร์มกรอกชื่อผู้ใช้, ชื่อ-นามสกุล, อีเมลสถาบัน และรหัสผ่าน)</span>
+        </div>
+        <div class="img-caption">ภาพที่ 4-2 แสดงหน้าต่างสมัครสมาชิกผู้ใช้งานใหม่ (Register Page)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <!-- 4.1.3 หน้าลืมรหัสผ่าน -->
+    <h4 class="subsection-title">4.1.3 หน้าลืมรหัสผ่าน (Forgot Password Page)</h4>
+    <p>
+        หน้าต่างสำหรับขอรีเซ็ตรหัสผ่านในกรณีที่ผู้ใช้งานลืมรหัสผ่าน โดยระบบจะให้ระบุอีเมลสถาบันที่ลงทะเบียนไว้เพื่อตรวจสอบและดำเนินการส่งลิงก์ตั้งรหัสผ่านใหม่
+    </p>
+    <div class="img-container">
+        <div class="img-placeholder">
+            <strong>[รูปหน้าต่างลืมรหัสผ่าน (Forgot Password Page)]</strong>
+            <span>(แสดงฟอร์มระบุอีเมลเพื่อขอรีเซ็ตรหัสผ่านเข้าสู่ระบบ)</span>
+        </div>
+        <div class="img-caption">ภาพที่ 4-3 แสดงหน้าต่างขอรีเซ็ตรหัสผ่าน (Forgot Password Page)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <!-- 4.1.4 หน้าจอหลักสำหรับผู้ใช้ทั่วไป / คลังอุปกรณ์ -->
+    <h4 class="subsection-title">4.1.4 หน้าจอหลักสำหรับผู้ใช้ทั่วไป / คลังอุปกรณ์ (User Dashboard & Catalog)</h4>
+    <p>
+        หน้าจอหลักสำหรับนักเรียน นักศึกษา และอาจารย์ ประกอบด้วยแถบค้นหาอัจฉริยะ ตัวกรองตามประเภท (ครุภัณฑ์/วัสดุสิ้นเปลือง), ตัวกรองตามอาคาร ชั้น และห้องปฏิบัติการ พร้อมแสดงการ์ดรายการครุภัณฑ์ รูปภาพ สถานะสต็อกคงเหลือ และปุ่มสำหรับกดยื่นขอยืมหรือขอเบิก
+    </p>
+    <div class="img-container">
+        <img src="https://project01-psi-plum.vercel.app/static/img/prototypes/user_catalog_prototype.jpg" alt="หน้าคลังอุปกรณ์" class="img-frame" onerror="this.outerHTML='<div class=\'img-placeholder\'><i class=\'fas fa-image\'></i> [รูปหน้าจอหลักคลังอุปกรณ์ (User Catalog)]</div>';">
+        <div class="img-caption">ภาพที่ 4-4 แสดงหน้าจอหลักคลังอุปกรณ์และแดชบอร์ดผู้ใช้ (User Dashboard & Catalog)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <!-- 4.1.5 หน้าต่างฟอร์มยื่นคำขอยืมครุภัณฑ์ -->
+    <h4 class="subsection-title">4.1.5 หน้าต่างฟอร์มยื่นคำขอยืมครุภัณฑ์ (Borrow Request Modal)</h4>
+    <p>
+        หน้าต่างป๊อปอัปสำหรับยื่นคำขอยืมครุภัณฑ์ (Durable) โดยผู้ยืมจะต้องเลือกวันและเวลาที่สะดวกเดินทางมารับอุปกรณ์ พร้อมระบุจำนวนวันที่ต้องการยืมใช้งาน (1-30 วัน) ก่อนกดยืนยันคำขอ
+    </p>
+    <div class="img-container">
+        <div class="img-placeholder">
+            <strong>[รูปหน้าต่างฟอร์มยื่นคำขอยืมครุภัณฑ์ (Borrow Request Modal)]</strong>
+            <span>(แสดงฟอร์มเลือกวันเวลารับของ และตัวเลือกจำนวนวันยืม 1-30 วัน)</span>
+        </div>
+        <div class="img-caption">ภาพที่ 4-5 แสดงหน้าต่างฟอร์มยื่นคำขอยืมครุภัณฑ์ (Borrow Request Modal)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <!-- 4.1.6 หน้าต่างฟอร์มยื่นคำขอเบิกวัสดุสิ้นเปลือง -->
+    <h4 class="subsection-title">4.1.6 หน้าต่างฟอร์มยื่นคำขอเบิกวัสดุสิ้นเปลือง (Consumable Request Modal)</h4>
+    <p>
+        หน้าต่างสำหรับยื่นคำขอเบิกวัสดุสิ้นเปลือง (Consumable) เช่น กระดาษพิมพ์, หมึกพิมพ์ โดยผู้ใช้ระบุจำนวนที่ต้องการเบิกใช้งาน ซึ่งระบบจะส่งเรื่องให้แอดมินอนุมัติตัดสต็อกโดยไม่ต้องนำกลับมาส่งคืน
+    </p>
+    <div class="img-container">
+        <div class="img-placeholder">
+            <strong>[รูปหน้าต่างฟอร์มยื่นคำขอเบิกวัสดุสิ้นเปลือง (Consumable Request Modal)]</strong>
+            <span>(แสดงฟอร์มระบุจำนวนชิ้นของวัสดุที่ต้องการขอเบิกใช้งาน)</span>
+        </div>
+        <div class="img-caption">ภาพที่ 4-6 แสดงหน้าต่างฟอร์มยื่นคำขอเบิกวัสดุสิ้นเปลือง (Consumable Request Modal)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <!-- 4.1.7 หน้าต่างฟอร์มแจ้งส่งคืนครุภัณฑ์พร้อมแนบรูปถ่ายหลักฐาน -->
+    <h4 class="subsection-title">4.1.7 หน้าต่างฟอร์มแจ้งส่งคืนครุภัณฑ์พร้อมแนบรูปถ่ายหลักฐาน (Return Equipment Modal)</h4>
+    <p>
+        หน้าต่างสำหรับแจ้งส่งคืนครุภัณฑ์ โดยระบบบังคับให้ผู้ยืมต้องอัปโหลดรูปถ่ายสภาพอุปกรณ์ขณะส่งคืน เพื่อใช้เป็นหลักฐานให้ผู้ดูแลระบบตรวจสอบสภาพของก่อนกดยืนยันรับคืนเข้าคลัง
+    </p>
+    <div class="img-container">
+        <div class="img-placeholder">
+            <strong>[รูปหน้าต่างแจ้งส่งคืนครุภัณฑ์ (Return Equipment Modal)]</strong>
+            <span>(แสดงช่องอัปโหลดรูปถ่ายสภาพอุปกรณ์ขณะส่งคืน และปุ่มยืนยันส่งคืน)</span>
+        </div>
+        <div class="img-caption">ภาพที่ 4-7 แสดงหน้าต่างแจ้งส่งคืนครุภัณฑ์พร้อมแนบรูปถ่ายหลักฐาน (Return Equipment Modal)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <!-- 4.1.8 หน้าแจ้งซ่อมครุภัณฑ์ชำรุด -->
+    <h4 class="subsection-title">4.1.8 หน้าแจ้งซ่อมครุภัณฑ์ชำรุด (Repair Request Page)</h4>
+    <p>
+        หน้าต่างสำหรับนักเรียน นักศึกษา และอาจารย์ ในการยื่นเรื่องแจ้งซ่อมครุภัณฑ์ที่พบว่าชำรุดเสียหาย โดยสามารถเลือกชื่ออุปกรณ์และกรอกรายละเอียดอาการชำรุดเบื้องต้นเพื่อให้เจ้าหน้าที่ตรวจสอบและดำเนินการซ่อมบำรุง
+    </p>
+    <div class="img-container">
+        <div class="img-placeholder">
+            <strong>[รูปหน้าต่างแจ้งซ่อมครุภัณฑ์ชำรุด (Repair Request Page)]</strong>
+            <span>(แสดงฟอร์มเลือกอุปกรณ์ชำรุด และช่องกรอกรายละเอียดอาการเสียหาย)</span>
+        </div>
+        <div class="img-caption">ภาพที่ 4-8 แสดงหน้าต่างยื่นคำขอแจ้งซ่อมครุภัณฑ์ชำรุด (Repair Request Page)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <!-- 4.1.9 หน้าข้อมูลส่วนตัวและแก้ไขโปรไฟล์ -->
+    <h4 class="subsection-title">4.1.9 หน้าข้อมูลส่วนตัวและแก้ไขโปรไฟล์ (User Profile Page)</h4>
+    <p>
+        หน้าแสดงข้อมูลส่วนตัวของผู้ใช้งาน สถิติจำนวนครั้งที่ยืม ฟอร์มแก้ไขชื่อ-นามสกุล อีเมล เปลี่ยนรหัสผ่าน และฟังก์ชันอัปโหลดรูปภาพโปรไฟล์ประจำตัว
+    </p>
+    <div class="img-container">
+        <div class="img-placeholder">
+            <strong>[รูปหน้าต่างข้อมูลส่วนตัว (User Profile Page)]</strong>
+            <span>(แสดงรูปโปรไฟล์, ข้อมูลชื่อ-นามสกุล, สถิติการยืม และฟอร์มเปลี่ยนรหัสผ่าน)</span>
+        </div>
+        <div class="img-caption">ภาพที่ 4-9 แสดงหน้าต่างข้อมูลส่วนตัวและแก้ไขโปรไฟล์ (User Profile Page)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <!-- 4.1.10 หน้าจอหลักสำหรับผู้ดูแลระบบ -->
+    <h4 class="subsection-title">4.1.10 หน้าจอหลักสำหรับผู้ดูแลระบบ (Admin Dashboard)</h4>
+    <p>
+        หน้าจอหลักสำหรับผู้ดูแลระบบ (Admin) ประกอบด้วยการ์ดสรุปสถิติสต็อกครุภัณฑ์, ตารางรายการคำขอยืมที่รอการพิจารณา (ปุ่มอนุมัติ/ปฏิเสธ), ตารางรายการส่งคืนที่รอตรวจสอบหลักฐานรูปภาพ, ตารางแจ้งซ่อม และตารางจัดการคลังครุภัณฑ์ทั้งหมด
+    </p>
+    <div class="img-container">
+        <img src="https://project01-psi-plum.vercel.app/static/img/prototypes/admin_dashboard_prototype.jpg" alt="หน้าแดชบอร์ดแอดมิน" class="img-frame" onerror="this.outerHTML='<div class=\'img-placeholder\'><i class=\'fas fa-image\'></i> [รูปหน้าแดชบอร์ดผู้ดูแลระบบ (Admin Dashboard)]</div>';">
+        <div class="img-caption">ภาพที่ 4-10 แสดงหน้าต่างแดชบอร์ดจัดการของผู้ดูแลระบบ (Admin Dashboard)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <!-- 4.1.11 หน้าประวัติการยืม-คืนทั้งหมดของผู้ดูแลระบบ -->
+    <h4 class="subsection-title">4.1.11 หน้าประวัติการยืม-คืนทั้งหมดของผู้ดูแลระบบ (Admin Borrow History Page)</h4>
+    <p>
+        หน้าศูนย์รวมประวัติการทำรายการยืม-คืนทั้งหมดในระบบ มีตัวกรองสถานะ (กำลังยืม, รออนุมัติ, รอรับคืน, คืนแล้ว, ปฏิเสธ), ช่องค้นหาอัจฉริยะ, ลิงก์เปิดดูรูปถ่ายหลักฐานส่งคืน และปุ่มกดออกรายงานสรุปข้อมูล (Excel / PDF)
+    </p>
+    <div class="img-container">
+        <div class="img-placeholder">
+            <strong>[รูปหน้าต่างประวัติการยืม-คืนทั้งหมด (Admin Borrow History Page)]</strong>
+            <span>(แสดงตารางประวัติการยืม-คืน, ตัวกรองสถานะ, ช่องค้นหา และปุ่มออกรายงาน)</span>
+        </div>
+        <div class="img-caption">ภาพที่ 4-11 แสดงหน้าต่างประวัติการยืม-คืนทั้งหมดของผู้ดูแลระบบ (Admin Borrow History Page)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <!-- 4.1.12 หน้าตรวจสอบประวัติการแก้ไขข้อมูลระบบ -->
+    <h4 class="subsection-title">4.1.12 หน้าตรวจสอบประวัติการแก้ไขข้อมูลระบบ (Admin Audit Logs Page)</h4>
+    <p>
+        หน้าตรวจสอบบันทึกประวัติการแก้ไขข้อมูล (Audit Logs) บันทึกทุกกิจกรรมของแอดมินเมื่อมีการเพิ่ม/แก้ไข/ลบ ครุภัณฑ์, วัสดุ, อาคาร, ชั้น และห้องปฏิบัติการ เพื่อความโปร่งใสและตรวจสอบย้อนหลังได้ พร้อมปุ่ม Export Excel
+    </p>
+    <div class="img-container">
+        <div class="img-placeholder">
+            <strong>[รูปหน้าต่างประวัติการแก้ไขข้อมูลระบบ (Admin Audit Logs Page)]</strong>
+            <span>(แสดงตารางประวัติ Audit Logs, ตัวกรองหมวดหมู่, ตัวกรองวันที่ และปุ่ม Export Excel)</span>
+        </div>
+        <div class="img-caption">ภาพที่ 4-12 แสดงหน้าต่างตรวจสอบประวัติการแก้ไขข้อมูลระบบ (Admin Audit Logs Page)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <!-- 4.1.13 หน้าจัดการแผนผังอาคาร ชั้น และห้องปฏิบัติการ -->
+    <h4 class="subsection-title">4.1.13 หน้าจัดการแผนผังอาคาร ชั้น และห้องปฏิบัติการ (Admin Locations Page)</h4>
+    <p>
+        หน้าต่างสำหรับผู้ดูแลระบบในการบริหารจัดการแผนผังสถานที่จัดเก็บครุภัณฑ์ สามารถเพิ่ม/แก้ไข/ลบ รายชื่ออาคารเรียน, จัดการชั้นเรียนในแต่ละอาคาร และจัดการห้องปฏิบัติการคอมพิวเตอร์ได้อย่างเป็นหมวดหมู่
+    </p>
+    <div class="img-container">
+        <div class="img-placeholder">
+            <strong>[รูปหน้าต่างจัดการแผนผังสถานที่ (Admin Locations Page)]</strong>
+            <span>(แสดงรายชื่ออาคาร, ชั้นเรียน, ห้องปฏิบัติการ และปุ่มเพิ่ม/แก้ไข/ลบ)</span>
+        </div>
+        <div class="img-caption">ภาพที่ 4-13 แสดงหน้าต่างจัดการแผนผังอาคาร ชั้น และห้องปฏิบัติการ (Admin Locations Page)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <!-- 4.1.14 หน้าพิมพ์รายงานสรุปผลทางการ -->
+    <h4 class="subsection-title">4.1.14 หน้าพิมพ์รายงานสรุปผลทางการ (Official Report Print / PDF Preview)</h4>
+    <p>
+        หน้ารายงานสรุปประวัติการยืม-คืน ครุภัณฑ์ชำรุด และยอดคงคลังในรูปแบบเอกสารทางการ จัดหน้าตามมาตรฐานขนาดกระดาษ A4 พร้อมหัวเอกสารและช่องลงนาม เหมาะสำหรับสั่งพิมพ์หรือบันทึกเป็นไฟล์ PDF
+    </p>
+    <div class="img-container">
+        <div class="img-placeholder">
+            <strong>[รูปหน้ารายงานสรุปผลทางการ (Official Report Print Preview)]</strong>
+            <span>(แสดงตารางรายงานทางการขนาด A4 พร้อมหัวรายงานและช่องลงนามผู้มีอำนาจ)</span>
+        </div>
+        <div class="img-caption">ภาพที่ 4-14 แสดงหน้าพิมพ์รายงานสรุปผลทางการ (Official Report Print / PDF Preview)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <!-- 4.1.15 หน้าสแกน QR Code เข้าสู่ระบบ -->
+    <h4 class="subsection-title">4.1.15 หน้าสแกน QR Code เข้าสู่ระบบ (Mobile QR Login Page)</h4>
+    <p>
+        หน้าต่างเปิดกล้องสแกน QR Code บนสมาร์ตโฟนเพื่อยืนยันการเข้าสู่ระบบบนหน้าจอคอมพิวเตอร์ได้อย่างสะดวกรวดเร็ว โดยไม่ต้องกรอกชื่อผู้ใช้และรหัสผ่านซ้ำ
+    </p>
+    <div class="img-container">
+        <div class="img-placeholder">
+            <strong>[รูปหน้าต่างสแกน QR Code เข้าสู่ระบบ (Mobile QR Login Page)]</strong>
+            <span>(แสดงหน้าต่างเปิดกล้องสแกน QR Code และปุ่มกดยืนยันการเข้าสู่ระบบ)</span>
+        </div>
+        <div class="img-caption">ภาพที่ 4-15 แสดงหน้าต่างสแกน QR Code เข้าสู่ระบบผ่านอุปกรณ์มือถือ (Mobile QR Login Page)</div>
+    </div>
+
+    <div class="spacing-line"></div>
+
+    <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 30px 0;">
+
+    <!-- 4.2 ผลการประเมินความพึงพอใจต่อโครงงานคอมพิวเตอร์ -->
+    <h3 class="section-title">4.2 ผลการประเมินความพึงพอใจต่อโครงงานคอมพิวเตอร์</h3>
+    <p>
+        โครงงานระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์ ผู้จัดทำโครงงานได้ออกแบบการประเมินความพึงพอใจกับการใช้งานของกลุ่มเป้าหมาย (นักเรียน/นักศึกษาสาขาวิชาคอมพิวเตอร์ จำนวน 50 คน) โดยมีครูที่ปรึกษาโครงงานเป็นผู้ตรวจสอบหาประสิทธิภาพของแบบประเมิน ทำให้ครบตามสถิติที่เราใช้ประเมิน ซึ่งได้ผลการวิเคราะห์ข้อมูลความพึงพอใจดังแสดงในตารางที่ 4-1
+    </p>
+
+    <div class="table-caption">ตาราง 4-1 แสดงผลค่าเฉลี่ยเลขคณิตการประเมินความพึงพอใจของโครงงานระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์ (จำนวน 50 คน)</div>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 55%;">รายการการประเมิน</th>
+                <th style="width: 15%;">ค่าเฉลี่ย (x̄)</th>
+                <th style="width: 15%;">S.D.</th>
+                <th style="width: 15%;">ความพึงพอใจ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="background-color: #fafafa; font-weight: bold;">
+                <td colspan="4">1. ด้านความตรงตามความต้องการของระบบ (Functional Requirements)</td>
+            </tr>
+            <tr>
+                <td>1.1 ความสะดวกในการค้นหาและคัดกรองข้อมูลครุภัณฑ์ตามอาคารและห้องจัดเก็บ</td>
+                <td class="text-center">4.52</td>
+                <td class="text-center">0.61</td>
+                <td class="text-center">มากที่สุด</td>
+            </tr>
+            <tr>
+                <td>1.2 ความสะดวกรวดเร็วในการยื่นคำขอยืมครุภัณฑ์และการขอเบิกวัสดุสิ้นเปลือง</td>
+                <td class="text-center">4.56</td>
+                <td class="text-center">0.54</td>
+                <td class="text-center">มากที่สุด</td>
+            </tr>
+            <tr>
+                <td>1.3 ความสะดวกในการแนบรูปถ่ายหลักฐานสภาพอุปกรณ์ขณะส่งคืน</td>
+                <td class="text-center">4.52</td>
+                <td class="text-center">0.58</td>
+                <td class="text-center">มากที่สุด</td>
+            </tr>
+            <tr>
+                <td>1.4 ความสามารถในการตรวจสอบประวัติและติดตามสถานะคำขอยืม-คืนของตนเอง</td>
+                <td class="text-center">4.48</td>
+                <td class="text-center">0.54</td>
+                <td class="text-center">มาก</td>
+            </tr>
+            <tr style="background-color: #fafafa; font-weight: bold;">
+                <td colspan="4">2. ด้านความง่ายต่อการใช้งาน (Usability & User-friendliness)</td>
+            </tr>
+            <tr>
+                <td>2.1 ขั้นตอนการเข้าสู่ระบบและสมัครสมาชิกมีความสะดวกรวดเร็ว</td>
+                <td class="text-center">4.52</td>
+                <td class="text-center">0.61</td>
+                <td class="text-center">มากที่สุด</td>
+            </tr>
+            <tr>
+                <td>2.2 รูปแบบเมนูและฟังก์ชันการใช้งานเข้าใจง่าย ไม่ซับซ้อน</td>
+                <td class="text-center">4.60</td>
+                <td class="text-center">0.53</td>
+                <td class="text-center">มากที่สุด</td>
+            </tr>
+            <tr>
+                <td>2.3 การแจ้งเตือนสถานะผ่านทางอีเมลมีความชัดเจนและเป็นประโยชน์</td>
+                <td class="text-center">4.52</td>
+                <td class="text-center">0.58</td>
+                <td class="text-center">มากที่สุด</td>
+            </tr>
+            <tr style="background-color: #fafafa; font-weight: bold;">
+                <td colspan="4">3. ด้านการออกแบบส่วนติดต่อผู้ใช้ (User Interface Design)</td>
+            </tr>
+            <tr>
+                <td>3.1 ความสวยงาม ทันสมัย และความสบายตาของหน้าเว็บ</td>
+                <td class="text-center">4.46</td>
+                <td class="text-center">0.61</td>
+                <td class="text-center">มาก</td>
+            </tr>
+            <tr>
+                <td>3.2 ความชัดเจนของรูปภาพ รหัสครุภัณฑ์ และสถานะคงเหลือของอุปกรณ์</td>
+                <td class="text-center">4.58</td>
+                <td class="text-center">0.57</td>
+                <td class="text-center">มากที่สุด</td>
+            </tr>
+            <tr>
+                <td>3.3 การรองรับการแสดงผลทั้งบนคอมพิวเตอร์ แท็บเล็ต และสมาร์ตโฟน (Responsive)</td>
+                <td class="text-center">4.58</td>
+                <td class="text-center">0.64</td>
+                <td class="text-center">มากที่สุด</td>
+            </tr>
+            <tr style="background-color: #fafafa; font-weight: bold;">
+                <td colspan="4">4. ด้านประสิทธิภาพและความเร็วของระบบ (System Performance)</td>
+            </tr>
+            <tr>
+                <td>4.1 ความรวดเร็วในการโหลดหน้าเว็บและการค้นหาอุปกรณ์</td>
+                <td class="text-center">4.62</td>
+                <td class="text-center">0.57</td>
+                <td class="text-center">มากที่สุด</td>
+            </tr>
+            <tr>
+                <td>4.2 ความเสถียรในการประมวลผลและการทำงานโดยรวมของระบบ</td>
+                <td class="text-center">4.58</td>
+                <td class="text-center">0.57</td>
+                <td class="text-center">มากที่สุด</td>
+            </tr>
+            <tr style="background-color: #e5e7eb; font-weight: bold;">
+                <td class="text-center">รวม</td>
+                <td class="text-center">4.54</td>
+                <td class="text-center">0.58</td>
+                <td class="text-center">มากที่สุด</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="spacing-line"></div>
+
+    <p class="summary-text">
+        <strong>จากตาราง 4-1 พบว่า</strong> ผลการประเมินความพึงพอใจของกลุ่มเป้าหมาย (นักเรียน/นักศึกษาสาขาวิชาคอมพิวเตอร์ จำนวน 50 คน) ที่มีต่อโครงงานระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์ ในภาพรวมมีความพึงพอใจอยู่ในระดับ <strong>"มากที่สุด" (x̄ = 4.54, S.D. = 0.58)</strong> เมื่อพิจารณาเป็นรายข้อ พบว่า รายการที่ผู้ใช้มีความพึงพอใจสูงที่สุด คือ ความรวดเร็วในการโหลดหน้าเว็บและการค้นหาอุปกรณ์ (x̄ = 4.62, S.D. = 0.57) อยู่ในระดับมากที่สุด รองลงมาได้แก่ รูปแบบเมนูและฟังก์ชันการใช้งานเข้าใจง่าย ไม่ซับซ้อน (x̄ = 4.60, S.D. = 0.53), ความชัดเจนของรูปภาพ รหัสครุภัณฑ์ และสถานะคงเหลือ (x̄ = 4.58, S.D. = 0.57), การรองรับการแสดงผลทั้งบนคอมพิวเตอร์ แท็บเล็ต และสมาร์ตโฟน (x̄ = 4.58, S.D. = 0.64) และความสะดวกรวดเร็วในการยื่นคำขอยืมครุภัณฑ์ (x̄ = 4.56, S.D. = 0.54) ตามลำดับ แสดงให้เห็นว่าระบบที่พัฒนาขึ้นสามารถอำนวยความสะดวกและตอบสนองต่อการใช้งานจริงได้อย่างมีประสิทธิภาพสูง
+    </p>
+
+</body>
+</html>

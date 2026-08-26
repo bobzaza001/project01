@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block title %}สมัครสมาชิก — ระบบยืม-คืนครุภัณฑ์{% endblock %}
 {% block content %}
-<div class="auth-wrapper">
-    <div class="auth-card">
+<div class="auth-wrapper fade-in">
+    <div class="auth-card" style="max-width: 480px; width: 100%;">
         <div class="auth-header">
             <div class="auth-logo-wrapper">
                 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="ATCC Logo" class="auth-logo-img">
@@ -11,19 +11,54 @@
             <p>สร้างบัญชีใหม่เพื่อเข้าใช้งานระบบ</p>
         </div>
 
+        <!-- แท็บเลือกประเภทผู้ใช้งาน -->
+        <div style="display: flex; gap: 8px; margin-bottom: 1.5rem; background: var(--bg-surface); padding: 4px; border-radius: 12px; border: 1px solid var(--glass-border);">
+            <button type="button" id="tabStudent" onclick="switchRole('student')" style="flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; background: var(--gradient-btn); color: white;">
+                <i class="fas fa-user-graduate"></i> นักศึกษา
+            </button>
+            <button type="button" id="tabTeacher" onclick="switchRole('teacher')" style="flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; background: transparent; color: var(--text-secondary);">
+                <i class="fas fa-chalkboard-teacher"></i> อาจารย์ / บุคลากร
+            </button>
+        </div>
+
         <form method="POST" action="{{ url_for('auth.register') }}" id="registerForm" class="auth-form">
-            <div class="form-group">
-                <label for="full_name">
-                    <i class="fas fa-id-card"></i> ชื่อ-นามสกุล (ภาษาไทย)
-                </label>
-                <input type="text" id="full_name" name="full_name" placeholder="กรอกชื่อ-นามสกุล ภาษาไทย" required>
+            <input type="hidden" name="account_type" id="account_type" value="student">
+
+            <!-- ฟิลด์สำหรับนักศึกษา -->
+            <div id="studentFields">
+                <div class="form-group">
+                    <label for="student_id">
+                        <i class="fas fa-id-badge"></i> รหัสนักศึกษา (11 หลัก)
+                    </label>
+                    <input type="text" id="student_id" name="student_id" placeholder="เช่น 68302040047" pattern="[0-9]{8,15}" required>
+                    <small style="color: var(--text-muted); font-size: 0.82rem; margin-top: 4px; display: block;">
+                        * ใช้รหัสนักศึกษาเป็นชื่อผู้ใช้เข้าสู่ระบบ (สามารถไปตั้งชื่อ-นามสกุลจริงได้ในหน้าโปรไฟล์)
+                    </small>
+                </div>
+            </div>
+
+            <!-- ฟิลด์สำหรับอาจารย์ / บุคลากร (ซ่อนเริ่มต้น) -->
+            <div id="teacherFields" style="display: none;">
+                <div class="form-group">
+                    <label for="teacher_name">
+                        <i class="fas fa-id-card"></i> ชื่อ-นามสกุล (ภาษาไทย)
+                    </label>
+                    <input type="text" id="teacher_name" name="teacher_name" placeholder="เช่น อ.สมศักดิ์ รักษ์ดี">
+                </div>
+
+                <div class="form-group">
+                    <label for="teacher_username">
+                        <i class="fas fa-user"></i> ชื่อผู้ใช้ (Username)
+                    </label>
+                    <input type="text" id="teacher_username" name="teacher_username" placeholder="เช่น somsaks">
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="email">
-                    <i class="fas fa-envelope"></i> อีเมล
+                    <i class="fas fa-envelope"></i> อีเมลสถาบัน (.ac.th)
                 </label>
-                <input type="email" id="email" name="email" placeholder="example@email.com" required>
+                <input type="email" id="email" name="email" placeholder="example@atcc.ac.th" required>
             </div>
 
             <div class="form-group">
@@ -63,4 +98,45 @@
         </div>
     </div>
 </div>
+
+<script>
+function switchRole(role) {
+    const accType = document.getElementById('account_type');
+    const tabStudent = document.getElementById('tabStudent');
+    const tabTeacher = document.getElementById('tabTeacher');
+    const studentFields = document.getElementById('studentFields');
+    const teacherFields = document.getElementById('teacherFields');
+    const studentId = document.getElementById('student_id');
+    const teacherName = document.getElementById('teacher_name');
+    const teacherUsername = document.getElementById('teacher_username');
+
+    if (role === 'student') {
+        accType.value = 'student';
+        tabStudent.style.background = 'var(--gradient-btn)';
+        tabStudent.style.color = 'white';
+        tabTeacher.style.background = 'transparent';
+        tabTeacher.style.color = 'var(--text-secondary)';
+        
+        studentFields.style.display = 'block';
+        teacherFields.style.display = 'none';
+        
+        studentId.required = true;
+        teacherName.required = false;
+        teacherUsername.required = false;
+    } else {
+        accType.value = 'teacher';
+        tabTeacher.style.background = 'var(--gradient-btn)';
+        tabTeacher.style.color = 'white';
+        tabStudent.style.background = 'transparent';
+        tabStudent.style.color = 'var(--text-secondary)';
+        
+        studentFields.style.display = 'none';
+        teacherFields.style.display = 'block';
+        
+        studentId.required = false;
+        teacherName.required = true;
+        teacherUsername.required = true;
+    }
+}
+</script>
 {% endblock %}
