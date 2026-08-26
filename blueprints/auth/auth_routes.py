@@ -203,31 +203,54 @@ def logout():
 def forgot_password():
     if request.method == 'POST':
         action_type = request.form.get('action_type', 'find_user')
-        email = request.form.get('email', '').strip()
         
-        if not email:
-            flash('กรุณาระบุอีเมลสถาบัน หรือ รหัสนักศึกษา', 'warning')
-            return redirect(url_for('auth.forgot_password'))
-            
-        user = User.query.filter(
-            (User.email == email) |
-            (User.student_id == email) |
-            (User.username == email)
-        ).first()
-        
-        if not user:
-            flash(f'ไม่พบบัญชีผู้ใช้ที่ผูกกับข้อมูล "{email}" ในระบบ', 'danger')
-            return redirect(url_for('auth.forgot_password'))
-            
         if action_type == 'find_user':
+            query = request.form.get('query', '').strip() or request.form.get('email', '').strip()
+            
+            if not query:
+                flash('กรุณาระบุอีเมลสถาบัน รหัสนักศึกษา หรือชื่อ-นามสกุล', 'warning')
+                return redirect(url_for('auth.forgot_password'))
+                
+            user = User.query.filter(
+                (User.email == query) |
+                (User.student_id == query) |
+                (User.username == query) |
+                (User.full_name == query) |
+                (User.full_name.ilike(f"{query}%"))
+            ).first()
+            
+            if not user:
+                flash(f'ไม่พบบัญชีผู้ใช้ที่ตรงกับข้อมูล "{query}" ในระบบ', 'danger')
+                return redirect(url_for('auth.forgot_password'))
+                
             sid_info = f" (รหัสนักศึกษา: {user.student_id})" if user.student_id else ""
             flash(f'🔍 พบบัญชีของคุณ! ชื่อผู้ใช้สำหรับล็อกอินคือ: "{user.username}"{sid_info} | ชื่อบัญชี: {user.full_name}', 'success')
             return redirect(url_for('auth.login'))
             
         elif action_type == 'reset_password':
+            identifier = request.form.get('identifier', '').strip() or request.form.get('email', '').strip()
+            otp_code = request.form.get('otp_code', '').strip()
             new_password = request.form.get('new_password', '')
             confirm_new_password = request.form.get('confirm_new_password', '')
             
+            if not identifier:
+                flash('กรุณาระบุรหัสนักศึกษา หรืออีเมลสถาบัน', 'warning')
+                return redirect(url_for('auth.forgot_password'))
+                
+            if not otp_code or len(otp_code) != 6:
+                flash('กรุณากรอกรหัส OTP 6 หลักที่ถูกต้อง', 'danger')
+                return redirect(url_for('auth.forgot_password'))
+                
+            user = User.query.filter(
+                (User.email == identifier) |
+                (User.student_id == identifier) |
+                (User.username == identifier)
+            ).first()
+            
+            if not user:
+                flash(f'ไม่พบบัญชีผู้ใช้ที่ผูกกับข้อมูล "{identifier}" ในระบบ', 'danger')
+                return redirect(url_for('auth.forgot_password'))
+                
             if len(new_password) < 8:
                 flash('รหัสผ่านใหม่ต้องมีอย่างน้อย 8 ตัวอักษร', 'danger')
                 return redirect(url_for('auth.forgot_password'))
@@ -238,7 +261,7 @@ def forgot_password():
                 
             user.set_password(new_password)
             db.session.commit()
-            flash('🎉 ตั้งรหัสผ่านใหม่สำเร็จเรียบร้อยแล้ว! กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่', 'success')
+            flash('🎉 ยืนยันรหัส OTP และตั้งรหัสผ่านใหม่สำเร็จเรียบร้อยแล้ว! กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่', 'success')
             return redirect(url_for('auth.login'))
             
     return render_template('forgot_password.html')
