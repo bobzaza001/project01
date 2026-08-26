@@ -45,6 +45,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     role = db.Column(db.String(10), nullable=False, default='user')
     profile_image = db.Column(db.Text, default='')
+    student_id = db.Column(db.String(20), unique=True, nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=get_local_now)
     
     borrow_requests = db.relationship('BorrowRequest', backref='requester', lazy='dynamic')

@@ -44,6 +44,7 @@ def login():
         
         user = User.query.filter(
             (User.username == username) |
+            (User.student_id == username) |
             (User.email == username) |
             (User.full_name == username) |
             (User.full_name.ilike(f"{username}%"))
@@ -102,7 +103,8 @@ def auth_callback():
             username = f"{original_username}{suffix}"
             suffix += 1
             
-        user = User(username=username, email=email, full_name=full_name, role='user')
+        student_id = username if (username.isdigit() and len(username) >= 8) else None
+        user = User(username=username, student_id=student_id, email=email, full_name=full_name, role='user')
         import secrets
         user.set_password(secrets.token_urlsafe(16))
         db.session.add(user)
@@ -131,12 +133,18 @@ def register():
         confirm_password = request.form.get('confirm_password', '')
         
         errors = []
+        student_id_val = None
+        
         if account_type == 'student':
             student_id = request.form.get('student_id', '').strip()
-            if not student_id:
-                errors.append('กรุณากรอกรหัสนักศึกษา')
+            if not student_id or len(student_id) != 11 or not student_id.isdigit():
+                errors.append('กรุณากรอกรหัสนักศึกษาเป็นตัวเลข 11 หลักให้ถูกต้อง (เช่น 68302040047)')
+            student_id_val = student_id
             username = student_id
             full_name = f"นักศึกษา ({student_id})"
+            
+            if User.query.filter((User.student_id == student_id) | (User.username == student_id)).first():
+                errors.append(f'รหัสนักศึกษา "{student_id}" มีอยู่ในระบบแล้ว')
         else:
             teacher_name = request.form.get('teacher_name', '').strip()
             teacher_username = request.form.get('teacher_username', '').strip()
@@ -144,6 +152,10 @@ def register():
                 errors.append('กรุณากรอกชื่อ-นามสกุลและชื่อผู้ใช้งานของอาจารย์')
             username = teacher_username
             full_name = teacher_name
+            student_id_val = None
+            
+            if User.query.filter_by(username=username).first():
+                errors.append(f'ชื่อผู้ใช้ "{username}" มีอยู่ในระบบแล้ว')
         
         if not email or not password:
             errors.append('กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน')
@@ -155,15 +167,19 @@ def register():
             errors.append('รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน')
         if User.query.filter_by(email=email).first():
             errors.append('อีเมลนี้ถูกใช้งานในระบบแล้ว')
-        if User.query.filter_by(username=username).first():
-            errors.append(f'ชื่อผู้ใช้ / รหัสนักศึกษา "{username}" มีอยู่ในระบบแล้ว')
         
         if errors:
             for error in errors:
                 flash(error, 'danger')
             return redirect(url_for('auth.register'))
         
-        new_user = User(username=username, email=email, full_name=full_name, role='user')
+        new_user = User(
+            username=username,
+            student_id=student_id_val,
+            email=email,
+            full_name=full_name,
+            role='user'
+        )
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
@@ -190,17 +206,22 @@ def forgot_password():
         email = request.form.get('email', '').strip()
         
         if not email:
-            flash('กรุณาระบุอีเมลสถาบัน', 'warning')
+            flash('กรุณาระบุอีเมลสถาบัน หรือ รหัสนักศึกษา', 'warning')
             return redirect(url_for('auth.forgot_password'))
             
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter(
+            (User.email == email) |
+            (User.student_id == email) |
+            (User.username == email)
+        ).first()
         
         if not user:
-            flash(f'ไม่พบบัญชีผู้ใช้ที่ผูกกับอีเมล "{email}" ในระบบ', 'danger')
+            flash(f'ไม่พบบัญชีผู้ใช้ที่ผูกกับข้อมูล "{email}" ในระบบ', 'danger')
             return redirect(url_for('auth.forgot_password'))
             
         if action_type == 'find_user':
-            flash(f'🔍 พบบัญชีของคุณ! ชื่อผู้ใช้ (Username/รหัสนักศึกษา) คือ: "{user.username}" (ชื่อบัญชี: {user.full_name})', 'success')
+            sid_info = f" (รหัสนักศึกษา: {user.student_id})" if user.student_id else ""
+            flash(f'🔍 พบบัญชีของคุณ! ชื่อผู้ใช้สำหรับล็อกอินคือ: "{user.username}"{sid_info} | ชื่อบัญชี: {user.full_name}', 'success')
             return redirect(url_for('auth.login'))
             
         elif action_type == 'reset_password':
