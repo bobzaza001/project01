@@ -43,7 +43,10 @@ def login():
         remember = request.form.get('remember', False)
         
         user = User.query.filter(
-            (User.username == username) | (User.full_name == username) | (User.email == username)
+            (User.username == username) |
+            (User.email == username) |
+            (User.full_name == username) |
+            (User.full_name.ilike(f"{username}%"))
         ).first()
         
         if user is None or not user.check_password(password):
