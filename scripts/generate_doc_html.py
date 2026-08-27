@@ -256,6 +256,14 @@ HTML_CONTENT = """<!DOCTYPE html>
             </tr>
             <tr>
                 <td class="text-center">7</td>
+                <td><strong>student_id</strong></td>
+                <td class="text-center">VARCHAR</td>
+                <td class="text-center">20</td>
+                <td>รหัสนักศึกษา 11 หลัก (เฉพาะกลุ่มผู้ใช้นักศึกษา)</td>
+                <td class="text-center"><span class="badge-unique">Index</span></td>
+            </tr>
+            <tr>
+                <td class="text-center">8</td>
                 <td><strong>profile_image</strong></td>
                 <td class="text-center">TEXT</td>
                 <td class="text-center">-</td>
@@ -263,7 +271,7 @@ HTML_CONTENT = """<!DOCTYPE html>
                 <td class="text-center">-</td>
             </tr>
             <tr>
-                <td class="text-center">8</td>
+                <td class="text-center">9</td>
                 <td><strong>created_at</strong></td>
                 <td class="text-center">DATETIME</td>
                 <td class="text-center">-</td>
