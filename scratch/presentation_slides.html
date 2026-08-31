@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สไลด์นำเสนอโครงงาน — ระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --primary: #38bdf8;
+            --primary-gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            --secondary-gradient: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            --emerald-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --amber-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+        }
+
+        /* Slide Container */
+        .presentation-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            height: 85vh;
+            max-height: 720px;
+            background: var(--bg-card);
+            backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 3rem 3.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            animation: fadeIn 0.4s ease-out;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Slide Header */
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .slide-title-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .slide-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .slide-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-badge {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--primary);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Slide Content Area */
+        .slide-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            align-items: stretch;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .card:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .card-body {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .card-body ul {
+            padding-left: 1.2rem;
+        }
+
+        .card-body li {
+            margin-bottom: 6px;
+        }
+
+        /* Code / Tech Badges */
+        .tech-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.88rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--glass-border);
+            color: #e2e8f0;
+        }
+
+        .tech-pill.python { color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); }
+        .tech-pill.flask { color: #ffffff; border-color: rgba(255, 255, 255, 0.4); }
+        .tech-pill.db { color: #34d399; border-color: rgba(52, 211, 153, 0.4); }
+        .tech-pill.js { color: #facc15; border-color: rgba(250, 204, 21, 0.4); }
+        .tech-pill.cloud { color: #c084fc; border-color: rgba(192, 132, 252, 0.4); }
+
+        /* Tables */
+        .slide-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.92rem;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .slide-table th, .slide-table td {
+            padding: 10px 14px;
+            border: 1px solid var(--glass-border);
+            text-align: left;
+        }
+
+        .slide-table th {
+            background: rgba(30, 41, 59, 0.9);
+            color: var(--primary);
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .slide-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .text-center { text-align: center !important; }
+
+        /* Highlight Metric Cards */
+        .metric-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 1.5rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2.4rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            height: 70px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 3rem;
+        }
+
+        .nav-info {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-nav {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-family: 'Prompt', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-nav:hover:not(:disabled) {
+            background: var(--primary-gradient);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-nav:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+            transition: width 0.3s ease;
+            z-index: 100;
+        }
+
+        /* Title Slide Special */
+        .title-slide-content {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 1.5rem;
+        }
+
+        .title-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--primary);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+        }
+
+        .main-project-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 20%, #38bdf8 60%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.3;
+            max-width: 900px;
+        }
+
+        .project-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .author-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1rem 2.5rem;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Progress Indicator -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Presentation Slide Container -->
+    <div class="presentation-container">
+
+        <!-- ================= SLIDE 1: หน้าปก ================= -->
+        <div class="slide active" id="slide-1">
+            <div class="title-slide-content">
+                <div class="title-logo">
+                    <i class="fas fa-cubes-stacked"></i>
+                </div>
+                <div class="slide-badge"><i class="fas fa-graduation-cap"></i> นำเสนอโครงงานระดับประกาศนียบัตรวิชาชีพ (ปวช.) สาขาวิชาคอมพิวเตอร์</div>
+                <h1 class="main-project-title">ระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์</h1>
+                <p class="project-subtitle">Computer Lab Equipment & Material Borrow-Return Management System</p>
+                <div class="author-box">
+                    <div style="font-weight: 600; color: var(--primary); margin-bottom: 4px;">วิทยาลัยเทคโนโลยีพณิชยการอยุธยา (ATCC)</div>
+                    <div style="color: var(--text-muted); font-size: 0.9rem;">ระบบเว็บแอปพลิเคชันจัดการยืม-คืนครุภัณฑ์และวัสดุอุปกรณ์แบบเรียลไทม์</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 2: ปัญหาและที่มา ================= -->
+        <div class="slide" id="slide-2">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <div class="slide-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <h2 class="slide-title">ที่มาและความสำคัญของปัญหา</h2>
+                </div>
+                <div class="slide-badge">Problem Statement</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card" style="border-left: 4px solid #ef4444;">
+                        <div class="card-header"><i class="fas fa-book" style="color: #ef4444;"></i> ระบบเดิมเป็นสมุดจด</div>
+                        <div class="card-body">
+                            การบันทึกการยืม-คืนด้วยสมุดกระดาษ ทำให้เกิดความล่าช้า ข้อมูลตกหล่น สูญหายได้ง่าย และไม่สามารถตรวจสอบสต็อกคงเหลือได้แบบทันที
+                        </div>
+                    </div>
+                    <div class="card" style="border-left: 4px solid #f59e0b;">
+                        <div class="card-header"><i class="fas fa-clock" style="color: #f59e0b;"></i> ขาดระบบติดตามสถานะ</div>
+                        <div class="card-body">
+                            นักเรียนและอาจารย์ไม่ทราบว่าอุปกรณ์ชิ้นใดว่างให้ยืมจริง ต้องเดินมาสอบถามที่ห้องปฏิบัติการ และเกิดปัญหาการส่งคืนเกินกำหนดบ่อยครั้ง
+                        </div>
+                    </div>
+                    <div class="card" style="border-left: 4px solid #8b5cf6;">
+                        <div class="card-header"><i class="fas fa-camera-retro" style="color: #8b5cf6;"></i> ไม่มีหลักฐานสภาพของ</div>
+                        <div class="card-body">
+                            เมื่ออุปกรณ์ชำรุดเสียหาย ไม่สามารถระบุได้ชัดเจนว่าเกิดในระหว่างการใช้งานของผู้ใด เนื่องจากไม่มีระบบแนบรูปถ่ายหลักฐานขณะส่งคืน
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 3: วัตถุประสงค์ ================= -->
+        <div class="slide" id="slide-3">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <div class="slide-icon"><i class="fas fa-bullseye"></i></div>
+                    <h2 class="slide-title">วัตถุประสงค์ของโครงงาน</h2>
+                </div>
+                <div class="slide-badge">Project Objectives</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-laptop-code"></i> 1. เพื่อพัฒนาเว็บแอปพลิเคชัน</div>
+                        <div class="card-body">
+                            พัฒนา <strong>ระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์</strong> เพื่ออำนวยความสะดวกในการยืม-คืนครุภัณฑ์ และการขอเบิกวัสดุสิ้นเปลืองผ่านเครือข่ายออนไลน์แบบ 24 ชั่วโมง
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-shield-halved"></i> 2. เพื่อเพิ่มประสิทธิภาพและลดความผิดพลาด</div>
+                        <div class="card-body">
+                            มีระบบตัดสต็อกอัตโนมัติ การตรวจสอบสิทธิ์ตามบทบาท (Admin, Teacher, Student) และการแจ้งเตือนสถานะคำขอผ่านทางอีเมล
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-images"></i> 3. เพื่อสร้างความโปร่งใสในการส่งคืน</div>
+                        <div class="card-body">
+                            มีระบบบังคับแนบรูปถ่ายหลักฐานสภาพอุปกรณ์ขณะส่งคืน เพื่อให้ผู้ดูแลระบบตรวจสอบสภาพของก่อนกดยืนยันรับคืนเข้าคลัง
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-chart-line"></i> 4. เพื่อประเมินความพึงพอใจ</div>
+                        <div class="card-body">
+                            เพื่อประเมินความพึงพอใจในการใช้งานระบบของกลุ่มตัวอย่างนักเรียน/นักศึกษาสาขาวิชาคอมพิวเตอร์ จำนวน 50 คน
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 4: ภาษาและเทคโนโลยีที่ใช้ ================= -->
+        <div class="slide" id="slide-4">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <div class="slide-icon"><i class="fas fa-code"></i></div>
+                    <h2 class="slide-title">ภาษาและเทคโนโลยีที่ใช้ในการพัฒนา</h2>
+                </div>
+                <div class="slide-badge">Tech Stack & Architecture</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <!-- ฝั่ง Back-End -->
+                    <div class="card">
+                        <div class="card-header"><i class="fab fa-python" style="color: #38bdf8;"></i> ฝั่ง Back-End & Logic</div>
+                        <div class="card-body">
+                            <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+                                <li><span class="tech-pill python"><i class="fab fa-python"></i> Python 3.11</span> — ภาษาหลักในการประมวลผลระบบ</li>
+                                <li><span class="tech-pill flask"><i class="fas fa-server"></i> Flask Framework</span> — สถาปัตยกรรม Modular Blueprints</li>
+                                <li><span class="tech-pill python"><i class="fas fa-user-lock"></i> Flask-Login</span> — ระบบ Session & Role-Based Auth</li>
+                                <li><span class="tech-pill python"><i class="fas fa-envelope"></i> Flask-Mail (SMTP)</span> — ระบบส่งอีเมลแจ้งเตือนอัตโนมัติ</li>
+                                <li><span class="tech-pill python"><i class="fas fa-file-excel"></i> OpenPyXL / ReportLab</span> — ส่งออกรายงาน Excel & PDF</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- ฝั่ง Front-End & Database -->
+                    <div class="card">
+                        <div class="card-header"><i class="fab fa-js" style="color: #facc15;"></i> ฝั่ง Front-End & ฐานข้อมูล</div>
+                        <div class="card-body">
+                            <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px;">
+                                <li><span class="tech-pill js"><i class="fab fa-html5"></i> HTML5 & Jinja2</span> — โครงสร้างเว็บและเทมเพลตฝั่งเซิร์ฟเวอร์</li>
+                                <li><span class="tech-pill js"><i class="fab fa-css3-alt"></i> Modern CSS3</span> — Glassmorphism Theme (Dark/Light)</li>
+                                <li><span class="tech-pill js"><i class="fab fa-js-square"></i> Vanilla JavaScript</span> — Debounce Search, Modal, PWA</li>
+                                <li><span class="tech-pill db"><i class="fas fa-database"></i> PostgreSQL / SQLite</span> — ฐานข้อมูลเชิงสัมพันธ์ Relational DB</li>
+                                <li><span class="tech-pill cloud"><i class="fas fa-cloud"></i> Vercel & Neon Cloud</span> — Cloud Serverless Hosting</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 5: โครงสร้างฐานข้อมูล ================= -->
+        <div class="slide" id="slide-5">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <div class="slide-icon"><i class="fas fa-database"></i></div>
+                    <h2 class="slide-title">โครงสร้างฐานข้อมูล (Database Schema)</h2>
+                </div>
+                <div class="slide-badge">PostgreSQL / SQLAlchemy ORM</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-users"></i> ตารางผู้ใช้งาน & สถานที่</div>
+                        <div class="card-body">
+                            • <strong>users:</strong> เก็บ id, student_id (11 หลัก), username, password_hash, full_name, email, role<br>
+                            • <strong>buildings:</strong> อาคารเรียน (id, name)<br>
+                            • <strong>floors / rooms:</strong> ชั้นเรียน และห้องปฏิบัติการ
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-boxes-stacked"></i> ตารางครุภัณฑ์ & วัสดุ</div>
+                        <div class="card-body">
+                            • <strong>equipments:</strong> id, equipment_code, name, category, item_type (durable/consumable), quantity, available_quantity, status, image_url, room_id
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-clipboard-list"></i> ตารางคำขอ & การซ่อม</div>
+                        <div class="card-body">
+                            • <strong>borrow_requests:</strong> คำขอยืม-คืน, วันเวลารับของ, กำหนดส่งคืน, return_image (Base64), สถานะ<br>
+                            • <strong>repair_requests:</strong> คำขอแจ้งซ่อมอุปกรณ์ชำรุด
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 6: การเข้าสู่ระบบ & กู้คืนบัญชี ================= -->
+        <div class="slide" id="slide-6">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <div class="slide-icon"><i class="fas fa-id-card"></i></div>
+                    <h2 class="slide-title">ระบบเข้าสู่ระบบและการกู้คืนบัญชี</h2>
+                </div>
+                <div class="slide-badge">Authentication & Recovery</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-user-graduate"></i> 1. สมัครด้วยรหัสนักศึกษา</div>
+                        <div class="card-body">
+                            • นักศึกษากรอก <strong>รหัสนักศึกษา 11 หลัก</strong> และอีเมลสถาบัน (@atcc.ac.th)<br>
+                            • ระบบนำรหัสนักศึกษาไปเป็น Username สำหรับเข้าสู่ระบบทันที<br>
+                            • อาจารย์สมัครด้วยชื่อ-นามสกุลจริง
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-right-to-bracket"></i> 2. ล็อกอินอัจฉริยะ</div>
+                        <div class="card-body">
+                            • เข้าสู่ระบบได้ด้วย <strong>รหัสนักศึกษา</strong>, ชื่อ-นามสกุลจริง, หรืออีเมลสถาบัน<br>
+                            • รองรับการสแกน <strong>QR Code เข้าสู่ระบบ</strong> ผ่านสมาร์ตโฟน<br>
+                            • มีระบบจำลองบัญชีเพื่อทดสอบระบบได้ทันที
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-key"></i> 3. ศูนย์กู้คืนบัญชี (OTP)</div>
+                        <div class="card-body">
+                            • <strong>ค้นหาชื่อผู้ใช้ (Find User):</strong> กรอกอีเมลเพื่อดู Username/รหัสนักศึกษา<br>
+                            • <strong>รีเซ็ตรหัสผ่านใหม่ (OTP):</strong> ยืนยันรหัส OTP 6 หลักแล้วตั้งรหัสผ่านใหม่ได้ทันที
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 7: คลังอุปกรณ์และการค้นหา ================= -->
+        <div class="slide" id="slide-7">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <div class="slide-icon"><i class="fas fa-boxes"></i></div>
+                    <h2 class="slide-title">คลังอุปกรณ์และการค้นหาอัจฉริยะ</h2>
+                </div>
+                <div class="slide-badge">Equipment Catalog & Filtering</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-filter"></i> ระบบตัวกรอง 4 มิติ</div>
+                        <div class="card-body">
+                            • <strong>ประเภทอุปกรณ์:</strong> ครุภัณฑ์ (ยืม-คืน) หรือ วัสดุสิ้นเปลือง (ขอเบิก)<br>
+                            • <strong>สถานที่จัดเก็บ:</strong> กรองแยกตาม อาคารเรียน, ชั้น, และห้องปฏิบัติการ<br>
+                            • <strong>หมวดหมู่:</strong> ไอทีและคอมพิวเตอร์, เฟอร์นิเจอร์, เครื่องใช้ไฟฟ้า, โสตทัศนูปกรณ์<br>
+                            • <strong>สิทธิ์การยืม:</strong> พกพา/ยืมกลับได้ หรือ ประจำห้อง
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-bolt"></i> ค้นหาแบบเรียลไทม์ (Debounce)</div>
+                        <div class="card-body">
+                            • ค้นหาด้วยชื่ออุปกรณ์, รหัสครุภัณฑ์ หรือยี่ห้อ ได้ทันทีขณะพิมพ์<br>
+                            • ใช้เทคโนโลยี <strong>JavaScript Debouncing</strong> ทำให้การแสดงผลลื่นไหล ไม่หน่วงหน้าจอ<br>
+                            • แสดงป้ายสถานะสต็อกคงเหลือชัดเจน (พร้อมให้ยืม / ถูกยืมหมด / อยู่ระหว่างซ่อม)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 8: กระบวนการยืม-คืน ================= -->
+        <div class="slide" id="slide-8">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <div class="slide-icon"><i class="fas fa-arrows-rotate"></i></div>
+                    <h2 class="slide-title">ขั้นตอนการยืม-คืน และการเบิกวัสดุ</h2>
+                </div>
+                <div class="slide-badge">Borrow-Return Workflow</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-4">
+                    <div class="card text-center">
+                        <div style="font-size: 2rem; color: #38bdf8; margin-bottom: 8px;"><i class="fas fa-hand-pointer"></i></div>
+                        <div style="font-weight: 700;">1. ยื่นคำขอ</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">เลือกวันเวลารับของ และระบุจำนวนวันยืม 1-30 วัน</div>
+                    </div>
+                    <div class="card text-center">
+                        <div style="font-size: 2rem; color: #f59e0b; margin-bottom: 8px;"><i class="fas fa-user-check"></i></div>
+                        <div style="font-weight: 700;">2. แอดมินอนุมัติ</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">ตัดสต็อกคงเหลืออัตโนมัติ และส่งอีเมลแจ้งผู้ยืม</div>
+                    </div>
+                    <div class="card text-center">
+                        <div style="font-size: 2rem; color: #ec4899; margin-bottom: 8px;"><i class="fas fa-camera"></i></div>
+                        <div style="font-weight: 700;">3. ส่งคืนแนบรูป</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">ผู้ยืมกดส่งคืนพร้อมอัปโหลดรูปถ่ายสภาพอุปกรณ์</div>
+                    </div>
+                    <div class="card text-center">
+                        <div style="font-size: 2rem; color: #10b981; margin-bottom: 8px;"><i class="fas fa-box-open"></i></div>
+                        <div style="font-weight: 700;">4. ยืนยันรับคืน</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">แอดมินตรวจรูปภาพแล้วกดยืนยัน คืนสต็อกเข้าคลัง</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 9: การบริหารจัดการของผู้ดูแลระบบ ================= -->
+        <div class="slide" id="slide-9">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <div class="slide-icon"><i class="fas fa-gauge-high"></i></div>
+                    <h2 class="slide-title">แดชบอร์ดและการจัดการของผู้ดูแลระบบ</h2>
+                </div>
+                <div class="slide-badge">Admin Management Hub</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-chart-pie"></i> แดชบอร์ดสรุปสถิติ & อนุมัติ</div>
+                        <div class="card-body">
+                            • สรุปยอดครุภัณฑ์ทั้งหมด, ยอดที่กำลังถูกยืม, ยอดรออนุมัติ, ยอดชำรุด<br>
+                            • ตารางจัดการคำขอยืม (ปุ่มอนุมัติ / ปฏิเสธพร้อมระบุเหตุผล)<br>
+                            • ตารางตรวจสอบหลักฐานรูปภาพการส่งคืน (ปุ่มรับของคืนเข้าคลัง)<br>
+                            • ตารางติดตามและอัปเดตสถานะการแจ้งซ่อมครุภัณฑ์
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-sitemap"></i> จัดการครุภัณฑ์และสถานที่ (CRUD)</div>
+                        <div class="card-body">
+                            • เพิ่ม/แก้ไข/ลบ ครุภัณฑ์และวัสดุสิ้นเปลือง พร้อมอัปโหลดรูปภาพ<br>
+                            • จัดการผังสถานที่: เพิ่ม/แก้ไข อาคารเรียน, ชั้นเรียน, และห้องปฏิบัติการ<br>
+                            • <strong>Audit Logs:</strong> ตรวจสอบประวัติการแก้ไขข้อมูลของแอดมินย้อนหลังได้ทุกกิจกรรม
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 10: รายงานทางการและการสแกน QR Code ================= -->
+        <div class="slide" id="slide-10">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <div class="slide-icon"><i class="fas fa-file-invoice"></i></div>
+                    <h2 class="slide-title">ระบบรายงานทางการ และฟังก์ชันเสริม</h2>
+                </div>
+                <div class="slide-badge">Reports & Mobile Features</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-file-excel" style="color: #10b981;"></i> รายงาน Excel (.xlsx)</div>
+                        <div class="card-body">
+                            ส่งออกรายงานประวัติการยืม-คืน, สถิติสต็อกคงคลัง, และประวัติ Audit Logs เป็นไฟล์ Excel จัดสไตล์หัวตารางอย่างเป็นทางการ
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-file-pdf" style="color: #ef4444;"></i> พิมพ์รายงาน PDF (A4)</div>
+                        <div class="card-body">
+                            หน้ารายงานสรุปประวัติทางการ จัดหน้าขนาดกระดาษ A4 พร้อมหัวเอกสารราชการและช่องลงนามผู้มีอำนาจ สั่งพิมพ์ได้ทันที
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-qrcode" style="color: #38bdf8;"></i> ป้ายโปสเตอร์ QR Code</div>
+                        <div class="card-body">
+                            พิมพ์ป้ายโปสเตอร์ประชาสัมพันธ์ขนาด A4 แปะหน้าห้องปฏิบัติการ เพื่อให้นักศึกษาสแกนเข้าสู่ระบบผ่านสมาร์ตโฟนได้สะดวกรวดเร็ว
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 11: การทดสอบระบบ ================= -->
+        <div class="slide" id="slide-11">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <div class="slide-icon"><i class="fas fa-vial-circle-check"></i></div>
+                    <h2 class="slide-title">ผลการทดสอบระบบ (System Testing)</h2>
+                </div>
+                <div class="slide-badge">Black-Box Testing (20 Test Cases)</div>
+            </div>
+            <div class="slide-body">
+                <table class="slide-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">กลุ่มการทดสอบ</th>
+                            <th style="width: 45%;">ประเด็นการทดสอบหลัก</th>
+                            <th style="width: 15%;">จำนวนเคส</th>
+                            <th style="width: 15%;">ผลการทดสอบ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1. การเข้าสู่ระบบ & สิทธิ์</strong></td>
+                            <td>ล็อกอิน Admin, Teacher, Student, รหัสผิด, ป้องกันเข้าข้ามสิทธิ์</td>
+                            <td class="text-center">5 Cases</td>
+                            <td class="text-center" style="color: #10b981; font-weight: 700;"><i class="fas fa-check-circle"></i> ผ่าน 100%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2. ฟังก์ชันผู้ใช้ (Student/Teacher)</strong></td>
+                            <td>ค้นหาอุปกรณ์, ขอยืมครุภัณฑ์, เบิกวัสดุ, บล็อกของหมด, คืนแนบรูป, แจ้งซ่อม</td>
+                            <td class="text-center">10 Cases</td>
+                            <td class="text-center" style="color: #10b981; font-weight: 700;"><i class="fas fa-check-circle"></i> ผ่าน 100%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3. การจัดการของผู้ดูแลระบบ</strong></td>
+                            <td>อนุมัติคำขอ, ปฏิเสธระบุเหตุผล, รับคืนเข้าคลัง, จัดการสถานที่, ออกรายงาน</td>
+                            <td class="text-center">5 Cases</td>
+                            <td class="text-center" style="color: #10b981; font-weight: 700;"><i class="fas fa-check-circle"></i> ผ่าน 100%</td>
+                        </tr>
+                        <tr style="background: rgba(56, 189, 248, 0.1); font-weight: 700;">
+                            <td colspan="2" class="text-center">รวมการทดสอบทั้งหมด</td>
+                            <td class="text-center">20 Cases</td>
+                            <td class="text-center" style="color: #38bdf8;">ผ่านครบทุกเคส</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 12: ผลการประเมินความพึงพอใจ ================= -->
+        <div class="slide" id="slide-12">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <div class="slide-icon"><i class="fas fa-square-poll-vertical"></i></div>
+                    <h2 class="slide-title">ผลการประเมินความพึงพอใจของกลุ่มตัวอย่าง</h2>
+                </div>
+                <div class="slide-badge">กลุ่มเป้าหมายนักศึกษาสายคอมพิวเตอร์ 50 คน</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-4" style="margin-bottom: 1rem;">
+                    <div class="metric-card">
+                        <div class="metric-value">50 คน</div>
+                        <div class="metric-label">กลุ่มตัวอย่างผู้ประเมิน</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" style="color: #38bdf8;">56% : 44%</div>
+                        <div class="metric-label">สัดส่วน ชาย : หญิง</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" style="color: #10b981;">4.54</div>
+                        <div class="metric-label">ค่าเฉลี่ยความพึงพอใจรวม (x̄)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" style="color: #8b5cf6;">มากที่สุด</div>
+                        <div class="metric-label">ระดับความพึงพอใจ (S.D. = 0.58)</div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-star" style="color: #facc15;"></i> รายการที่ได้รับคะแนนสูงสุด 3 อันดับแรก</div>
+                        <div class="card-body">
+                            1. ความรวดเร็วในการโหลดหน้าเว็บและการค้นหาอุปกรณ์ <strong>(x̄ = 4.62, S.D. = 0.57)</strong><br>
+                            2. รูปแบบเมนูและฟังก์ชันการใช้งานเข้าใจง่าย ไม่ซับซ้อน <strong>(x̄ = 4.60, S.D. = 0.53)</strong><br>
+                            3. ความชัดเจนของรูปภาพ รหัสครุภัณฑ์ และการรองรับมือถือ <strong>(x̄ = 4.58, S.D. = 0.57)</strong>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-award" style="color: #38bdf8;"></i> ผลการประเมินจากผู้เชี่ยวชาญ (3 ท่าน)</div>
+                        <div class="card-body">
+                            • ความคิดเห็นภาพรวมของผู้เชี่ยวชาญอยู่ในระดับ <strong>"มากที่สุด" (x̄ = 4.67, S.D. = 0.43)</strong><br>
+                            • ด้านที่มีคะแนนเต็มสูงสุด: ระบบการตรวจสอบสิทธิ์และการรักษาความปลอดภัยของข้อมูล <strong>(x̄ = 5.00)</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 13: ประโยชน์ที่ได้รับ ================= -->
+        <div class="slide" id="slide-13">
+            <div class="slide-header">
+                <div class="slide-title-group">
+                    <div class="slide-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                    <h2 class="slide-title">ประโยชน์ที่ได้รับจากโครงงาน</h2>
+                </div>
+                <div class="slide-badge">Project Benefits</div>
+            </div>
+            <div class="slide-body">
+                <div class="grid-3">
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-bolt"></i> ด้านความสะดวกรวดเร็ว</div>
+                        <div class="card-body">
+                            นักเรียน นักศึกษา และอาจารย์สามารถตรวจสอบสต็อกและทำเรื่องยืม-คืนได้ทันทีจากทุกที่ทุกเวลา ไม่ต้องเดินทางมายังห้องแล็บ
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-shield-check"></i> ด้านความโปร่งใสและหลักฐาน</div>
+                        <div class="card-body">
+                            มีระบบบันทึกรูปถ่ายสภาพอุปกรณ์ตอนส่งคืน และระบบ Audit Logs ตรวจสอบย้อนหลังได้ทุกขั้นตอน ป้องกันการสูญหาย
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-file-lines"></i> ด้านการบริหารจัดการ</div>
+                        <div class="card-body">
+                            ลดภาระงานเอกสารของผู้ดูแลระบบ สามารถออกรายงานสรุปยอดและพิมพ์เอกสารราชการขนาด A4 ได้ในคลิกเดียว
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 14: สรุปและ Q&A ================= -->
+        <div class="slide" id="slide-14">
+            <div class="title-slide-content">
+                <div class="title-logo" style="background: var(--emerald-gradient); color: white;">
+                    <i class="fas fa-circle-check"></i>
+                </div>
+                <h1 class="main-project-title" style="font-size: 2.2rem;">ขอขอบคุณคณะกรรมการและอาจารย์ทุกท่าน</h1>
+                <p class="project-subtitle" style="color: #38bdf8; font-weight: 500;">ระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์ — วิทยาลัยเทคโนโลยีพณิชยการอยุธยา</p>
+                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 12px 30px; border-radius: 14px; font-size: 1.1rem; margin-top: 10px;">
+                    <i class="fas fa-comments" style="color: #facc15; margin-right: 8px;"></i> ช่วงถาม-ตอบ (Questions & Answers)
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <div class="nav-info" id="slideIndicator">
+            สไลด์ 1 / 14
+        </div>
+        <div class="nav-buttons">
+            <button class="btn-nav" id="prevBtn" onclick="changeSlide(-1)">
+                <i class="fas fa-arrow-left"></i> ก่อนหน้า
+            </button>
+            <button class="btn-nav" id="nextBtn" onclick="changeSlide(1)">
+                ถัดไป <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 14;
+
+        function updateSlide() {
+            // Hide all slides
+            for (let i = 1; i <= totalSlides; i++) {
+                const el = document.getElementById(`slide-${i}`);
+                if (el) el.classList.remove('active');
+            }
+
+            // Show current slide
+            const activeEl = document.getElementById(`slide-${currentSlide}`);
+            if (activeEl) activeEl.classList.add('active');
+
+            // Update Indicator & Progress
+            document.getElementById('slideIndicator').innerText = `สไลด์ ${currentSlide} / ${totalSlides}`;
+            const progressPct = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = `${progressPct}%`;
+
+            // Update Buttons
+            document.getElementById('prevBtn').disabled = (currentSlide === 1);
+            document.getElementById('nextBtn').disabled = (currentSlide === totalSlides);
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 1) currentSlide = 1;
+            if (currentSlide > totalSlides) currentSlide = totalSlides;
+            updateSlide();
+        }
+
+        // Keyboard Navigation (Arrow keys & Space)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                if (currentSlide < totalSlides) changeSlide(1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                if (currentSlide > 1) changeSlide(-1);
+            }
+        });
+
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>
