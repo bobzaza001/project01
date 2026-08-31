@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>เอกสารสรุปรายละเอียดข้อมูลระบบทั้งหมด — โครงงานระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์</title>
+    <style>
+        body {
+            font-family: 'TH Sarabun New', 'Cordia New', AngsanaUPC, sans-serif;
+            font-size: 16pt;
+            line-height: 1.5;
+            color: #000000;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #ffffff;
+        }
+        .header-project {
+            font-size: 14pt;
+            font-weight: normal;
+            color: #808080;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 5px;
+        }
+        h1.doc-title {
+            text-align: center;
+            font-size: 20pt;
+            font-weight: bold;
+            margin: 0 0 8px 0;
+            color: #0f172a;
+        }
+        h2.doc-subtitle {
+            text-align: center;
+            font-size: 16pt;
+            font-weight: normal;
+            margin: 0 0 25px 0;
+            color: #475569;
+        }
+        h2.section-header {
+            font-size: 18pt;
+            font-weight: bold;
+            margin-top: 30px;
+            margin-bottom: 12px;
+            color: #1e3a8a;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 4px;
+        }
+        h3.subsection-header {
+            font-size: 16pt;
+            font-weight: bold;
+            margin-top: 18px;
+            margin-bottom: 8px;
+            color: #0f172a;
+        }
+        p {
+            margin: 0 0 10px 0;
+            text-align: justify;
+            text-indent: 40px;
+        }
+        .no-indent {
+            text-indent: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0 20px 0;
+            font-size: 14pt;
+        }
+        th, td {
+            border: 1px solid #000000;
+            padding: 6px 10px;
+            vertical-align: middle;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            text-align: center;
+        }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .table-caption {
+            font-weight: bold;
+            margin-bottom: 6px;
+            text-indent: 0;
+        }
+        .notice-box {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 16px;
+            margin-bottom: 25px;
+            font-size: 14pt;
+            color: #1e40af;
+            border-radius: 4px;
+        }
+        ul, ol {
+            padding-left: 50px;
+            margin-bottom: 12px;
+        }
+        li {
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="notice-box">
+        <strong>💡 คำแนะนำสำหรับการคัดลอกลง Google Docs หรือ Microsoft Word:</strong><br>
+        เอกสารฉบับนี้รวบรวมรายละเอียดข้อมูลทั้งหมดของระบบ (Tech Stack, ฐานข้อมูล 7 ตาราง, โมดูลระบบ, 20 Test Cases, ผลการประเมิน 50 คน และข้อมูลบัญชี)<br>
+        กด <strong>Ctrl + A</strong> (เลือกทั้งหมด) &gt; <strong>Ctrl + C</strong> (คัดลอก) &gt; ไปที่ <strong>Google Docs หรือ Word</strong> แล้วกด <strong>Ctrl + V</strong> (วาง) ได้ทันทีครับ
+    </div>
+
+    <div class="header-project">
+        <span>โครงงานระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์</span>
+        <span>วิทยาลัยเทคโนโลยีพณิชยการอยุธยา (ATCC)</span>
+    </div>
+
+    <h1 class="doc-title">เอกสารสรุปรายละเอียดข้อมูลระบบทั้งหมด</h1>
+    <h2 class="doc-subtitle">โครงงาน: ระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์ (Computer Lab Equipment Borrowing System)</h2>
+
+    <!-- ================= 1. ภาษาและเทคโนโลยี ================= -->
+    <h2 class="section-header">1. ภาษาโปรแกรม เทคโนโลยี และสถาปัตยกรรมระบบ (Tech Stack)</h2>
+    <p>
+        โครงงานระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์ได้รับการพัฒนาขึ้นโดยใช้สถาปัตยกรรมเว็บแอปพลิเคชันแบบ Modular Architecture แยกโครงสร้างการทำงานออกเป็นส่วนต่างๆ อย่างเป็นระเบียบ โดยมีรายละเอียดภาษาโปรแกรมและเครื่องมือที่ใช้ ดังนี้
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 25%;">ส่วนประกอบ</th>
+                <th style="width: 30%;">ภาษา / เทคโนโลยีที่ใช้</th>
+                <th style="width: 45%;">หน้าที่และการทำงานในระบบ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Back-End Language</strong></td>
+                <td>Python 3.11+</td>
+                <td>ประมวลผลตรรกะทางธุรกิจ (Business Logic), คำนวณวันยืม-คืน, ระบบตัดสต็อกอัตโนมัติ และการตรวจสอบความปลอดภัย</td>
+            </tr>
+            <tr>
+                <td><strong>Web Framework</strong></td>
+                <td>Flask Framework</td>
+                <td>โครงสร้างแบบ Modular Blueprints (auth, admin, user) จัดการ Routing และ Middleware</td>
+            </tr>
+            <tr>
+                <td><strong>Database Engine</strong></td>
+                <td>PostgreSQL (Cloud) / SQLite (Dev)</td>
+                <td>ฐานข้อมูลเชิงสัมพันธ์ Relational Database รองรับการจัดเก็บข้อมูลแบบ ACID และคีย์ Foreign Keys</td>
+            </tr>
+            <tr>
+                <td><strong>Database ORM</strong></td>
+                <td>SQLAlchemy (Flask-SQLAlchemy)</td>
+                <td>จัดการโมเดลฐานข้อมูลเชิงวัตถุ ความสัมพันธ์แบบ 1:M และ M:N</td>
+            </tr>
+            <tr>
+                <td><strong>Authentication & Security</strong></td>
+                <td>Flask-Login & Werkzeug Security</td>
+                <td>จัดการ Session ผู้ใช้งาน และการเข้ารหัสผ่านแบบ Scrypt Password Hashing</td>
+            </tr>
+            <tr>
+                <td><strong>Notification System</strong></td>
+                <td>Flask-Mail (SMTP TLS via Gmail)</td>
+                <td>ส่งอีเมลแจ้งเตือนอัตโนมัติเมื่ออนุมัติคำขอ, ปฏิเสธคำขอ และแจ้งเตือนเมื่อใกล้ถึงกำหนดส่งคืน</td>
+            </tr>
+            <tr>
+                <td><strong>Image Processing</strong></td>
+                <td>Pillow (PIL)</td>
+                <td>ปรับขนาดและบีบอัดรูปถ่ายสภาพอุปกรณ์ และจัดเก็บเป็น Base64 Data URL</td>
+            </tr>
+            <tr>
+                <td><strong>Reporting Engine</strong></td>
+                <td>OpenPyXL & ReportLab</td>
+                <td>ส่งออกรายงานสรุปประวัติเป็นไฟล์ Excel (.xlsx) และสร้างเอกสารทางการ PDF ขนาด A4</td>
+            </tr>
+            <tr>
+                <td><strong>Front-End Core</strong></td>
+                <td>HTML5 & Jinja2 Template</td>
+                <td>โครงสร้างหน้าเว็บและเทมเพลตฝั่งเซิร์ฟเวอร์แบบ Server-Side Rendering</td>
+            </tr>
+            <tr>
+                <td><strong>Styling & UI</strong></td>
+                <td>Modern CSS3 (Glassmorphism)</td>
+                <td>ออกแบบหน้าเว็บแบบ Responsive รองรับทั้งคอมพิวเตอร์ แท็บเล็ต และสมาร์ตโฟน (Dark/Light Mode)</td>
+            </tr>
+            <tr>
+                <td><strong>Client Scripting</strong></td>
+                <td>Vanilla JavaScript (ES6+)</td>
+                <td>ระบบค้นหาแบบเรียลไทม์ (Debounced Filter), ระบบแท็บ, Modal Popup และ PWA Service Worker</td>
+            </tr>
+            <tr>
+                <td><strong>QR Code & Scanner</strong></td>
+                <td>HTML5-QRCode Scanner</td>
+                <td>เปิดกล้องสมาร์ตโฟนสแกน QR Code เข้าสู่ระบบและตรวจสอบข้อมูลอุปกรณ์</td>
+            </tr>
+            <tr>
+                <td><strong>Cloud Deployment</strong></td>
+                <td>Vercel Cloud & Neon PostgreSQL</td>
+                <td>ระบบคลาวด์เซิร์ฟเวอร์เลส รองรับการทำงานออนไลน์ตลอด 24 ชั่วโมง เชื่อมต่อ GitHub CI/CD อัตโนมัติ</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ================= 2. โครงสร้างฐานข้อมูล ================= -->
+    <h2 class="section-header">2. โครงสร้างฐานข้อมูล (Database Schema 7 Tables)</h2>
+    <p>
+        ฐานข้อมูลของระบบประกอบด้วย 7 ตารางหลัก ที่มีความสัมพันธ์เชิงสัมพันธ์ (Relational Database) เพื่อรองรับข้อมูลการทำงานอย่างครบถ้วน:
+    </p>
+
+    <div class="table-caption">ตารางที่ 1: ตาราง users (ข้อมูลสมาชิกและผู้ใช้งานระบบ)</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Field Name</th>
+                <th>Data Type</th>
+                <th>Key</th>
+                <th>Nullable</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>id</td><td class="text-center">INT</td><td class="text-center">PK</td><td class="text-center">No</td><td>รหัสลำดับผู้ใช้งาน</td></tr>
+            <tr><td>student_id</td><td class="text-center">VARCHAR(20)</td><td class="text-center">Unique</td><td class="text-center">Yes</td><td>รหัสนักศึกษา 11 หลัก (สำหรับกลุ่มนักศึกษา)</td></tr>
+            <tr><td>username</td><td class="text-center">VARCHAR(80)</td><td class="text-center">Unique</td><td class="text-center">No</td><td>ชื่อผู้ใช้งานสำหรับล็อกอิน / รหัสนักศึกษา</td></tr>
+            <tr><td>password_hash</td><td class="text-center">VARCHAR(256)</td><td class="text-center">-</td><td class="text-center">No</td><td>รหัสผ่านที่ผ่านการแฮชความปลอดภัย</td></tr>
+            <tr><td>full_name</td><td class="text-center">VARCHAR(150)</td><td class="text-center">-</td><td class="text-center">No</td><td>ชื่อ-นามสกุลจริงภาษาไทย</td></tr>
+            <tr><td>email</td><td class="text-center">VARCHAR(120)</td><td class="text-center">Unique</td><td class="text-center">No</td><td>อีเมลสถาบัน (@atcc.ac.th)</td></tr>
+            <tr><td>role</td><td class="text-center">VARCHAR(10)</td><td class="text-center">-</td><td class="text-center">No</td><td>สิทธิ์การใช้งาน (admin หรือ user)</td></tr>
+            <tr><td>profile_image</td><td class="text-center">TEXT</td><td class="text-center">-</td><td class="text-center">Yes</td><td>ข้อมูลรูปภาพโปรไฟล์ (Base64 Data URL)</td></tr>
+            <tr><td>created_at</td><td class="text-center">DATETIME</td><td class="text-center">-</td><td class="text-center">No</td><td>วันและเวลาที่สมัครสมาชิก</td></tr>
+        </tbody>
+    </table>
+
+    <div class="table-caption">ตารางที่ 2: ตาราง equipments (ข้อมูลครุภัณฑ์และวัสดุอุปกรณ์)</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Field Name</th>
+                <th>Data Type</th>
+                <th>Key</th>
+                <th>Nullable</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>id</td><td class="text-center">INT</td><td class="text-center">PK</td><td class="text-center">No</td><td>รหัสอุปกรณ์</td></tr>
+            <tr><td>equipment_code</td><td class="text-center">VARCHAR(50)</td><td class="text-center">Unique</td><td class="text-center">No</td><td>รหัสครุภัณฑ์ เช่น IT-NB-001</td></tr>
+            <tr><td>name</td><td class="text-center">VARCHAR(100)</td><td class="text-center">-</td><td class="text-center">No</td><td>ชื่ออุปกรณ์</td></tr>
+            <tr><td>category</td><td class="text-center">VARCHAR(50)</td><td class="text-center">-</td><td class="text-center">No</td><td>หมวดหมู่อุปกรณ์</td></tr>
+            <tr><td>item_type</td><td class="text-center">VARCHAR(20)</td><td class="text-center">-</td><td class="text-center">No</td><td>ประเภท (durable=ครุภัณฑ์ / consumable=วัสดุสิ้นเปลือง)</td></tr>
+            <tr><td>quantity</td><td class="text-center">INT</td><td class="text-center">-</td><td class="text-center">No</td><td>จำนวนทั้งหมดในคลัง</td></tr>
+            <tr><td>available_quantity</td><td class="text-center">INT</td><td class="text-center">-</td><td class="text-center">No</td><td>จำนวนคงเหลือที่พร้อมให้ยืม/เบิก</td></tr>
+            <tr><td>status</td><td class="text-center">VARCHAR(20)</td><td class="text-center">-</td><td class="text-center">No</td><td>สถานะ (available, borrowed, repair)</td></tr>
+            <tr><td>is_borrowable</td><td class="text-center">BOOLEAN</td><td class="text-center">-</td><td class="text-center">No</td><td>อนุญาตให้ยืมพกพากลับได้หรือไม่</td></tr>
+            <tr><td>image_url</td><td class="text-center">TEXT</td><td class="text-center">-</td><td class="text-center">Yes</td><td>รูปภาพอุปกรณ์ (Base64)</td></tr>
+            <tr><td>room_id</td><td class="text-center">INT</td><td class="text-center">FK</td><td class="text-center">No</td><td>รหัสห้องที่จัดเก็บอุปกรณ์</td></tr>
+        </tbody>
+    </table>
+
+    <div class="table-caption">ตารางที่ 3: ตาราง borrow_requests (ข้อมูลใบคำขอยืม-คืน และเบิกวัสดุ)</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Field Name</th>
+                <th>Data Type</th>
+                <th>Key</th>
+                <th>Nullable</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>id</td><td class="text-center">INT</td><td class="text-center">PK</td><td class="text-center">No</td><td>รหัสใบคำขอ</td></tr>
+            <tr><td>user_id</td><td class="text-center">INT</td><td class="text-center">FK</td><td class="text-center">No</td><td>รหัสผู้ยื่นคำขอ (users.id)</td></tr>
+            <tr><td>equipment_id</td><td class="text-center">INT</td><td class="text-center">FK</td><td class="text-center">No</td><td>รหัสอุปกรณ์ที่ขอยืม (equipments.id)</td></tr>
+            <tr><td>quantity</td><td class="text-center">INT</td><td class="text-center">-</td><td class="text-center">No</td><td>จำนวนที่ขอยืมหรือเบิก</td></tr>
+            <tr><td>borrow_datetime</td><td class="text-center">DATETIME</td><td class="text-center">-</td><td class="text-center">No</td><td>วันและเวลาที่มารับของ</td></tr>
+            <tr><td>return_deadline</td><td class="text-center">DATETIME</td><td class="text-center">-</td><td class="text-center">No</td><td>กำหนดวันและเวลาที่ต้องส่งคืน</td></tr>
+            <tr><td>actual_return_date</td><td class="text-center">DATETIME</td><td class="text-center">-</td><td class="text-center">Yes</td><td>วันที่ส่งคืนจริงเข้าคลัง</td></tr>
+            <tr><td>status</td><td class="text-center">VARCHAR(20)</td><td class="text-center">-</td><td class="text-center">No</td><td>สถานะ (pending, approved, rejected, return_pending, returned)</td></tr>
+            <tr><td>return_image</td><td class="text-center">TEXT</td><td class="text-center">-</td><td class="text-center">Yes</td><td>รูปถ่ายสภาพของตอนส่งคืน (Base64)</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ================= 3. ฟังก์ชันการทำงานของระบบ ================= -->
+    <h2 class="section-header">3. รายละเอียดฟังก์ชันการทำงานของระบบ (System Features & Modules)</h2>
+    
+    <h3 class="subsection-header">3.1 โมดูลระบบยืนยันตัวตนและกู้คืนบัญชี (Auth & Account Recovery)</h3>
+    <ul>
+        <li><strong>การสมัครสมาชิกด้วยรหัสนักศึกษา:</strong> นักศึกษากรอกรหัสนักศึกษา 11 หลัก และอีเมลสถาบัน โดยระบบจะนำรหัสนักศึกษาไปเป็น Username ในการเข้าสู่ระบบโดยอัตโนมัติ</li>
+        <li><strong>การล็อกอินอัจฉริยะ:</strong> รองรับการพิมพ์รหัสนักศึกษา 11 หลัก, ชื่อผู้ใช้, ชื่อ-นามสกุลจริง หรืออีเมลสถาบัน ในช่องเดียว</li>
+        <li><strong>ศูนย์กู้คืนบัญชีผู้ใช้งาน (Account Recovery Center):</strong>
+            <ul>
+                <li><em>แท็บค้นหาชื่อผู้ใช้ (Find Username):</em> กรอกอีเมลสถาบันเพื่อค้นหา Username และรหัสนักศึกษา</li>
+                <li><em>แท็บรีเซ็ตรหัสผ่านใหม่ด้วย OTP (OTP Reset):</em> ยืนยันรหัส OTP 6 หลัก แล้วตั้งรหัสผ่านใหม่ได้ทันทีผ่านหน้าเว็บ</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3 class="subsection-header">3.2 โมดูลคลังอุปกรณ์และการค้นหา (Catalog & Smart Filters)</h3>
+    <ul>
+        <li><strong>ระบบตัวกรอง 4 มิติ:</strong> กรองแยกตามประเภท (ครุภัณฑ์/วัสดุสิ้นเปลือง), กรองตามสถานที่ (อาคาร/ชั้น/ห้อง), กรองตามหมวดหมู่ และกรองตามสิทธิ์พกพา</li>
+        <li><strong>ระบบค้นหาเรียลไทม์ (Debounced Search):</strong> ค้นหาตามชื่ออุปกรณ์ รหัสครุภัณฑ์ หรือยี่ห้อ ได้ทันทีขณะพิมพ์แบบลื่นไหล</li>
+    </ul>
+
+    <h3 class="subsection-header">3.3 โมดูลขั้นตอนการยืม-คืน และการเบิกวัสดุ (Borrow-Return Workflow)</h3>
+    <ul>
+        <li><strong>การขอยืมครุภัณฑ์:</strong> ระบุวันเวลารับของ และจำนวนวันยืม 1-30 วัน พร้อมระบบป้องกันของหมดสต็อกและป้องกันคำขอซ้ำซ้อน</li>
+        <li><strong>การขอเบิกวัสดุสิ้นเปลือง:</strong> ระบุจำนวนที่ต้องการเบิกใช้งานเพื่อส่งเรื่องตัดสต็อกโดยไม่ต้องนำมาคืน</li>
+        <li><strong>การส่งคืนพร้อมแนบรูปถ่ายหลักฐาน:</strong> ผู้ยืมต้องอัปโหลดรูปถ่ายสภาพอุปกรณ์ตอนส่งคืน เพื่อให้แอดมินตรวจสภาพของก่อนกดยืนยันรับคืนเข้าคลัง</li>
+    </ul>
+
+    <h3 class="subsection-header">3.4 โมดูลการบริหารจัดการของผู้ดูแลระบบ (Admin Management)</h3>
+    <ul>
+        <li><strong>Admin Dashboard:</strong> รวมสถิติสต็อกคงคลัง, รายการรออนุมัติ, รายการตรวจรับคืน และรายการแจ้งซ่อม</li>
+        <li><strong>ศูนย์รวมประวัติการยืม-คืน:</strong> รวมประวัติทุกรายการพร้อมตัวกรองสถานะและช่องค้นหาอัจฉริยะ</li>
+        <li><strong>ระบบตรวจสอบประวัติการแก้ไขข้อมูล (Audit Logs):</strong> บันทึกประวัติกิจกรรมของแอดมินทุกครั้งเมื่อมีการเพิ่ม/แก้/ลบ เพื่อความโปร่งใส</li>
+        <li><strong>ระบบจัดการผังสถานที่:</strong> เพิ่ม/แก้ไข/ลบ รายชื่ออาคารเรียน ชั้นเรียน และห้องปฏิบัติการ</li>
+        <li><strong>ระบบรายงานทางการ:</strong> ดาวน์โหลดไฟล์ Excel (.xlsx) และเปิดพิมพ์หน้ารายงานทางการ PDF (A4) พร้อมช่องลงนาม</li>
+    </ul>
+
+    <!-- ================= 4. ผลการทดสอบระบบ ================= -->
+    <h2 class="section-header">4. ผลการทดสอบระบบ (System Testing - 20 Test Cases)</h2>
+    <p>
+        ผลการทดสอบระบบแบบ Black-Box Testing ครอบคลุมทั้งกรณีทดสอบแบบ Positive, Negative และ Security Test รวม 20 กรณีทดสอบ ดังแสดงในตารางต่อไปนี้:
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 8%;">รหัส</th>
+                <th style="width: 14%;">กลุ่มผู้ใช้</th>
+                <th style="width: 20%;">ฟังก์ชันที่ทดสอบ</th>
+                <th style="width: 28%;">ข้อมูลนำเข้า / เงื่อนไข</th>
+                <th style="width: 15%;">ผลการทดสอบ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td class="text-center">TC-01</td><td>Admin</td><td>เข้าสู่ระบบผู้ดูแลระบบ (Positive)</td><td>username: admin1, password ถูกต้อง</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-02</td><td>Teacher</td><td>เข้าสู่ระบบอาจารย์ (Positive)</td><td>username: teacher, password ถูกต้อง</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-03</td><td>Student</td><td>เข้าสู่ระบบนักศึกษา (Positive)</td><td>รหัสนักศึกษา 11 หลัก, password ถูกต้อง</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-04</td><td>ทุกกลุ่ม</td><td>ล็อกอินรหัสผ่านไม่ถูกต้อง (Negative)</td><td>username ถูกต้อง แต่ password ผิด</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-05</td><td>Student</td><td>ป้องกันเข้าถึงข้ามสิทธิ์ (Security)</td><td>พิมพ์ URL เข้า /admin/dashboard ตรง</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-06</td><td>User</td><td>ค้นหาและคัดกรองอุปกรณ์</td><td>พิมพ์คำค้นหา "กล้อง" หรือกรองห้อง</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-07</td><td>Student</td><td>ยื่นคำขอยืมครุภัณฑ์ (Borrow)</td><td>เลือกอุปกรณ์, ระบุวันรับของ และ 3 วัน</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-08</td><td>Teacher</td><td>ยื่นขอยืมเพื่อการสอน (Teacher)</td><td>เลือกโปรเจกเตอร์/แล็ปท็อป ระบุ 7 วัน</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-09</td><td>User</td><td>ยื่นคำขอเบิกวัสดุสิ้นเปลือง</td><td>เลือกกระดาษพิมพ์ ระบุจำนวน 2 ชุด</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-10</td><td>User</td><td>ขอยืมอุปกรณ์ของหมดสต็อก (Negative)</td><td>อุปกรณ์ที่ available_quantity = 0</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-11</td><td>User</td><td>ยื่นขอยืมซ้ำซ้อนในชิ้นเดิม (Negative)</td><td>กดยื่นขอยืมชิ้นที่รออนุมัติค้างอยู่</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-12</td><td>User</td><td>ยื่นขอยืมไม่ระบุวันเวลา (Negative)</td><td>วันเวลายืม: [ว่าง]</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-13</td><td>User</td><td>ส่งคืนครุภัณฑ์พร้อมแนบรูปถ่าย</td><td>กดส่งคืน + อัปโหลดรูปภาพสภาพของ</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-14</td><td>User</td><td>ส่งคืนโดยไม่แนบรูปถ่าย (Negative)</td><td>กดส่งคืนโดยไม่เลือกไฟล์รูปถ่าย</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-15</td><td>User</td><td>ยื่นคำขอแจ้งซ่อมครุภัณฑ์ชำรุด</td><td>เลือกอุปกรณ์ + ระบุอาการชำรุด</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-16</td><td>Admin</td><td>อนุมัติคำขอยืมครุภัณฑ์ (Approve)</td><td>แอดมินกดอนุมัติคำขอยืม</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-17</td><td>Admin</td><td>ปฏิเสธคำขอยืมพร้อมระบุเหตุผล</td><td>แอดมินกดปฏิเสธ + ระบุเหตุผล</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-18</td><td>Admin</td><td>ตรวจภาพและยืนยันรับของคืน</td><td>ตรวจรูปถ่ายและกดยืนยันรับคืน</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-19</td><td>Admin</td><td>จัดการครุภัณฑ์และสถานที่ (CRUD)</td><td>เพิ่ม/แก้ไข/ลบ ข้อมูลและรูปภาพ</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+            <tr><td class="text-center">TC-20</td><td>Admin</td><td>ส่งออกรายงานสรุปผล (Export)</td><td>ดาวน์โหลด Excel (.xlsx) / พิมพ์ PDF</td><td class="text-center" style="color: #059669; font-weight: bold;">ผ่าน (Pass)</td></tr>
+        </tbody>
+    </table>
+
+    <!-- ================= 5. ผลการประเมินความพึงพอใจ ================= -->
+    <h2 class="section-header">5. ผลการประเมินความพึงพอใจจากกลุ่มตัวอย่าง (50 คน)</h2>
+    <p>
+        การวิเคราะห์ข้อมูลความพึงพอใจของกลุ่มเป้าหมายนักเรียน/นักศึกษาสาขาวิชาคอมพิวเตอร์ จำนวน 50 คน (เพศชาย 28 คน คิดเป็นร้อยละ 56.00 / เพศหญิง 22 คน คิดเป็นร้อยละ 44.00) โดยใช้สถิติค่าเฉลี่ยเลขคณิต (x̄) และส่วนเบี่ยงเบนมาตรฐาน (S.D.) สรุปได้ดังนี้:
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 55%;">รายการประเมินความพึงพอใจ</th>
+                <th style="width: 15%;">ค่าเฉลี่ย (x̄)</th>
+                <th style="width: 15%;">S.D.</th>
+                <th style="width: 15%;">ระดับความพึงพอใจ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>1. ด้านความตรงตามความต้องการของระบบ (Functional Requirement)</td><td class="text-center">4.52</td><td class="text-center">0.57</td><td class="text-center">มากที่สุด</td></tr>
+            <tr><td>2. ด้านความง่ายและสะดวกในการใช้งาน (Usability & User-friendliness)</td><td class="text-center">4.55</td><td class="text-center">0.57</td><td class="text-center">มากที่สุด</td></tr>
+            <tr><td>3. ด้านการออกแบบส่วนติดต่อผู้ใช้ (User Interface Design)</td><td class="text-center">4.54</td><td class="text-center">0.61</td><td class="text-center">มากที่สุด</td></tr>
+            <tr><td>4. ด้านประสิทธิภาพและความเร็วของระบบ (System Performance)</td><td class="text-center">4.60</td><td class="text-center">0.57</td><td class="text-center">มากที่สุด</td></tr>
+            <tr style="background-color: #e5e7eb; font-weight: bold;">
+                <td class="text-center">รวมเฉลี่ยทุกด้าน</td>
+                <td class="text-center">4.54</td>
+                <td class="text-center">0.58</td>
+                <td class="text-center">มากที่สุด</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>
+        <strong>สรุปผลการประเมิน:</strong> ในภาพรวมกลุ่มเป้าหมายมีความพึงพอใจต่อระบบการยืมอุปกรณ์ห้องคอมพิวเตอร์อยู่ในระดับ <strong>"มากที่สุด" (x̄ = 4.54, S.D. = 0.58)</strong> และผลการประเมินจากผู้เชี่ยวชาญจำนวน 3 ท่าน อยู่ในระดับ <strong>"มากที่สุด" (x̄ = 4.67, S.D. = 0.43)</strong>
+    </p>
+
+    <!-- ================= 6. ข้อมูลบัญชีทดสอบระบบ ================= -->
+    <h2 class="section-header">6. ข้อมูลบัญชีผู้ใช้งานสำหรับทดสอบระบบ (Demo Accounts)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>บทบาท (Role)</th>
+                <th>รหัสนักศึกษา / Username</th>
+                <th>รหัสผ่าน (Password)</th>
+                <th>ชื่อ-นามสกุล / สิทธิ์การใช้งาน</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>ผู้ดูแลระบบ (Admin)</strong></td>
+                <td class="text-center"><code>admin1</code></td>
+                <td class="text-center"><code>admin1234</code></td>
+                <td>สมชาย ผู้ดูแลระบบ (จัดการระบบทั้งหมด, อนุมัติคำขอ, ตรวจรับของคืน, จัดการคลังและสถานที่, ออกรายงาน)</td>
+            </tr>
+            <tr>
+                <td><strong>อาจารย์ (Teacher)</strong></td>
+                <td class="text-center"><code>teacher</code></td>
+                <td class="text-center"><code>password123</code></td>
+                <td>อาจารย์ ทดสอบระบบ (ยืมครุภัณฑ์เพื่อการเรียนการสอน, ขอเบิกวัสดุ, แจ้งซ่อม)</td>
+            </tr>
+            <tr>
+                <td><strong>นักศึกษา (Student 1)</strong></td>
+                <td class="text-center"><code>68302040047</code></td>
+                <td class="text-center"><code>Akkawutlnwza007</code></td>
+                <td>เอกวุฒิ วงศ์มี (ค้นหาอุปกรณ์, ขอยืมครุภัณฑ์, ส่งคืนพร้อมแนบรูปถ่าย, ติดตามสถานะ)</td>
+            </tr>
+            <tr>
+                <td><strong>นักศึกษา (Student 2)</strong></td>
+                <td class="text-center"><code>68302040056</code></td>
+                <td class="text-center"><code>password123</code></td>
+                <td>ธีรวัฒน์ ชินรัมย์ (ค้นหาอุปกรณ์, ขอยืมครุภัณฑ์, ส่งคืนพร้อมแนบรูปถ่าย, ติดตามสถานะ)</td>
+            </tr>
+            <tr>
+                <td><strong>นักศึกษา (Student 3)</strong></td>
+                <td class="text-center"><code>68302040055</code></td>
+                <td class="text-center"><code>password123</code></td>
+                <td>นภัสสร ศรีอินทร์ (ค้นหาอุปกรณ์, ขอยืมครุภัณฑ์, ส่งคืนพร้อมแนบรูปถ่าย, ติดตามสถานะ)</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
