@@ -22,9 +22,18 @@
     <!-- แถบค้นหาและตัวกรอง -->
     <div class="filter-container fade-in" style="margin-bottom: 2rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
         
-        <!-- แถบค้นหา -->
-        <div style="width: 100%; max-width: 800px;">
-            <input type="text" id="searchInput" placeholder="🔍 ค้นหาชื่ออุปกรณ์ หรือ เลขห้อง..." style="width: 100%; padding: 1rem 1.5rem; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--bg-input); color: var(--text-primary); outline: none; font-size: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center;">
+        <!-- แถบค้นหา พร้อมปุ่มล้างคำค้น -->
+        <div style="width: 100%; max-width: 800px; position: relative;">
+            <input type="text" id="searchInput" placeholder="🔍 ค้นหาชื่ออุปกรณ์ รหัสครุภัณฑ์ หรือเลขห้อง..." style="width: 100%; padding: 1.1rem 3rem 1.1rem 1.5rem; border-radius: 14px; border: 1px solid var(--glass-border); background: var(--bg-input); color: var(--text-primary); outline: none; font-size: 1.05rem; box-shadow: 0 4px 20px rgba(0,0,0,0.15); text-align: left; transition: all 0.3s ease;">
+            <button type="button" id="clearSearchBtn" onclick="clearSearch()" style="display: none; position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); border: none; color: var(--text-muted); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; align-items: center; justify-content: center; font-size: 0.9rem; transition: all 0.2s;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- แถบสรุปผลลัพธ์จำนวนอุปกรณ์ -->
+        <div id="filterResultCount" style="font-size: 0.92rem; color: var(--text-muted); font-weight: 500; width: 100%; max-width: 800px; display: flex; justify-content: space-between; align-items: center; padding: 0 5px;">
+            <span><i class="fas fa-cubes" style="color: var(--primary);"></i> อุปกรณ์ทั้งหมด: <strong id="visibleCount" style="color: var(--text-primary);">{{ equipment|length }}</strong> รายการ</span>
+            <span id="activeFilterBadge" style="display: none; background: rgba(56,189,248,0.15); color: var(--primary); padding: 2px 10px; border-radius: 20px; font-size: 0.8rem;"><i class="fas fa-filter"></i> มีการกรองข้อมูล</span>
         </div>
 
         <!-- แถบตัวกรอง (Dropdowns) -->
@@ -63,7 +72,7 @@
             </select>
             
             <select id="borrowableFilter" class="filter-dropdown" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--bg-input); color: var(--text-primary); outline: none; cursor: pointer; font-size: 0.95rem;">
-                <option value="all">🔄 ประเภทการใช้งาน (ทั้งหมด)</option>
+                <option value="all">🔄 สิทธิ์การใช้งาน (ทั้งหมด)</option>
                 <option value="true">🎒 พกพา/ยืมกลับได้</option>
                 <option value="false">🏢 ประจำห้อง/ยืมไม่ได้</option>
             </select>
@@ -79,7 +88,7 @@
             <!-- รูปภาพ -->
             <div class="eq-image-wrapper">
                 {% if eq.image_url %}
-                <img src="{{ eq.image_url }}" alt="{{ eq.name }}" class="eq-img">
+                <img src="{{ eq.image_url }}" alt="{{ eq.name }}" class="eq-img" loading="lazy">
                 {% else %}
                 <div class="eq-image-placeholder">
                     <div class="placeholder-icon-circle">
@@ -126,11 +135,25 @@
                 <p class="eq-desc">{{ eq.description or 'ไม่มีรายละเอียดเพิ่มเติม' }}</p>
                 
                 <div class="eq-card-footer">
-                    <!-- Badge จำนวนคงเหลือ -->
-                    {% set badge_class = 'available' if eq.available_quantity > 0 else 'unavailable' %}
-                    <div class="eq-availability {{ badge_class }}">
-                        <i class="fas {{ 'fa-check-circle' if eq.available_quantity > 0 else 'fa-times-circle' }}"></i>
-                        <span>คงเหลือ <strong>{{ eq.available_quantity }}</strong> / {{ eq.total_quantity }}</span>
+                    <!-- Badge จำนวนคงเหลือ พร้อม Live Pulse Dot -->
+                    {% set is_avail = eq.available_quantity > 0 and eq.status != 'maintenance' %}
+                    <div class="eq-availability {{ 'available' if is_avail else 'unavailable' }}">
+                        {% if is_avail %}
+                            <span class="live-pulse-dot"></span>
+                            <span>พร้อมให้ยืม <strong>{{ eq.available_quantity }}</strong> / {{ eq.total_quantity }} ชิ้น</span>
+                        {% elif eq.status == 'maintenance' %}
+                            <i class="fas fa-wrench" style="color: #f59e0b;"></i>
+                            <span>อยู่ระหว่างซ่อมบำรุง</span>
+                        {% else %}
+                            <i class="fas fa-times-circle"></i>
+                            <span>ถูกยืมหมดคลัง (0 / {{ eq.total_quantity }})</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- แถบ Mini Stock Progress Bar -->
+                    <div class="eq-stock-bar">
+                        {% set stock_pct = ((eq.available_quantity / (eq.total_quantity if eq.total_quantity > 0 else 1)) * 100)|round|int %}
+                        <div class="eq-stock-fill" style="width: {{ stock_pct }}%; background: {{ '#10b981' if is_avail else '#ef4444' }};"></div>
                     </div>
                     
                     <!-- ปุ่มการทำงาน -->
@@ -314,26 +337,51 @@ document.addEventListener('DOMContentLoaded', function() {
     let debounceTimer;
     function filterEquipmentDebounced() {
         clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(filterEquipment, 150);
+        debounceTimer = setTimeout(filterEquipment, 100);
     }
 
+    const clearBtn = document.getElementById('clearSearchBtn');
+    const visibleCountEl = document.getElementById('visibleCount');
+    const activeFilterBadge = document.getElementById('activeFilterBadge');
+
+    window.clearSearch = function() {
+        searchInput.value = '';
+        clearBtn.style.display = 'none';
+        filterEquipment();
+        searchInput.focus();
+    };
+
     function filterEquipment() {
-        const searchTerm = searchInput.value.toLowerCase();
+        const searchTerm = searchInput.value.toLowerCase().trim();
         const activeType = typeFilter.value;
         const activeCat = categoryFilter.value;
         const activeLocation = floorRoomFilter.value; // "all", "floor-X", "room-Y"
         const activeBorrowable = borrowableFilter.value;
 
+        // แสดง/ซ่อนปุ่มล้างคำค้น
+        if (clearBtn) {
+            clearBtn.style.display = searchTerm ? 'inline-flex' : 'none';
+        }
+
+        // แสดง/ซ่อนป้ายบอกว่ากำลังกรอง
+        const isFiltered = (searchTerm !== '' || activeType !== 'all' || activeCat !== 'all' || activeLocation !== 'all' || activeBorrowable !== 'all');
+        if (activeFilterBadge) {
+            activeFilterBadge.style.display = isFiltered ? 'inline-block' : 'none';
+        }
+
+        let visibleCount = 0;
+
         allCards.forEach(card => {
-            const eqName = card.querySelector('.eq-name').innerText.toLowerCase();
-            const eqDesc = card.querySelector('.eq-desc').innerText.toLowerCase();
-            const eqCat = card.getAttribute('data-category');
-            const eqType = card.getAttribute('data-item-type');
-            const eqFloorId = card.getAttribute('data-floor-id');
-            const eqRoomId = card.getAttribute('data-room-id');
-            const eqBorrowable = card.getAttribute('data-borrowable');
+            const eqName = card.querySelector('.eq-name') ? card.querySelector('.eq-name').innerText.toLowerCase() : '';
+            const eqDesc = card.querySelector('.eq-desc') ? card.querySelector('.eq-desc').innerText.toLowerCase() : '';
+            const eqCode = card.querySelector('.eq-code') ? card.querySelector('.eq-code').innerText.toLowerCase() : '';
+            const eqCat = card.getAttribute('data-category') || '';
+            const eqType = card.getAttribute('data-item-type') || '';
+            const eqFloorId = card.getAttribute('data-floor-id') || '';
+            const eqRoomId = card.getAttribute('data-room-id') || '';
+            const eqBorrowable = card.getAttribute('data-borrowable') || '';
             
-            const matchesSearch = eqName.includes(searchTerm) || eqDesc.includes(searchTerm);
+            const matchesSearch = !searchTerm || eqName.includes(searchTerm) || eqDesc.includes(searchTerm) || eqCode.includes(searchTerm);
             const matchesType = (activeType === 'all' || eqType === activeType);
             const matchesCat = (activeCat === 'all' || eqCat === activeCat);
             const matchesBorrowable = (activeBorrowable === 'all' || eqBorrowable === activeBorrowable);
@@ -347,12 +395,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
-            // ล้างบิลด์อนิเมชั่นดีเลย์ของบราวเซอร์เพื่อความเร็วสูงสุดขณะพิมพ์
             if (card._fadeTimeout) {
                 clearTimeout(card._fadeTimeout);
             }
 
             if (matchesSearch && matchesType && matchesCat && matchesLocation && matchesBorrowable) {
+                visibleCount++;
                 card.style.display = 'flex';
                 card._fadeTimeout = setTimeout(() => {
                     card.style.opacity = '1';
@@ -361,9 +409,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 card.style.opacity = '0';
                 card._fadeTimeout = setTimeout(() => {
                     card.style.display = 'none';
-                }, 300);
+                }, 200);
             }
         });
+
+        if (visibleCountEl) {
+            visibleCountEl.innerText = visibleCount;
+        }
     }
 
     // ดีเลย์การค้นหาชั่วคราวเพื่อรอให้ผู้ใช้พิมพ์เสร็จก่อนค่อยกรอง (Debounce) ป้องกันเว็บหน่วง
