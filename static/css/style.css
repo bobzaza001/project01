@@ -1329,105 +1329,25 @@ a:hover { color: var(--pink); }
     animation-delay: calc(var(--card-index, 0) * 0.04s);
 }
 
-/* Search Focus Glow & Dropdowns */
-#searchInput {
-    color: #ffffff !important;
-    background: rgba(15, 23, 42, 0.85) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    font-weight: 500 !important;
-    font-size: 1.05rem !important;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-#searchInput::placeholder {
-    color: #94a3b8 !important;
-    opacity: 0.85;
-}
-#searchInput:focus {
-    color: #ffffff !important;
-    border-color: #38bdf8 !important;
-    box-shadow: 0 0 25px rgba(56, 189, 248, 0.45), 0 0 10px rgba(129, 140, 248, 0.25) !important;
-    background: rgba(15, 23, 42, 0.95) !important;
+/* ==================== Search & Filter Toolbar (Theme-Adaptive & Minimal) ==================== */
+.search-box-unified input {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-primary) !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ==================== 1. Interactive Category Filter Chips ==================== */
-.category-chip-container {
-    padding: 2px 0;
+.search-box-unified input::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.8;
 }
 
-.category-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 7px 15px;
-    border-radius: 50px;
-    font-size: 0.88rem;
-    font-weight: 500;
-    font-family: inherit;
-    color: #94a3b8;
-    background: rgba(15, 23, 42, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    cursor: pointer;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    user-select: none;
+.search-box-unified input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.35) !important;
 }
 
-.category-chip:hover {
-    color: #f8fafc;
-    border-color: rgba(56, 189, 248, 0.5);
-    background: rgba(30, 41, 59, 0.9);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
-}
-
-.category-chip.active {
-    color: #ffffff !important;
-    background: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%) !important;
-    border-color: rgba(56, 189, 248, 0.8) !important;
-    box-shadow: 0 4px 18px rgba(2, 132, 199, 0.4), 0 0 10px rgba(79, 70, 229, 0.3) !important;
-    font-weight: 600;
-    transform: scale(1.03);
-}
-
-.category-chip:active {
-    transform: scale(0.95);
-}
-
-/* ==================== 2. Segmented Type Control (macOS Style) ==================== */
-.segmented-control {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(15px);
-}
-
-.segment-btn {
-    padding: 6px 14px;
-    border-radius: 9px;
-    border: none;
-    background: transparent;
-    color: #94a3b8;
-    font-size: 0.86rem;
-    font-weight: 500;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    user-select: none;
-}
-
-.segment-btn:hover {
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.08);
-}
-
-.segment-btn.active {
-    color: #ffffff !important;
-    background: rgba(56, 189, 248, 0.22) !important;
-    border: 1px solid rgba(56, 189, 248, 0.45) !important;
-    box-shadow: 0 2px 8px rgba(56, 189, 248, 0.25) !important;
-    font-weight: 600;
-}
-
-/* ==================== 3. Custom Animated Glass Dropdowns ==================== */
+/* Custom Minimalist Animated Dropdowns */
 .custom-select-box {
     position: relative;
     user-select: none;
@@ -1438,38 +1358,41 @@ a:hover { color: var(--pink); }
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 0.72rem 1.15rem;
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 14px;
-    color: #f8fafc;
-    font-size: 0.9rem;
+    gap: 8px;
+    padding: 0.65rem 1rem;
+    background: var(--bg-card) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 12px;
+    color: var(--text-primary) !important;
+    font-size: 0.88rem;
     font-weight: 500;
     font-family: inherit;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .custom-select-trigger:hover {
-    border-color: rgba(56, 189, 248, 0.6);
-    background: rgba(30, 41, 59, 0.95);
-    box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
-    transform: translateY(-2px);
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
+    transform: translateY(-1px);
 }
 
 .custom-select-box.open .custom-select-trigger {
-    border-color: #38bdf8;
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
 }
 
 .select-chevron {
-    font-size: 0.8rem;
-    color: #38bdf8;
-    transition: transform 0.25s ease;
+    font-size: 0.75rem;
+    color: var(--primary);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
 }
 
 .custom-select-box.open .select-chevron {
@@ -1478,37 +1401,37 @@ a:hover { color: var(--pink); }
 
 .custom-select-dropdown {
     position: absolute;
-    top: calc(100% + 8px);
+    top: calc(100% + 6px);
     left: 0;
     width: 100%;
-    min-width: 230px;
-    max-height: 280px;
+    min-width: 210px;
+    max-height: 270px;
     overflow-y: auto;
-    background: rgba(15, 23, 42, 0.96);
-    border: 1px solid rgba(56, 189, 248, 0.35);
-    border-radius: 16px;
+    background: var(--bg-card-solid) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 14px;
     padding: 6px;
-    box-shadow: 0 20px 45px -5px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.2);
+    box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.25), 0 0 15px rgba(56, 189, 248, 0.15);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px) scale(0.96);
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(-8px) scale(0.97);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     scrollbar-width: thin;
-    scrollbar-color: #38bdf8 rgba(255, 255, 255, 0.05);
+    scrollbar-color: var(--primary) var(--bg-surface);
 }
 
 .custom-select-dropdown::-webkit-scrollbar {
     width: 5px;
 }
 .custom-select-dropdown::-webkit-scrollbar-thumb {
-    background: #38bdf8;
+    background: var(--primary);
     border-radius: 10px;
 }
 .custom-select-dropdown::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: transparent;
 }
 
 .custom-select-box.open .custom-select-dropdown {
@@ -1518,22 +1441,21 @@ a:hover { color: var(--pink); }
 }
 
 .custom-optgroup-title {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 700;
-    color: #818cf8;
-    padding: 8px 10px 4px 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    margin-bottom: 4px;
+    color: var(--primary);
+    padding: 6px 10px 4px 10px;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid var(--glass-border);
+    margin-bottom: 3px;
 }
 
 .custom-option {
-    padding: 8px 12px;
-    border-radius: 10px;
-    font-size: 0.88rem;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 0.86rem;
     font-weight: 500;
-    color: #cbd5e1;
+    color: var(--text-primary);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -1542,27 +1464,26 @@ a:hover { color: var(--pink); }
 }
 
 .custom-option:hover {
-    background: rgba(56, 189, 248, 0.15);
-    color: #ffffff;
-    padding-left: 15px;
+    background: var(--bg-surface) !important;
+    color: var(--primary) !important;
+    padding-left: 13px;
 }
 
 .custom-option.active {
-    background: linear-gradient(90deg, rgba(2, 132, 199, 0.35), rgba(79, 70, 229, 0.35)) !important;
-    color: #38bdf8 !important;
+    background: rgba(56, 189, 248, 0.15) !important;
+    color: var(--primary) !important;
     font-weight: 600;
-    border: 1px solid rgba(56, 189, 248, 0.3);
 }
 
 .custom-option.floor-opt {
     font-weight: 600;
-    color: #38bdf8;
+    color: var(--primary);
     background: rgba(56, 189, 248, 0.05);
     margin: 2px 0;
 }
 
 .custom-option.room-opt {
-    padding-left: 20px;
+    padding-left: 18px;
 }
 
 .eq-actions-group {
