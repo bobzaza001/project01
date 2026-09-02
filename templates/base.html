@@ -103,19 +103,33 @@
     </nav>
     {% endif %}
 
-    <!-- พื้นที่แสดงข้อความแจ้งเตือน (Flash Messages) -->
-    <div class="flash-container">
+    <!-- พื้นที่แสดงข้อความแจ้งเตือนลอยแบบโมเดิร์น (Modern Glassmorphic Toast Notifications) -->
+    <div class="flash-container" id="toastContainer">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                <div class="flash-message flash-{{ category }}" onclick="this.style.display='none'">
-                    <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'danger' %}fa-exclamation-circle{% elif category == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
-                    {{ message }}
-                    <span class="flash-close">&times;</span>
+                <div class="flash-message flash-{{ category }} toast-item" onclick="dismissToast(this)">
+                    <div class="toast-icon-wrapper">
+                        <i class="fas {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-circle-xmark{% elif category == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+                    </div>
+                    <div class="toast-text">{{ message }}</div>
+                    <button type="button" class="flash-close" aria-label="Close">&times;</button>
+                    <div class="toast-timer-bar"></div>
                 </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
+    </div>
+
+    <!-- หน้าต่างขยายดูรูปภาพเต็มตา (Global Image Lightbox Preview) -->
+    <div id="imageLightboxModal" class="lightbox-modal" onclick="closeLightbox(event)">
+        <div class="lightbox-dialog" onclick="event.stopPropagation()">
+            <button type="button" class="lightbox-close" onclick="closeLightbox()">&times;</button>
+            <div class="lightbox-body">
+                <img id="lightboxImg" src="" alt="Enlarged Image Preview">
+            </div>
+            <div id="lightboxCaption" class="lightbox-caption"></div>
+        </div>
     </div>
 
     <!-- ปุ่มสลับธีมสำหรับหน้าที่ไม่มี Navbar (Login/Register) -->

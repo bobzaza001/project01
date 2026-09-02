@@ -161,7 +161,7 @@
                 </thead>
                 <tbody>
                     {% for req in records %}
-                    <tr style="border-bottom: 1px solid var(--glass-border); transition: background 0.15s ease;">
+                    <tr class="row-status-{{ req.status }}" style="border-bottom: 1px solid var(--glass-border); transition: background 0.15s ease;">
                         <td style="text-align: center; color: var(--text-muted); font-weight: 700; font-family: monospace; font-size: 0.95rem; padding: 1rem 0.75rem;">
                             {{ req.id }}
                         </td>

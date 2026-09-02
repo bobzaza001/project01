@@ -145,7 +145,7 @@
                     </thead>
                     <tbody>
                         {% for req in requests %}
-                        <tr class="fade-in">
+                        <tr class="fade-in row-status-{{ req.status }}">
                             <td>{{ req.id }}</td>
                             <td>
                                 <div class="user-cell">
@@ -156,7 +156,7 @@
                             <td>
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     {% if req.equipment.image_url %}
-                                    <img src="{{ req.equipment.image_url }}" class="eq-table-img">
+                                    <img src="{{ req.equipment.image_url }}" alt="{{ req.equipment.name }}" class="eq-table-img table-img" data-preview="true" title="คลิกเพื่อขยายดูรูปภาพ" style="cursor: pointer;">
                                     {% else %}
                                     <div class="eq-table-img" style="background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;"><i class="fas fa-image" style="color: var(--text-muted);"></i></div>
                                     {% endif %}

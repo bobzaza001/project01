@@ -181,47 +181,132 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // --- ซ่อน Flash Messages อัตโนมัติหลัง 5 วินาที ---
-    const flashMessages = document.querySelectorAll('.flash-message');
-    flashMessages.forEach(function(msg) {
+    // --- ระบบ Toast Notifications อัตโนมัติ (ลบ DOM ป้องกัน Memory Leak) ---
+    const toastItems = document.querySelectorAll('.toast-item');
+    toastItems.forEach(function(toast) {
         setTimeout(function() {
-            msg.style.animation = 'slideIn 0.3s ease-out reverse';
-            setTimeout(function() {
-                msg.style.display = 'none';
-            }, 300);
-        }, 5000);
+            dismissToast(toast);
+        }, 4000);
     });
     
     // --- เพิ่ม animation ให้ตาราง rows ทีละแถว ---
     const rows = document.querySelectorAll('.fade-in');
     rows.forEach(function(row, index) {
-        row.style.animationDelay = (index * 0.05) + 's';
+        row.style.animationDelay = (index * 0.04) + 's';
     });
+
+    // --- รัน Count-Up Animation สำหรับตัวเลขสถิติ (Hardware-Accelerated 60fps) ---
+    initCountUpNumbers();
+
+    // --- คลิกที่รูปภาพเพื่อเปิด Lightbox ขยายดูภาพเต็มตา ---
+    initImageLightboxListeners();
 });
+
+// ==================== ระบบ Toast Notifications ====================
+function dismissToast(el) {
+    if (!el || el._isDismissing) return;
+    el._isDismissing = true;
+    el.classList.add('toast-dismissing');
+    setTimeout(function() {
+        if (el.parentNode) {
+            el.parentNode.removeChild(el);
+        }
+    }, 350);
+}
+
+// ==================== ระบบ Image Lightbox (ขยายดูภาพคมชัด) ====================
+function openLightbox(src, caption) {
+    const modal = document.getElementById('imageLightboxModal');
+    const img = document.getElementById('lightboxImg');
+    const cap = document.getElementById('lightboxCaption');
+    if (!modal || !img) return;
+
+    img.src = src;
+    img.alt = caption || 'Equipment Preview';
+    if (cap) cap.innerText = caption || '';
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    const modal = document.getElementById('imageLightboxModal');
+    if (!modal) return;
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+// ปิด Lightbox เมื่อกดปุ่ม ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeLightbox();
+    }
+});
+
+function initImageLightboxListeners() {
+    document.addEventListener('click', function(e) {
+        const target = e.target;
+        if (target.tagName === 'IMG' && (target.classList.contains('eq-img') || target.classList.contains('table-img') || target.hasAttribute('data-preview'))) {
+            openLightbox(target.src, target.alt || target.getAttribute('data-caption') || 'ภาพขยาย');
+        }
+    });
+}
+
+// ==================== ระบบ Count-Up Animation ตัวเลขสถิติ ====================
+function initCountUpNumbers() {
+    const counters = document.querySelectorAll('.count-up, .stat-number');
+    counters.forEach(function(counter) {
+        const target = parseInt(counter.getAttribute('data-target') || counter.innerText.replace(/[^0-9]/g, ''), 10);
+        if (isNaN(target) || target <= 0) return;
+
+        let start = 0;
+        const duration = 1000; // 1 วินาที
+        const startTime = performance.now();
+
+        function updateNumber(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // Ease-Out Cubic formula
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+            const current = Math.floor(easeProgress * target);
+            counter.innerText = current;
+
+            if (progress < 1) {
+                requestAnimationFrame(updateNumber);
+            } else {
+                counter.innerText = target;
+            }
+        }
+        requestAnimationFrame(updateNumber);
+    });
+}
 
 // ==================== ฟังก์ชันช่วยเหลือ ====================
 
 function showFormError(message) {
-    /** แสดงข้อความ error แบบ alert ชั่วคราว */
+    /** แสดงข้อความ error แบบ Toast Notification ชั่วคราว */
     const alertDiv = document.createElement('div');
-    alertDiv.className = 'flash-message flash-danger';
-    alertDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + message + '<span class="flash-close">&times;</span>';
-    alertDiv.onclick = function() { this.remove(); };
+    alertDiv.className = 'flash-message flash-danger toast-item';
+    alertDiv.innerHTML = `
+        <div class="toast-icon-wrapper">
+            <i class="fas fa-circle-xmark"></i>
+        </div>
+        <div class="toast-text">${message}</div>
+        <button type="button" class="flash-close">&times;</button>
+        <div class="toast-timer-bar"></div>
+    `;
+    alertDiv.onclick = function() { dismissToast(this); };
     
-    let container = document.querySelector('.flash-container');
+    let container = document.getElementById('toastContainer');
     if (!container) {
         container = document.createElement('div');
+        container.id = 'toastContainer';
         container.className = 'flash-container';
         document.body.appendChild(container);
     }
     container.appendChild(alertDiv);
     
-    // ลบอัตโนมัติหลัง 4 วินาที
     setTimeout(function() {
-        alertDiv.style.animation = 'slideIn 0.3s ease-out reverse';
-        setTimeout(function() {
-            alertDiv.remove();
-        }, 300);
+        dismissToast(alertDiv);
     }, 4000);
 }
 

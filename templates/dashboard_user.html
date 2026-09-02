@@ -104,11 +104,11 @@
                         </thead>
                         <tbody>
                             {% for req in my_requests %}
-                            <tr class="stagger-row">
+                            <tr class="stagger-row row-status-{{ req.status }}">
                                 <td>{{ req.id }}</td>
                                 <td>
                                     {% if req.equipment.image_url %}
-                                    <img src="{{ req.equipment.image_url }}" class="eq-table-img">
+                                    <img src="{{ req.equipment.image_url }}" alt="{{ req.equipment.name }}" class="eq-table-img table-img" data-preview="true" title="คลิกเพื่อขยายดูรูปภาพ" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                                     {% else %}
                                     <div class="eq-table-img" style="background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;"><i class="fas fa-image" style="color: var(--text-muted);"></i></div>
                                     {% endif %}
