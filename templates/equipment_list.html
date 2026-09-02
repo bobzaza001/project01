@@ -37,24 +37,25 @@
         </div>
 
         <!-- แถบตัวกรอง (Dropdowns) -->
-        <div style="display: flex; gap: 10px; width: 100%; max-width: 800px; flex-wrap: wrap;">
+        <!-- แถบตัวกรอง (Cool Glassmorphic Dropdowns) -->
+        <div style="display: flex; gap: 12px; width: 100%; max-width: 800px; flex-wrap: wrap;">
             
             <!-- ประเภท -->
-            <select id="typeFilter" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--bg-input); color: var(--text-primary); outline: none; cursor: pointer; font-size: 0.95rem;">
-                <option value="all">📦 ทุกประเภท</option>
+            <select id="typeFilter" class="filter-dropdown" style="flex: 1; min-width: 160px;">
+                <option value="all">📦 ทุกประเภทการใช้งาน</option>
                 <option value="durable">🔄 ครุภัณฑ์ (ยืม-คืน)</option>
-                <option value="consumable">📝 วัสดุสิ้นเปลือง</option>
+                <option value="consumable">📝 วัสดุสิ้นเปลือง (เบิกใช้)</option>
             </select>
 
             <!-- ชั้น/ห้อง -->
-            <select id="floorRoomFilter" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--bg-input); color: var(--text-primary); outline: none; cursor: pointer; font-size: 0.95rem;">
-                <option value="all">🏢 ทุกชั้น / ทุกห้อง</option>
+            <select id="floorRoomFilter" class="filter-dropdown" style="flex: 1.2; min-width: 180px;">
+                <option value="all">🏢 ทุกอาคาร / ทุกห้อง</option>
                 {% for b in buildings %}
-                    <optgroup label="อาคาร: {{ b.name }}" style="color: black;">
+                    <optgroup label="🏢 อาคาร: {{ b.name }}">
                     {% for f in b.floors %}
-                        <option value="floor-{{ f.id }}">🏢 เลือกทั้งชั้น: {{ f.name }}</option>
+                        <option value="floor-{{ f.id }}">📑 เลือกทั้งชั้น: {{ f.name }}</option>
                         {% for r in f.rooms %}
-                            <option value="room-{{ r.id }}">-- ห้อง {{ r.name }}</option>
+                            <option value="room-{{ r.id }}">&nbsp;&nbsp;🚪 ห้อง {{ r.name }}</option>
                         {% endfor %}
                     {% endfor %}
                     </optgroup>
@@ -62,19 +63,20 @@
             </select>
 
             <!-- หมวดหมู่ -->
-            <select id="categoryFilter" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--bg-input); color: var(--text-primary); outline: none; cursor: pointer; font-size: 0.95rem;">
-                <option value="all">🏷️ ทุกหมวดหมู่</option>
+            <select id="categoryFilter" class="filter-dropdown" style="flex: 1; min-width: 160px;">
+                <option value="all">🏷️ ทุกหมวดหมู่อุปกรณ์</option>
                 <option value="ไอทีและคอมพิวเตอร์">🖥️ ไอทีและคอมพิวเตอร์</option>
                 <option value="เฟอร์นิเจอร์">🪑 เฟอร์นิเจอร์</option>
                 <option value="เครื่องใช้ไฟฟ้า">⚡ เครื่องใช้ไฟฟ้า</option>
                 <option value="โสตทัศนูปกรณ์">🎥 โสตทัศนูปกรณ์</option>
-                <option value="ทั่วไป">📦 ทั่วไป</option>
+                <option value="ทั่วไป">📦 อุปกรณ์ทั่วไป</option>
             </select>
             
-            <select id="borrowableFilter" class="filter-dropdown" style="flex: 1; min-width: 150px; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--bg-input); color: var(--text-primary); outline: none; cursor: pointer; font-size: 0.95rem;">
-                <option value="all">🔄 สิทธิ์การใช้งาน (ทั้งหมด)</option>
-                <option value="true">🎒 พกพา/ยืมกลับได้</option>
-                <option value="false">🏢 ประจำห้อง/ยืมไม่ได้</option>
+            <!-- สิทธิ์การใช้งาน -->
+            <select id="borrowableFilter" class="filter-dropdown" style="flex: 1; min-width: 160px;">
+                <option value="all">🔄 สิทธิ์การพกพา (ทั้งหมด)</option>
+                <option value="true">🎒 พกพา/ยืมออกนอกห้องได้</option>
+                <option value="false">🏢 ใช้งานประจำห้องเท่านั้น</option>
             </select>
 
         </div>
