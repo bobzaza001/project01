@@ -1349,53 +1349,220 @@ a:hover { color: var(--pink); }
     background: rgba(15, 23, 42, 0.95) !important;
 }
 
-.filter-dropdown, .filter-container select {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2338bdf8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 14px center !important;
-    background-size: 16px !important;
-    padding: 0.85rem 2.4rem 0.85rem 1.15rem !important;
-    background-color: rgba(15, 23, 42, 0.9) !important;
-    border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    color: #ffffff !important;
-    border-radius: 14px !important;
-    font-weight: 500 !important;
-    font-size: 0.93rem !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25) !important;
-    cursor: pointer !important;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+/* ==================== 1. Interactive Category Filter Chips ==================== */
+.category-chip-container {
+    padding: 2px 0;
 }
 
-.filter-dropdown:hover, .filter-container select:hover {
-    border-color: #38bdf8 !important;
-    background-color: rgba(30, 41, 59, 0.95) !important;
-    box-shadow: 0 0 18px rgba(56, 189, 248, 0.35) !important;
+.category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 15px;
+    border-radius: 50px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    font-family: inherit;
+    color: #94a3b8;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    user-select: none;
+}
+
+.category-chip:hover {
+    color: #f8fafc;
+    border-color: rgba(56, 189, 248, 0.5);
+    background: rgba(30, 41, 59, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+}
+
+.category-chip.active {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%) !important;
+    border-color: rgba(56, 189, 248, 0.8) !important;
+    box-shadow: 0 4px 18px rgba(2, 132, 199, 0.4), 0 0 10px rgba(79, 70, 229, 0.3) !important;
+    font-weight: 600;
+    transform: scale(1.03);
+}
+
+.category-chip:active {
+    transform: scale(0.95);
+}
+
+/* ==================== 2. Segmented Type Control (macOS Style) ==================== */
+.segmented-control {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(15px);
+}
+
+.segment-btn {
+    padding: 6px 14px;
+    border-radius: 9px;
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 0.86rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+}
+
+.segment-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.segment-btn.active {
+    color: #ffffff !important;
+    background: rgba(56, 189, 248, 0.22) !important;
+    border: 1px solid rgba(56, 189, 248, 0.45) !important;
+    box-shadow: 0 2px 8px rgba(56, 189, 248, 0.25) !important;
+    font-weight: 600;
+}
+
+/* ==================== 3. Custom Animated Glass Dropdowns ==================== */
+.custom-select-box {
+    position: relative;
+    user-select: none;
+}
+
+.custom-select-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0.72rem 1.15rem;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 14px;
+    color: #f8fafc;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+}
+
+.custom-select-trigger:hover {
+    border-color: rgba(56, 189, 248, 0.6);
+    background: rgba(30, 41, 59, 0.95);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
     transform: translateY(-2px);
 }
 
-.filter-dropdown:focus, .filter-container select:focus {
-    outline: none !important;
-    border-color: #38bdf8 !important;
-    box-shadow: 0 0 22px rgba(56, 189, 248, 0.5) !important;
+.custom-select-box.open .custom-select-trigger {
+    border-color: #38bdf8;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
 }
 
-.filter-dropdown option, .filter-container select option {
-    background-color: #0f172a !important;
-    color: #f8fafc !important;
-    padding: 12px 14px !important;
-    font-size: 0.95rem !important;
-    font-weight: 500 !important;
+.select-chevron {
+    font-size: 0.8rem;
+    color: #38bdf8;
+    transition: transform 0.25s ease;
 }
 
-.filter-dropdown optgroup, .filter-container select optgroup {
-    background-color: #1e293b !important;
+.custom-select-box.open .select-chevron {
+    transform: rotate(180deg);
+}
+
+.custom-select-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    min-width: 230px;
+    max-height: 280px;
+    overflow-y: auto;
+    background: rgba(15, 23, 42, 0.96);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 16px;
+    padding: 6px;
+    box-shadow: 0 20px 45px -5px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.2);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.96);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    scrollbar-width: thin;
+    scrollbar-color: #38bdf8 rgba(255, 255, 255, 0.05);
+}
+
+.custom-select-dropdown::-webkit-scrollbar {
+    width: 5px;
+}
+.custom-select-dropdown::-webkit-scrollbar-thumb {
+    background: #38bdf8;
+    border-radius: 10px;
+}
+.custom-select-dropdown::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.custom-select-box.open .custom-select-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.custom-optgroup-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #818cf8;
+    padding: 8px 10px 4px 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 4px;
+}
+
+.custom-option {
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #cbd5e1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s ease;
+}
+
+.custom-option:hover {
+    background: rgba(56, 189, 248, 0.15);
+    color: #ffffff;
+    padding-left: 15px;
+}
+
+.custom-option.active {
+    background: linear-gradient(90deg, rgba(2, 132, 199, 0.35), rgba(79, 70, 229, 0.35)) !important;
     color: #38bdf8 !important;
-    font-weight: 700 !important;
-    padding: 8px 12px !important;
-    font-size: 0.92rem !important;
+    font-weight: 600;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.custom-option.floor-opt {
+    font-weight: 600;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.05);
+    margin: 2px 0;
+}
+
+.custom-option.room-opt {
+    padding-left: 20px;
 }
 
 .eq-actions-group {
