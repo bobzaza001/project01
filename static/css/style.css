@@ -984,6 +984,8 @@ a:hover { color: var(--pink); }
 
 /* ---------- Equipment Cards (คลังอุปกรณ์ + User Dashboard) ---------- */
 .equipment-grid {
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 1.75rem;
@@ -1330,6 +1332,11 @@ a:hover { color: var(--pink); }
 }
 
 /* ==================== Search & Filter Toolbar (Theme-Adaptive & Minimal) ==================== */
+.filter-wrapper {
+    position: relative;
+    z-index: 100;
+}
+
 .search-box-unified input {
     background: var(--bg-card) !important;
     border: 1px solid var(--glass-border) !important;
@@ -1351,6 +1358,11 @@ a:hover { color: var(--pink); }
 .custom-select-box {
     position: relative;
     user-select: none;
+    z-index: 1;
+}
+
+.custom-select-box.open {
+    z-index: 500 !important;
 }
 
 .custom-select-trigger {
@@ -1411,10 +1423,10 @@ a:hover { color: var(--pink); }
     border: 1px solid var(--glass-border) !important;
     border-radius: 14px;
     padding: 6px;
-    box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.25), 0 0 15px rgba(56, 189, 248, 0.15);
+    box-shadow: 0 20px 45px -5px rgba(0, 0, 0, 0.35), 0 0 20px rgba(56, 189, 248, 0.2);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    z-index: 1000;
+    z-index: 99999 !important;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px) scale(0.97);
