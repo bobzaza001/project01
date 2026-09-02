@@ -83,7 +83,7 @@
     <!-- Grid -->
     <div class="equipment-grid" id="equipmentGrid">
         {% for eq in equipment %}
-        <div class="equipment-card reveal-card" data-category="{{ eq.category }}" data-item-type="{{ eq.item_type }}" data-floor-id="{{ eq.room.floor_id if eq.room else '' }}" data-room-id="{{ eq.room_id or '' }}" data-borrowable="{{ 'true' if eq.is_borrowable else 'false' }}">
+        <div class="equipment-card reveal-card" style="--card-index: {{ loop.index0 }};" data-category="{{ eq.category }}" data-item-type="{{ eq.item_type }}" data-floor-id="{{ eq.room.floor_id if eq.room else '' }}" data-room-id="{{ eq.room_id or '' }}" data-borrowable="{{ 'true' if eq.is_borrowable else 'false' }}">
             
             <!-- รูปภาพ -->
             <div class="eq-image-wrapper">
