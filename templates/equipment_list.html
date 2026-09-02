@@ -137,23 +137,27 @@
                 <div class="eq-card-footer">
                     <!-- Badge จำนวนคงเหลือ พร้อม Live Pulse Dot -->
                     {% set is_avail = eq.available_quantity > 0 and eq.status != 'maintenance' %}
-                    <div class="eq-availability {{ 'available' if is_avail else 'unavailable' }}">
-                        {% if is_avail %}
-                            <span class="live-pulse-dot"></span>
-                            <span>พร้อมให้ยืม <strong>{{ eq.available_quantity }}</strong> / {{ eq.total_quantity }} ชิ้น</span>
-                        {% elif eq.status == 'maintenance' %}
-                            <i class="fas fa-wrench" style="color: #f59e0b;"></i>
-                            <span>อยู่ระหว่างซ่อมบำรุง</span>
-                        {% else %}
-                            <i class="fas fa-times-circle"></i>
-                            <span>ถูกยืมหมดคลัง (0 / {{ eq.total_quantity }})</span>
-                        {% endif %}
+                    {% if is_avail %}
+                    <div class="eq-availability available">
+                        <span class="live-pulse-dot dot-green"></span>
+                        <span>พร้อมให้ยืม <strong>{{ eq.available_quantity }}</strong> / {{ eq.total_quantity }} ชิ้น</span>
                     </div>
+                    {% elif eq.status == 'maintenance' %}
+                    <div class="eq-availability maintenance">
+                        <span class="live-pulse-dot dot-amber"></span>
+                        <span>อยู่ระหว่างซ่อมบำรุง</span>
+                    </div>
+                    {% else %}
+                    <div class="eq-availability unavailable">
+                        <span class="live-pulse-dot dot-red"></span>
+                        <span>ถูกยืมหมดคลัง (0 / {{ eq.total_quantity }})</span>
+                    </div>
+                    {% endif %}
 
                     <!-- แถบ Mini Stock Progress Bar -->
                     <div class="eq-stock-bar">
                         {% set stock_pct = ((eq.available_quantity / (eq.total_quantity if eq.total_quantity > 0 else 1)) * 100)|round|int %}
-                        <div class="eq-stock-fill" style="width: {{ stock_pct }}%; background: {{ '#10b981' if is_avail else '#ef4444' }};"></div>
+                        <div class="eq-stock-fill" style="width: {{ stock_pct }}%; background: {{ 'linear-gradient(90deg, #10b981, #34d399)' if is_avail else ('linear-gradient(90deg, #f59e0b, #fbbf24)' if eq.status == 'maintenance' else '#ef4444') }};"></div>
                     </div>
                     
                     <!-- ปุ่มการทำงาน -->

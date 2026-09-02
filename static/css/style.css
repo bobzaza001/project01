@@ -949,28 +949,58 @@ a:hover { color: var(--pink); }
 .eq-availability.available {
     background: rgba(16, 185, 129, 0.12);
     color: #10b981;
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+}
+.eq-availability.maintenance {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.35);
 }
 .eq-availability.unavailable {
     background: rgba(239, 68, 68, 0.12);
     color: #ef4444;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    border: 1px solid rgba(239, 68, 68, 0.35);
 }
 
-/* Live Pulsing Dot */
+/* Live Pulsing Dots */
 .live-pulse-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
     display: inline-block;
+}
+
+.live-pulse-dot.dot-green {
     background-color: #10b981;
     box-shadow: 0 0 0 rgba(16, 185, 129, 0.7);
-    animation: livePulse 1.8s infinite;
+    animation: livePulseGreen 1.8s infinite;
 }
-@keyframes livePulse {
+@keyframes livePulseGreen {
     0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8); transform: scale(0.95); }
     70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); transform: scale(1.15); }
     100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); transform: scale(0.95); }
+}
+
+.live-pulse-dot.dot-amber {
+    background-color: #f59e0b;
+    box-shadow: 0 0 0 rgba(245, 158, 11, 0.7);
+    animation: livePulseAmber 1.8s infinite;
+}
+@keyframes livePulseAmber {
+    0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.8); transform: scale(0.95); }
+    70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); transform: scale(1.15); }
+    100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); transform: scale(0.95); }
+}
+
+.live-pulse-dot.dot-red {
+    background-color: #ef4444;
+    box-shadow: 0 0 0 rgba(239, 68, 68, 0.7);
+    animation: livePulseRed 1.8s infinite;
+}
+@keyframes livePulseRed {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); transform: scale(0.95); }
+    70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); transform: scale(1.15); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); transform: scale(0.95); }
 }
 
 /* Stock Progress Bar */
