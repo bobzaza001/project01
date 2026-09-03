@@ -1016,6 +1016,8 @@ a:hover { color: var(--pink); }
     transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: var(--shadow);
     position: relative;
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 420px;
 }
 
 .equipment-card:hover {
