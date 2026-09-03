@@ -367,3 +367,134 @@ function updatePasswordStrength(password) {
     strengthDiv.style.background = level.color;
     strengthDiv.style.height = '4px';
 }
+
+// ==================== ระบบบีบอัดรูปภาพอัตโนมัติก่อนส่ง (Client-Side Image Auto-Compressor) ====================
+/**
+ * บีบอัดและปรับขนาดรูปภาพอัตโนมัติในเบราว์เซอร์ก่อนส่งขึ้น Server
+ * ป้องกันปัญหา 413: PAYLOAD_TOO_LARGE ของ Vercel Serverless (ที่จำกัดขนาด 4.5MB)
+ * รองรับกล้องมือถือความละเอียดสูง 10MB - 30MB ให้เหลือขนาดกะทัดรัด (~200KB - 400KB) โดยยังคมชัด 100%
+ */
+async function compressImageFile(file, maxWidth = 1280, maxHeight = 1280, quality = 0.82) {
+    if (!file || !file.type.startsWith('image/')) return file;
+    // ถ้าไฟล์เล็กกว่า 500KB อยู่แล้ว ไม่ต้องบีบอัดซ้ำ
+    if (file.size <= 500 * 1024) return file;
+
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function(event) {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = function() {
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = Math.round((width * maxHeight) / height);
+                        height = maxHeight;
+                    }
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                canvas.toBlob(function(blob) {
+                    if (!blob) {
+                        resolve(file);
+                        return;
+                    }
+                    const cleanName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+                    const compressedFile = new File([blob], cleanName, {
+                        type: 'image/jpeg',
+                        lastModified: Date.now()
+                    });
+                    resolve(compressedFile);
+                }, 'image/jpeg', quality);
+            };
+            img.onerror = function() {
+                resolve(file);
+            };
+        };
+        reader.onerror = function() {
+            resolve(file);
+        };
+    });
+}
+
+/** ผูกระบบบีบอัดเข้ากับ input[type="file"] ทุกช่องในระบบแบบอัตโนมัติ */
+document.addEventListener('change', async function(e) {
+    const input = e.target;
+    if (input.tagName === 'INPUT' && input.type === 'file' && input.files && input.files[0]) {
+        const file = input.files[0];
+        if (file.type.startsWith('image/') && file.size > 500 * 1024) {
+            // แสดง Toast แจ้งเตือนว่ากำลังปรับขนาดรูปภาพ
+            const originalSizeMb = (file.size / (1024 * 1024)).toFixed(1);
+            const compressed = await compressImageFile(file);
+            const newSizeKb = Math.round(compressed.size / 1024);
+
+            if (window.DataTransfer) {
+                const dt = new DataTransfer();
+                dt.items.add(compressed);
+                input.files = dt.files;
+            }
+            console.log(`[Image Auto-Compress] ${file.name}: ${originalSizeMb}MB -> ${newSizeKb}KB`);
+        }
+    }
+});
+
+/** ดักจับตอน submit form เพื่อความปลอดภัย 100% ว่าไม่มีไฟล์รูปเกินขนาดหลุดขึ้น Serverless */
+document.addEventListener('submit', async function(e) {
+    const form = e.target;
+    if (form.getAttribute('data-submitting') === 'true') return;
+    
+    const fileInputs = form.querySelectorAll('input[type="file"]');
+    if (!fileInputs || fileInputs.length === 0) return;
+
+    let hasOversized = false;
+    for (const input of fileInputs) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            if (file.type.startsWith('image/') && file.size > 500 * 1024) {
+                hasOversized = true;
+                break;
+            }
+        }
+    }
+
+    if (hasOversized) {
+        e.preventDefault();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        let originalBtnHtml = '';
+        if (submitBtn) {
+            originalBtnHtml = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังประมวลผลรูป...';
+        }
+
+        for (const input of fileInputs) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (file.type.startsWith('image/') && file.size > 500 * 1024) {
+                    const compressed = await compressImageFile(file);
+                    if (window.DataTransfer) {
+                        const dt = new DataTransfer();
+                        dt.items.add(compressed);
+                        input.files = dt.files;
+                    }
+                }
+            }
+        }
+
+        form.setAttribute('data-submitting', 'true');
+        form.submit();
+    }
+}, true);

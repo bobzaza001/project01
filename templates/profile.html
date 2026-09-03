@@ -37,7 +37,7 @@
                         <label for="profile_image" style="position: absolute; bottom: 5px; right: 5px; background: var(--gradient-btn); color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.4); border: 2px solid var(--bg-card-solid); transition: var(--transition);" title="เปลี่ยนรูปโปรไฟล์">
                             <i class="fas fa-camera"></i>
                         </label>
-                        <input type="file" id="profile_image" name="profile_image" accept="image/*" style="display: none;" onchange="document.getElementById('profileImgForm').submit();">
+                        <input type="file" id="profile_image" name="profile_image" accept="image/*" style="display: none;" onchange="submitProfileImage(this);">
                     </div>
                 </form>
 
@@ -125,4 +125,23 @@
 
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function submitProfileImage(input) {
+    if (input.files && input.files[0]) {
+        let file = input.files[0];
+        if (file.type.startsWith('image/') && file.size > 500 * 1024) {
+            file = await compressImageFile(file, 800, 800, 0.85);
+            if (window.DataTransfer) {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                input.files = dt.files;
+            }
+        }
+        document.getElementById('profileImgForm').submit();
+    }
+}
+</script>
 {% endblock %}
