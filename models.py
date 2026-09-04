@@ -46,6 +46,9 @@ class User(UserMixin, db.Model):
     role = db.Column(db.String(10), nullable=False, default='user')
     profile_image = db.Column(db.Text, default='')
     student_id = db.Column(db.String(20), unique=True, nullable=True, index=True)
+    is_verified = db.Column(db.Boolean, default=False, nullable=False)
+    verification_token = db.Column(db.String(100), nullable=True, index=True)
+    verification_sent_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=get_local_now)
     
     borrow_requests = db.relationship('BorrowRequest', backref='requester', lazy='dynamic')

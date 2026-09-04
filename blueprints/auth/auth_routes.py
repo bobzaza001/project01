@@ -55,6 +55,12 @@ def login():
             flash('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'danger')
             return redirect(url_for('auth.login'))
         
+        # ตรวจสอบการยืนยันอีเมล (ยกเว้นผู้ดูแลระบบ)
+        if not getattr(user, 'is_verified', True) and not user.is_admin():
+            resend_url = url_for('auth.resend_verification', email=user.email)
+            flash(f'⚠️ บัญชีของคุณยังไม่ได้รับการยืนยันตัวตนผ่านอีเมล กรุณาตรวจสอบอีเมลและกดยืนยัน หรือ <a href="{resend_url}" style="color: #38bdf8; font-weight: bold; text-decoration: underline;">คลิกที่นี่เพื่อขอรับอีเมลยืนยันอีกครั้ง</a>', 'warning')
+            return redirect(url_for('auth.login'))
+        
         login_user(user, remember=bool(remember))
         session['show_login_intro'] = True
         flash(f'ยินดีต้อนรับ {user.full_name}!', 'success')
@@ -173,24 +179,105 @@ def register():
                 flash(error, 'danger')
             return redirect(url_for('auth.register'))
         
+        import secrets
+        verification_token = secrets.token_urlsafe(32)
+
         new_user = User(
             username=username,
             student_id=student_id_val,
             email=email,
             full_name=full_name,
-            role='user'
+            role='user',
+            is_verified=False,
+            verification_token=verification_token,
+            verification_sent_at=get_local_now()
         )
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
         
-        if account_type == 'student':
-            flash(f'สมัครสมาชิกสำเร็จด้วยรหัสนักศึกษา {username}! กรุณาเข้าสู่ระบบและไปตั้งชื่อ-นามสกุลจริงที่หน้าโปรไฟล์', 'success')
-        else:
-            flash(f'สมัครสมาชิกสำเร็จ! ยินดีต้อนรับ {full_name}', 'success')
+        # ส่งอีเมลยืนยันตัวตนพร้อมปุ่มกด Activate
+        try:
+            from notifications import send_verification_email
+            verify_url = url_for('auth.verify_email', token=verification_token, _external=True)
+            send_verification_email(new_user, verify_url)
+        except Exception as e:
+            print(f"Error sending verification email: {e}")
+
+        flash(f'🎉 สมัครสมาชิกสำเร็จ! ระบบได้ส่งอีเมลยืนยันตัวตนไปที่ "{email}" แล้ว กรุณาเปิดอีเมลและกดปุ่มยืนยันเพื่อเปิดใช้งานบัญชีของคุณก่อนเข้าสู่ระบบ', 'success')
         return redirect(url_for('auth.login'))
     
     return render_template('register.html')
+
+@auth_bp.route('/verify-email/<token>')
+def verify_email(token):
+    """ลิงก์สำหรับยืนยันอีเมลเมื่อผู้ใช้กดปุ่มในอีเมล"""
+    if not token:
+        flash('❌ ลิงก์ยืนยันตัวตนไม่ถูกต้อง', 'danger')
+        return redirect(url_for('auth.login'))
+
+    user = User.query.filter_by(verification_token=token).first()
+    if not user:
+        flash('❌ ลิงก์ยืนยันตัวตนไม่ถูกต้อง หรือบัญชีนี้ได้รับการยืนยันเรียบร้อยแล้ว', 'warning')
+        return redirect(url_for('auth.login'))
+
+    # ตรวจสอบอายุ Token (24 ชั่วโมง)
+    if user.verification_sent_at:
+        now = get_local_now()
+        if now - user.verification_sent_at > timedelta(hours=24):
+            flash('⚠️ ลิงก์ยืนยันตัวตนนี้หมดอายุแล้ว (เกิน 24 ชั่วโมง) กรุณาขอรับอีเมลยืนยันใหม่อีกครั้ง', 'warning')
+            return redirect(url_for('auth.resend_verification', email=user.email))
+
+    user.is_verified = True
+    user.verification_token = None
+    db.session.commit()
+
+    flash(f'🎉 ยืนยันอีเมลสำเร็จเรียบร้อยแล้ว! บัญชีของคุณ ({user.full_name}) พร้อมใช้งานแล้ว กรุณาเข้าสู่ระบบ', 'success')
+    return redirect(url_for('auth.login'))
+
+@auth_bp.route('/resend-verification', methods=['GET', 'POST'])
+def resend_verification():
+    """หน้าสำหรับขอส่งอีเมลยืนยันตัวตนใหม่อีกครั้ง"""
+    prefilled_email = request.args.get('email', '')
+    
+    if request.method == 'POST':
+        identifier = request.form.get('identifier', '').strip()
+        if not identifier:
+            flash('กรุณากรอกอีเมลสถาบัน หรือรหัสนักศึกษา', 'warning')
+            return render_template('resend_verification.html', email=prefilled_email)
+
+        user = User.query.filter(
+            (User.email == identifier) |
+            (User.student_id == identifier) |
+            (User.username == identifier)
+        ).first()
+
+        if not user:
+            flash('ไม่พบบัญชีผู้ใช้งานนี้ในระบบ กรุณาตรวจสอบข้อมูลอีกครั้ง', 'danger')
+            return render_template('resend_verification.html', email=identifier)
+
+        if user.is_verified:
+            flash('บัญชีนี้ได้รับการยืนยันตัวตนเรียบร้อยแล้ว สามารถเข้าสู่ระบบได้ทันที', 'info')
+            return redirect(url_for('auth.login'))
+
+        # สร้าง token ใหม่และส่งอีเมล
+        import secrets
+        new_token = secrets.token_urlsafe(32)
+        user.verification_token = new_token
+        user.verification_sent_at = get_local_now()
+        db.session.commit()
+
+        try:
+            from notifications import send_verification_email
+            verify_url = url_for('auth.verify_email', token=new_token, _external=True)
+            send_verification_email(user, verify_url)
+        except Exception as e:
+            print(f"Error sending verification email: {e}")
+
+        flash(f'✉️ ส่งลิงก์ยืนยันตัวตนไปยังอีเมล "{user.email}" เรียบร้อยแล้ว กรุณาตรวจสอบกล่องจดหมายของคุณ', 'success')
+        return redirect(url_for('auth.login'))
+
+    return render_template('resend_verification.html', email=prefilled_email)
 
 @auth_bp.route('/logout')
 @login_required

@@ -257,3 +257,56 @@ def check_and_send_due_warnings():
 
     except Exception as e:
         logger.error(f"❌ Scheduler check_and_send_due_warnings ล้มเหลว: {e}")
+
+
+def send_verification_email(user, verify_url):
+    """ส่งอีเมลยืนยันการสมัครสมาชิก พร้อมปุ่มกด Activate Account"""
+    user_type_label = "นักเรียน / นักศึกษา" if user.is_student() else ("อาจารย์ / บุคลากร" if user.is_teacher() else "ผู้ใช้งาน")
+    
+    content = f"""
+    <div style="text-align: center; margin-bottom: 24px;">
+        <div style="display: inline-block; width: 64px; height: 64px; line-height: 64px; border-radius: 50%; background: #e0f2fe; color: #0284c7; font-size: 28px; margin-bottom: 12px;">
+            ✉️
+        </div>
+        <h2 style="color: #0f172a; margin: 0 0 8px; font-size: 1.35rem; font-weight: 700;">
+            ยืนยันที่อยู่อีเมลของคุณ
+        </h2>
+        <p style="color: #64748b; margin: 0; font-size: 0.95rem;">
+            ระบบบริหารจัดการและยืม-คืนครุภัณฑ์ แผนกเทคโนโลยีสารสนเทศ ATCC
+        </p>
+    </div>
+
+    <p style="color: #334155; line-height: 1.6; margin: 0 0 16px; font-size: 1rem;">
+        สวัสดีครับ/ค่ะ คุณ<strong>{user.full_name}</strong>,
+    </p>
+    <p style="color: #475569; line-height: 1.6; margin: 0 0 24px; font-size: 0.95rem;">
+        ขอบคุณสำหรับการลงทะเบียนเข้าใช้งานในสถานะ <strong>{user_type_label}</strong> กรุณาคลิกปุ่มด้านล่างนี้เพื่อยืนยันความเป็นเจ้าของอีเมลและเปิดใช้งานบัญชีของคุณ:
+    </p>
+
+    <!-- Call to Action Button -->
+    <div style="text-align: center; margin: 32px 0;">
+        <a href="{verify_url}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%); color: #ffffff; text-decoration: none; padding: 14px 36px; border-radius: 12px; font-size: 1.05rem; font-weight: 700; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4); letter-spacing: 0.5px;">
+            🔐 ยืนยันบัญชีผู้ใช้งานทันที
+        </a>
+    </div>
+
+    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+        <p style="color: #64748b; font-size: 0.85rem; margin: 0 0 8px;">
+            หากปุ่มด้านบนกดไม่ได้ สามารถคัดลอกลิงก์ด้านล่างนี้ไปเปิดในเว็บเบราว์เซอร์ของคุณได้โดยตรง:
+        </p>
+        <a href="{verify_url}" style="color: #0284c7; font-size: 0.82rem; word-break: break-all; text-decoration: underline;">
+            {verify_url}
+        </a>
+    </div>
+
+    <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; font-size: 0.85rem; color: #854d0e; line-height: 1.5;">
+        ⏳ <strong>หมายเหตุ:</strong> ลิงก์ยืนยันตัวตนนี้มีอายุการใช้งาน <strong>24 ชั่วโมง</strong> หากคุณไม่ได้เป็นผู้ทำรายการสมัครสมาชิก สามารถเพิกเฉยต่ออีเมลฉบับนี้ได้
+    </div>
+    """
+
+    return send_email(
+        to=user.email,
+        subject='✉️ ยืนยันที่อยู่อีเมลของคุณ — ระบบยืม-คืนครุภัณฑ์ ATCC',
+        body_html=_email_wrapper(content)
+    )
+
