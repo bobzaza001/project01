@@ -233,11 +233,10 @@
                             <td>
                                 {% if req.status == 'pending' %}
                                 <div class="action-btns">
-                                    <form method="POST" action="{{ url_for('admin.approve_borrow', req_id=req.id) }}" style="display:inline;">
-                                        <button type="submit" class="btn btn-sm btn-success" title="อนุมัติ" onclick="return confirm('ยืนยันอนุมัติคำขอยืมนี้?');">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-sm btn-success" title="อนุมัติการยืม" 
+                                            onclick="openApproveBorrowModal({{ req.id }}, '{{ req.requester.full_name | replace("'", "\\'") }}', '{{ req.equipment.name | replace("'", "\\'") }}', '{{ req.equipment.equipment_code }}', '{{ req.borrow_days or 3 }} วัน ({{ req.borrow_datetime.strftime('%d/%m/%Y %H:%M') }})')">
+                                        <i class="fas fa-check"></i>
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-danger" title="ปฏิเสธคำขอยืม" 
                                             onclick="openRejectModal({{ req.id }}, '{{ req.requester.full_name | replace("'", "\\'") }}', '{{ req.equipment.name | replace("'", "\\'") }}', '{{ req.equipment.equipment_code }}')">
                                         <i class="fas fa-times"></i>
@@ -251,11 +250,10 @@
                                     </button>
                                 </form>
                                 {% elif req.status == 'return_pending' %}
-                                <form method="POST" action="{{ url_for('admin.approve_return', req_id=req.id) }}" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-success" title="ยืนยันรับคืนเข้าคลัง" style="margin-top: 5px;">
-                                        <i class="fas fa-box-open"></i> รับของคืน
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-sm btn-success" title="ยืนยันรับคืนเข้าคลัง" style="margin-top: 5px;"
+                                        onclick="openApproveReturnModal({{ req.id }}, '{{ req.requester.full_name | replace("'", "\\'") }}', '{{ req.equipment.name | replace("'", "\\'") }}', '{{ req.equipment.equipment_code }}', '{{ req.damage_status or 'normal' }}', '{{ (req.damage_note or '') | replace("'", "\\'") }}')">
+                                    <i class="fas fa-box-open"></i> รับของคืน
+                                </button>
                                 {% elif req.status in ['returned', 'rejected'] %}
                                 <form method="POST" action="{{ url_for('admin.dismiss_request', req_id=req.id) }}" style="display:inline;" onsubmit="return confirm('ลบรายการนี้ออกจากหน้าแดชบอร์ด? (ประวัติยังคงตรวจสอบได้ในหน้าประวัติการยืมทั้งหมด)');">
                                     <button type="submit" class="btn btn-sm btn-secondary" style="border-radius: 8px; padding: 4px 8px; font-size: 0.78rem; opacity: 0.85;" title="ลบออกจากแดชบอร์ด">
@@ -536,9 +534,120 @@
     </div>
 </div>
 
+<!-- Approve Borrow Confirmation Modal -->
+<div id="approveBorrowModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.65); backdrop-filter: blur(5px);">
+    <div class="modal-content fade-in" style="background: linear-gradient(145deg, #0f2b23, #064e3b); margin: 10% auto; padding: 2rem; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.3); width: 90%; max-width: 480px; color: white; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 25px rgba(16, 185, 129, 0.2);">
+        <span class="close-modal" onclick="closeApproveBorrowModal()" style="color: #aaa; position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        <h2 style="margin-bottom: 0.5rem; color: #34d399; font-size: 1.35rem; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-circle-check"></i> ยืนยันการอนุมัติให้ยืม
+        </h2>
+        <p style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 1.2rem;">
+            คุณต้องการอนุมัติคำขอยืมครุภัณฑ์/วัสดุรายการนี้ใช่หรือไม่?
+        </p>
+        
+        <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1rem; margin-bottom: 1.25rem; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="font-size: 0.92rem; color: #e2e8f0; margin-bottom: 6px;">
+                👤 ผู้ขอยืม: <strong id="approveUserName" style="color: #6ee7b7;">-</strong>
+            </div>
+            <div style="font-size: 0.92rem; color: #e2e8f0; margin-bottom: 6px;">
+                📦 ครุภัณฑ์: <strong id="approveEquipmentName" style="color: #fff;">-</strong> (<span id="approveEquipmentCode" class="code-badge" style="background: rgba(16,185,129,0.2); color: #6ee7b7; border-color: rgba(16,185,129,0.4);">-</span>)
+            </div>
+            <div style="font-size: 0.88rem; color: #94a3b8;">
+                ⏰ ระยะเวลา/วันที่: <span id="approveBorrowInfo" style="color: #cbd5e1; font-weight: 600;">-</span>
+            </div>
+        </div>
+
+        <form id="approveBorrowForm" method="POST" action="">
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-secondary" onclick="closeApproveBorrowModal()" style="border-radius: 8px; padding: 0.5rem 1.2rem;">
+                    ยกเลิก
+                </button>
+                <button type="submit" class="btn btn-success" style="border-radius: 8px; padding: 0.5rem 1.4rem; font-weight: bold; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">
+                    <i class="fas fa-check"></i> ยืนยันอนุมัติ
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Approve Return Confirmation Modal -->
+<div id="approveReturnModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.65); backdrop-filter: blur(5px);">
+    <div class="modal-content fade-in" style="background: linear-gradient(145deg, #1e1b4b, #2e1065); margin: 10% auto; padding: 2rem; border-radius: 20px; border: 1px solid rgba(168, 85, 247, 0.3); width: 90%; max-width: 480px; color: white; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 25px rgba(168, 85, 247, 0.2);">
+        <span class="close-modal" onclick="closeApproveReturnModal()" style="color: #aaa; position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+        <h2 style="margin-bottom: 0.5rem; color: #c084fc; font-size: 1.35rem; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-box-open"></i> ยืนยันการรับคืนเข้าคลัง
+        </h2>
+        <p style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 1.2rem;">
+            ตรวจสอบและยืนยันการรับคืนอุปกรณ์กลับเข้าสู่คลัง
+        </p>
+        
+        <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1rem; margin-bottom: 1.25rem; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="font-size: 0.92rem; color: #e2e8f0; margin-bottom: 6px;">
+                👤 ผู้ส่งคืน: <strong id="returnUserName" style="color: #d8b4fe;">-</strong>
+            </div>
+            <div style="font-size: 0.92rem; color: #e2e8f0; margin-bottom: 6px;">
+                📦 ครุภัณฑ์: <strong id="returnEquipmentName" style="color: #fff;">-</strong> (<span id="returnEquipmentCode" class="code-badge" style="background: rgba(168,85,247,0.2); color: #d8b4fe; border-color: rgba(168,85,247,0.4);">-</span>)
+            </div>
+            <div id="returnDamageBox" style="margin-top: 8px; font-size: 0.85rem; padding: 6px 10px; border-radius: 6px; background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); display: none;">
+                <i class="fas fa-triangle-exclamation"></i> สภาพอุปกรณ์: <strong id="returnDamageText">ชำรุด</strong>
+            </div>
+        </div>
+
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 8px; padding: 10px; margin-bottom: 1.25rem; font-size: 0.82rem; color: #93c5fd;">
+            💡 <strong>หมายเหตุ:</strong> เมื่อกดยืนยัน ระบบจะทำการบันทึกประวัติการคืน และเพิ่มยอดคงเหลือของอุปกรณ์กลับเข้าคลังอัตโนมัติ
+        </div>
+
+        <form id="approveReturnForm" method="POST" action="">
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-secondary" onclick="closeApproveReturnModal()" style="border-radius: 8px; padding: 0.5rem 1.2rem;">
+                    ยกเลิก
+                </button>
+                <button type="submit" class="btn btn-success" style="border-radius: 8px; padding: 0.5rem 1.4rem; font-weight: bold; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">
+                    <i class="fas fa-box-open"></i> ยืนยันรับของคืน
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Load Chart.js and render beautiful dark neon charts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    function openApproveBorrowModal(id, userName, eqName, eqCode, borrowInfo) {
+        document.getElementById('approveUserName').textContent = userName;
+        document.getElementById('approveEquipmentName').textContent = eqName;
+        document.getElementById('approveEquipmentCode').textContent = eqCode;
+        document.getElementById('approveBorrowInfo').textContent = borrowInfo;
+        document.getElementById('approveBorrowForm').action = '/admin/approve_borrow/' + id;
+        document.getElementById('approveBorrowModal').style.display = 'block';
+    }
+
+    function closeApproveBorrowModal() {
+        document.getElementById('approveBorrowModal').style.display = 'none';
+    }
+
+    function openApproveReturnModal(id, userName, eqName, eqCode, damageStatus, damageNote) {
+        document.getElementById('returnUserName').textContent = userName;
+        document.getElementById('returnEquipmentName').textContent = eqName;
+        document.getElementById('returnEquipmentCode').textContent = eqCode;
+        
+        const damageBox = document.getElementById('returnDamageBox');
+        const damageText = document.getElementById('returnDamageText');
+        if (damageStatus === 'damaged') {
+            damageBox.style.display = 'block';
+            damageText.textContent = damageNote ? ('ชำรุด (' + damageNote + ')') : 'ชำรุด';
+        } else {
+            damageBox.style.display = 'none';
+        }
+
+        document.getElementById('approveReturnForm').action = '/admin/approve_return/' + id;
+        document.getElementById('approveReturnModal').style.display = 'block';
+    }
+
+    function closeApproveReturnModal() {
+        document.getElementById('approveReturnModal').style.display = 'none';
+    }
+
     function openRejectModal(id, userName, eqName, eqCode) {
         document.getElementById('rejectUserName').textContent = userName;
         document.getElementById('rejectEquipmentName').textContent = eqName;
@@ -571,6 +680,14 @@
     }
 
     window.onclick = function(event) {
+        const approveModal = document.getElementById('approveBorrowModal');
+        if (event.target == approveModal) {
+            closeApproveBorrowModal();
+        }
+        const returnModal = document.getElementById('approveReturnModal');
+        if (event.target == returnModal) {
+            closeApproveReturnModal();
+        }
         const disposeModal = document.getElementById('disposeModal');
         if (event.target == disposeModal) {
             closeDisposeModal();
