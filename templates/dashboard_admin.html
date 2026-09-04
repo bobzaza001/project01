@@ -198,9 +198,9 @@
                                         {% endif %}
                                         {% if req.return_image_url %}
                                         <div style="margin-top: 5px;">
-                                            <a href="{{ req.return_image_url }}" target="_blank" style="color: #60a5fa; font-size: 0.75rem; text-decoration: underline;">
+                                            <button type="button" onclick="openLightbox('{{ req.return_image_url }}', 'ภาพถ่ายสภาพตอนส่งคืน: {{ req.equipment.name }}');" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 6px; padding: 3px 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">
                                                 <i class="fas fa-image"></i> ดูรูปสภาพส่งคืน
-                                            </a>
+                                            </button>
                                         </div>
                                         {% endif %}
                                     {% elif req.status == 'returned' %}
@@ -210,9 +210,9 @@
                                         {% endif %}
                                         {% if req.return_image_url %}
                                         <div style="margin-top: 5px;">
-                                            <a href="{{ req.return_image_url }}" target="_blank" style="color: #60a5fa; font-size: 0.75rem; text-decoration: underline;">
+                                            <button type="button" onclick="openLightbox('{{ req.return_image_url }}', 'ภาพถ่ายสภาพตอนส่งคืน: {{ req.equipment.name }}');" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 6px; padding: 3px 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s;">
                                                 <i class="fas fa-image"></i> ดูรูปสภาพส่งคืน
-                                            </a>
+                                            </button>
                                         </div>
                                         {% endif %}
                                     {% elif req.status == 'rejected' %}
